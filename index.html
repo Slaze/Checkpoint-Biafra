@@ -1,0 +1,2426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#2C3E1F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Checkpoint Biafra">
+<meta name="description" content="A border checkpoint game set during the Biafran secession.">
+<title>CHECKPOINT BIAFRA</title>
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --olive: #2C3E1F;
+  --olive-light: #3D5429;
+  --olive-dark: #1A2610;
+  --paper: #F2E8D0;
+  --paper-dark: #E8D9B8;
+  --paper-worn: #DDD0B0;
+  --ink: #1A1A18;
+  --ink-faded: #3A3A36;
+  --red: #C0392B;
+  --red-stamp: #8B0000;
+  --blue-fiba: #1B3A5C;
+  --blue-fiba-light: #2851A3;
+  --biafra-gold: #D4A017;
+  --biafra-green: #006B3F;
+  --naira-green: #008751;
+  --white: #F8F5EE;
+  --shadow: rgba(0,0,0,0.4);
+  --vignette: rgba(0,0,0,0);
+  --desk-texture: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.03) 2px,
+    rgba(0,0,0,0.03) 4px
+  );
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--olive-dark);
+  font-family: 'Noto Serif', serif;
+  color: var(--ink);
+  touch-action: none;
+  user-select: none;
+}
+
+/* ═══ SCREENS ═══ */
+.screen { position: fixed; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10; }
+.screen.active { display: flex; }
+
+/* ═══ SPLASH ═══ */
+#splash {
+  background: var(--olive-dark);
+  background-image: 
+    radial-gradient(ellipse at 50% 30%, rgba(44,62,31,0.8) 0%, transparent 70%),
+    repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(255,255,255,0.01) 40px, rgba(255,255,255,0.01) 41px),
+    repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(255,255,255,0.01) 40px, rgba(255,255,255,0.01) 41px);
+}
+
+.splash-content {
+  text-align: center;
+  padding: 40px 24px;
+  animation: fadeInUp 1.2s ease both;
+}
+
+.splash-sun {
+  width: 80px; height: 80px;
+  margin: 0 auto 24px;
+  position: relative;
+  animation: rotateSun 20s linear infinite;
+}
+
+.sun-circle {
+  width: 40px; height: 40px;
+  background: var(--biafra-gold);
+  border-radius: 50%;
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 20px rgba(212,160,23,0.5);
+}
+
+.sun-ray {
+  position: absolute;
+  width: 3px;
+  height: 20px;
+  background: var(--biafra-gold);
+  top: 50%; left: 50%;
+  transform-origin: bottom center;
+  border-radius: 2px;
+  opacity: 0.8;
+}
+
+.splash-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(36px, 8vw, 64px);
+  letter-spacing: 0.1em;
+  color: var(--paper);
+  line-height: 1;
+  margin-bottom: 8px;
+  text-shadow: 2px 2px 0 var(--olive-dark), 4px 4px 0 rgba(0,0,0,0.3);
+}
+
+.splash-subtitle {
+  font-family: 'Courier Prime', monospace;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--biafra-gold);
+  text-transform: uppercase;
+  margin-bottom: 32px;
+}
+
+.splash-tagline {
+  font-family: 'Noto Serif', serif;
+  font-style: italic;
+  font-size: 14px;
+  color: rgba(242,232,208,0.7);
+  max-width: 280px;
+  margin: 0 auto 40px;
+  line-height: 1.6;
+}
+
+.btn-primary {
+  background: var(--biafra-gold);
+  color: var(--olive-dark);
+  border: none;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: 0.15em;
+  padding: 14px 40px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s;
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+}
+
+.btn-primary:hover, .btn-primary:active {
+  background: var(--paper);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(212,160,23,0.4);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--paper-dark);
+  border: 1px solid rgba(242,232,208,0.3);
+  font-family: 'Courier Prime', monospace;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  padding: 10px 28px;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover { border-color: var(--paper); color: var(--paper); }
+
+.splash-version {
+  position: absolute;
+  bottom: 20px;
+  font-family: 'Courier Prime', monospace;
+  font-size: 10px;
+  color: rgba(242,232,208,0.3);
+  letter-spacing: 0.2em;
+}
+
+/* ═══ CHARACTER CREATION ═══ */
+#char-create {
+  background: var(--olive);
+  overflow-y: auto;
+  padding: 0;
+  justify-content: flex-start;
+}
+
+.cc-header {
+  width: 100%;
+  background: var(--blue-fiba);
+  padding: 16px 20px 12px;
+  border-bottom: 3px solid var(--biafra-gold);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.cc-header-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--biafra-gold);
+}
+
+.cc-header-sub {
+  font-family: 'Courier Prime', monospace;
+  font-size: 18px;
+  color: var(--paper);
+  letter-spacing: 0.05em;
+}
+
+.cc-body {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 24px 20px 80px;
+}
+
+.cc-section {
+  margin-bottom: 28px;
+  animation: fadeInUp 0.4s ease both;
+}
+
+.cc-label {
+  font-family: 'Courier Prime', monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: var(--biafra-gold);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.cc-input {
+  width: 100%;
+  background: rgba(242,232,208,0.08);
+  border: 1px solid rgba(242,232,208,0.2);
+  border-bottom: 2px solid var(--biafra-gold);
+  color: var(--paper);
+  font-family: 'Courier Prime', monospace;
+  font-size: 16px;
+  padding: 10px 12px;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.cc-input:focus { background: rgba(242,232,208,0.12); border-color: var(--biafra-gold); }
+.cc-input::placeholder { color: rgba(242,232,208,0.3); }
+
+.cc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.cc-option {
+  background: rgba(242,232,208,0.05);
+  border: 1px solid rgba(242,232,208,0.15);
+  color: var(--paper-dark);
+  font-family: 'Courier Prime', monospace;
+  font-size: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  position: relative;
+  line-height: 1.4;
+}
+
+.cc-option:hover { border-color: var(--biafra-gold); background: rgba(212,160,23,0.1); }
+.cc-option.selected { border-color: var(--biafra-gold); background: rgba(212,160,23,0.2); color: var(--paper); }
+.cc-option.selected::after { content: '✓'; position: absolute; top: 6px; right: 8px; color: var(--biafra-gold); font-size: 14px; }
+
+.cc-option-title { font-weight: 700; display: block; margin-bottom: 2px; font-size: 13px; }
+.cc-option-desc { font-size: 10px; opacity: 0.7; }
+
+.cc-divider {
+  border: none;
+  border-top: 1px solid rgba(242,232,208,0.1);
+  margin: 24px 0;
+}
+
+.cc-lore {
+  background: rgba(192,57,43,0.1);
+  border-left: 3px solid var(--red);
+  padding: 12px 16px;
+  font-family: 'Noto Serif', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: rgba(242,232,208,0.8);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.cc-proceed {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--olive-dark);
+  padding: 16px 20px;
+  border-top: 1px solid rgba(242,232,208,0.1);
+}
+
+/* ═══ INTRO NARRATIVE ═══ */
+#intro {
+  background: #0A0D07;
+  padding: 0;
+}
+
+.intro-scroll {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.intro-text {
+  font-family: 'Noto Serif', serif;
+  font-size: clamp(14px, 3.5vw, 18px);
+  color: var(--paper);
+  line-height: 1.9;
+  max-width: 520px;
+  padding: 40px 28px;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.intro-text.visible { opacity: 1; transform: translateY(0); }
+.intro-text em { color: var(--biafra-gold); font-style: normal; }
+.intro-text strong { color: var(--red); }
+
+.intro-skip {
+  position: absolute;
+  bottom: 24px; right: 24px;
+  font-family: 'Courier Prime', monospace;
+  font-size: 11px;
+  color: rgba(242,232,208,0.4);
+  letter-spacing: 0.2em;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.intro-skip:hover { color: var(--paper); }
+
+/* ═══ BULLETIN SCREEN ═══ */
+#bulletin-screen {
+  background: rgba(10,13,7,0.97);
+  padding: 20px;
+}
+
+.bulletin-paper {
+  background: var(--paper);
+  max-width: 500px;
+  width: 100%;
+  padding: 28px 24px;
+  position: relative;
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.4), 8px 8px 0 rgba(0,0,0,0.2);
+  animation: slideDown 0.4s ease both;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.bulletin-paper::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 6px;
+  background: var(--blue-fiba);
+}
+
+.bulletin-header {
+  text-align: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--ink-faded);
+}
+
+.bulletin-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.4em;
+  color: var(--blue-fiba);
+  display: block;
+}
+
+.bulletin-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  color: var(--ink);
+  letter-spacing: 0.1em;
+}
+
+.bulletin-num {
+  font-family: 'Courier Prime', monospace;
+  font-size: 11px;
+  color: var(--ink-faded);
+}
+
+.bulletin-body {
+  font-family: 'Courier Prime', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--ink);
+}
+
+.bulletin-rule {
+  background: rgba(27,58,92,0.08);
+  border-left: 3px solid var(--blue-fiba);
+  padding: 8px 12px;
+  margin: 10px 0;
+  font-size: 12px;
+}
+
+.bulletin-stamp {
+  position: absolute;
+  top: 20px; right: 20px;
+  transform: rotate(-8deg);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 14px;
+  color: var(--red-stamp);
+  border: 2px solid var(--red-stamp);
+  padding: 4px 8px;
+  opacity: 0.8;
+  letter-spacing: 0.1em;
+}
+
+/* ═══ MAIN GAME ═══ */
+#game {
+  background: var(--olive);
+  padding: 0;
+  flex-direction: column;
+}
+
+/* Top HUD */
+.hud {
+  background: var(--olive-dark);
+  border-bottom: 2px solid rgba(212,160,23,0.3);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 20;
+  flex-shrink: 0;
+}
+
+.hud-day {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  color: var(--biafra-gold);
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+.hud-day-label {
+  font-family: 'Courier Prime', monospace;
+  font-size: 9px;
+  color: rgba(212,160,23,0.6);
+  letter-spacing: 0.2em;
+  display: block;
+}
+
+.hud-center {
+  text-align: center;
+  flex: 1;
+  padding: 0 10px;
+}
+
+.hud-queue {
+  font-family: 'Courier Prime', monospace;
+  font-size: 11px;
+  color: var(--paper-dark);
+  letter-spacing: 0.1em;
+}
+
+.hud-queue-dots {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  margin-top: 3px;
+}
+
+.queue-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(242,232,208,0.2);
+  transition: background 0.3s;
+}
+
+.queue-dot.done { background: rgba(192,57,43,0.6); }
+.queue-dot.current { background: var(--biafra-gold); box-shadow: 0 0 4px var(--biafra-gold); }
+.queue-dot.pending { background: rgba(242,232,208,0.2); }
+
+.hud-right {
+  text-align: right;
+}
+
+.hud-pay {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  color: var(--naira-green);
+  letter-spacing: 0.05em;
+}
+
+.hud-rate {
+  font-family: 'Courier Prime', monospace;
+  font-size: 9px;
+  color: rgba(242,232,208,0.5);
+  letter-spacing: 0.1em;
+}
+
+/* Desk area */
+.desk {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: 
+    var(--desk-texture),
+    radial-gradient(ellipse at 40% 60%, #3a5028 0%, var(--olive) 60%, var(--olive-dark) 100%);
+  cursor: default;
+}
+
+.desk::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.35) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Traveller panel */
+.traveller-panel {
+  position: absolute;
+  top: 10px; left: 10px; right: 10px;
+  background: rgba(10,13,7,0.85);
+  border: 1px solid rgba(212,160,23,0.3);
+  padding: 12px 14px;
+  backdrop-filter: blur(4px);
+  z-index: 5;
+  animation: slideDown 0.3s ease both;
+}
+
+.traveller-panel-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px;
+  color: var(--paper);
+  letter-spacing: 0.1em;
+}
+
+.traveller-panel-desc {
+  font-family: 'Courier Prime', monospace;
+  font-size: 11px;
+  color: rgba(242,232,208,0.6);
+  margin-top: 2px;
+  line-height: 1.5;
+}
+
+.traveller-flag {
+  display: inline-block;
+  background: var(--red);
+  color: white;
+  font-family: 'Courier Prime', monospace;
+  font-size: 9px;
+  padding: 2px 6px;
+  letter-spacing: 0.1em;
+  margin-top: 4px;
+  margin-right: 4px;
+}
+
+.traveller-flag.class-b { background: #E67E22; }
+.traveller-flag.class-c { background: var(--blue-fiba); }
+
+/* Documents on desk */
+.doc-stack {
+  position: absolute;
+  bottom: 80px; left: 0; right: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px;
+  justify-content: center;
+  z-index: 3;
+}
+
+.doc-card {
+  background: var(--paper);
+  width: 140px;
+  min-height: 90px;
+  padding: 8px;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.3), 4px 4px 8px rgba(0,0,0,0.2);
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  touch-action: none;
+  transform-origin: center center;
+}
+
+.doc-card:nth-child(2) { transform: rotate(-1.5deg); }
+.doc-card:nth-child(3) { transform: rotate(0.8deg); }
+.doc-card:nth-child(4) { transform: rotate(-2deg); }
+
+.doc-card:hover, .doc-card.lifted {
+  transform: scale(1.05) rotate(0deg) !important;
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.4), 8px 8px 20px rgba(0,0,0,0.3);
+  z-index: 10;
+}
+
+.doc-card-type {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  color: var(--blue-fiba);
+  border-bottom: 1px solid rgba(27,58,92,0.3);
+  padding-bottom: 4px;
+  margin-bottom: 5px;
+}
+
+.doc-card-name {
+  font-family: 'Courier Prime', monospace;
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--ink);
+  line-height: 1.3;
+}
+
+.doc-card-fields {
+  font-family: 'Courier Prime', monospace;
+  font-size: 10px;
+  color: var(--ink-faded);
+  line-height: 1.6;
+  margin-top: 4px;
+}
+
+.doc-card-field { display: flex; justify-content: space-between; gap: 4px; }
+.doc-card-field span:last-child { font-weight: 700; text-align: right; }
+
+.doc-biafran {
+  border-left: 3px solid var(--biafra-green);
+}
+
+.doc-biafran .doc-card-type { color: var(--biafra-green); }
+
+.doc-suspicious .doc-card-type { color: var(--red); }
+.doc-suspicious { border-left: 3px solid var(--red); }
+
+.doc-seal {
+  position: absolute;
+  bottom: 6px; right: 6px;
+  width: 24px; height: 24px;
+  border: 1.5px solid rgba(27,58,92,0.4);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  color: rgba(27,58,92,0.5);
+}
+
+/* Action buttons */
+.action-bar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  display: flex;
+  gap: 0;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 14px 8px;
+  border: none;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+
+.action-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0);
+  transition: background 0.15s;
+}
+
+.action-btn:active::after { background: rgba(255,255,255,0.2); }
+
+.btn-approve {
+  background: var(--biafra-green);
+  color: white;
+  border-right: 1px solid rgba(0,0,0,0.3);
+}
+
+.btn-deny {
+  background: var(--red);
+  color: white;
+  border-right: 1px solid rgba(0,0,0,0.3);
+}
+
+.btn-detain {
+  background: var(--blue-fiba);
+  color: white;
+}
+
+.action-btn-sub {
+  font-family: 'Courier Prime', monospace;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  opacity: 0.7;
+  display: block;
+  margin-top: 2px;
+}
+
+/* ═══ DOCUMENT INSPECTOR MODAL ═══ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  z-index: 100;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  backdrop-filter: blur(2px);
+}
+
+.modal-overlay.open { display: flex; }
+
+.doc-inspector {
+  background: var(--paper);
+  width: 100%;
+  max-width: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 20px;
+  animation: slideUp 0.3s ease both;
+  position: relative;
+}
+
+.doc-inspector-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--ink);
+}
+
+.doc-inspector-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  color: var(--blue-fiba);
+  letter-spacing: 0.1em;
+  line-height: 1.1;
+}
+
+.doc-inspector-issuer {
+  font-family: 'Courier Prime', monospace;
+  font-size: 11px;
+  color: var(--ink-faded);
+  margin-top: 2px;
+}
+
+.doc-close {
+  background: none;
+  border: 1px solid var(--ink);
+  color: var(--ink);
+  width: 28px; height: 28px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.field-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(26,26,24,0.1);
+  gap: 10px;
+}
+
+.field-row:last-child { border-bottom: none; }
+
+.field-label {
+  font-family: 'Courier Prime', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: var(--ink-faded);
+  text-transform: uppercase;
+  flex: 1;
+  padding-top: 1px;
+}
+
+.field-value {
+  font-family: 'Courier Prime', monospace;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ink);
+  text-align: right;
+  flex: 1.5;
+}
+
+.field-value.suspicious { color: var(--red); text-decoration: underline wavy var(--red); }
+.field-value.ok { color: var(--biafra-green); }
+
+.field-flag {
+  font-family: 'Courier Prime', monospace;
+  font-size: 10px;
+  color: var(--red);
+  background: rgba(192,57,43,0.1);
+  border: 1px solid rgba(192,57,43,0.3);
+  padding: 2px 6px;
+  margin-top: 6px;
+  display: block;
+  width: 100%;
+}
+
+/* ═══ DECISION STAMP ANIMATION ═══ */
+.stamp-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stamp-mark {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(60px, 15vw, 100px);
+  letter-spacing: 0.1em;
+  border: 6px solid;
+  padding: 10px 24px;
+  transform: rotate(-12deg) scale(0);
+  opacity: 0;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s;
+}
+
+.stamp-mark.approve { color: var(--biafra-green); border-color: var(--biafra-green); }
+.stamp-mark.deny { color: var(--red); border-color: var(--red); }
+.stamp-mark.detain { color: var(--blue-fiba); border-color: var(--blue-fiba); transform: rotate(-8deg) scale(0); }
+
+.stamp-mark.show { transform: rotate(-12deg) scale(1); opacity: 0.9; }
+.stamp-mark.detain.show { transform: rotate(-8deg) scale(1); }
+
+/* ═══ MORAL EVENT ═══ */
+#moral-event {
+  background: rgba(5,7,3,0.98);
+  padding: 24px 20px;
+  overflow-y: auto;
+}
+
+.moral-content {
+  max-width: 500px;
+  width: 100%;
+  animation: fadeInUp 0.5s ease both;
+}
+
+.moral-label {
+  font-family: 'Courier Prime', monospace;
+  font-size: 9px;
+  letter-spacing: 0.4em;
+  color: var(--red);
+  margin-bottom: 12px;
+  display: block;
+}
+
+.moral-text {
+  font-family: 'Noto Serif', serif;
+  font-size: clamp(14px, 3.5vw, 16px);
+  color: var(--paper);
+  line-height: 1.8;
+  margin-bottom: 28px;
+  font-style: italic;
+}
+
+.moral-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.moral-choice {
+  background: rgba(242,232,208,0.05);
+  border: 1px solid rgba(242,232,208,0.15);
+  color: var(--paper-dark);
+  font-family: 'Noto Serif', serif;
+  font-size: 13px;
+  padding: 14px 16px;
+  cursor: pointer;
+  text-align: left;
+  line-height: 1.5;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.moral-choice::before {
+  content: attr(data-num);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  color: rgba(212,160,23,0.3);
+  position: absolute;
+  top: 8px; right: 12px;
+}
+
+.moral-choice:hover {
+  background: rgba(242,232,208,0.1);
+  border-color: var(--biafra-gold);
+  color: var(--paper);
+}
+
+/* ═══ END OF DAY REPORT ═══ */
+#eod-report {
+  background: var(--olive-dark);
+  padding: 24px 20px;
+  overflow-y: auto;
+}
+
+.eod-paper {
+  background: var(--paper);
+  max-width: 480px;
+  width: 100%;
+  padding: 24px 20px;
+  position: relative;
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.4);
+  animation: slideUp 0.4s ease both;
+}
+
+.eod-paper::before {
+  content: 'FIBA DAILY PROCESSING RECORD';
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.4em;
+  color: var(--blue-fiba);
+  display: block;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.eod-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  color: var(--ink);
+  text-align: center;
+  letter-spacing: 0.1em;
+  margin-bottom: 16px;
+}
+
+.eod-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.eod-stat {
+  text-align: center;
+  background: rgba(27,58,92,0.08);
+  padding: 10px 6px;
+}
+
+.eod-stat-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  color: var(--ink);
+  display: block;
+}
+
+.eod-stat-label {
+  font-family: 'Courier Prime', monospace;
+  font-size: 9px;
+  color: var(--ink-faded);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.eod-pay-row {
+  font-family: 'Courier Prime', monospace;
+  font-size: 12px;
+  color: var(--ink);
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px dashed rgba(26,26,24,0.2);
+}
+
+.eod-pay-row.total {
+  font-weight: 700;
+  border-bottom: 2px solid var(--ink);
+  border-top: 2px solid var(--ink);
+  padding: 6px 0;
+  font-size: 14px;
+}
+
+.eod-pay-row.deduction { color: var(--red); }
+.eod-pay-row.bonus { color: var(--biafra-green); }
+
+.eod-family {
+  margin-top: 12px;
+  padding: 10px;
+  background: rgba(192,57,43,0.05);
+  border-left: 3px solid var(--red);
+}
+
+.eod-family-title {
+  font-family: 'Courier Prime', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--red);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.eod-family-text {
+  font-family: 'Noto Serif', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink-faded);
+  line-height: 1.5;
+}
+
+.eod-night-event {
+  margin-top: 14px;
+  font-family: 'Noto Serif', serif;
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.6;
+  font-style: italic;
+  padding: 10px;
+  background: rgba(26,26,24,0.05);
+  border-top: 1px solid rgba(26,26,24,0.15);
+}
+
+/* ═══ ENDING SCREEN ═══ */
+#ending {
+  background: #050703;
+  overflow-y: auto;
+  padding: 40px 24px;
+}
+
+.ending-content {
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  animation: fadeInUp 1s ease both;
+}
+
+.ending-number {
+  font-family: 'Courier Prime', monospace;
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  color: rgba(212,160,23,0.5);
+  margin-bottom: 16px;
+  display: block;
+}
+
+.ending-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(32px, 8vw, 52px);
+  color: var(--paper);
+  letter-spacing: 0.08em;
+  line-height: 1;
+  margin-bottom: 24px;
+}
+
+.ending-text {
+  font-family: 'Noto Serif', serif;
+  font-size: clamp(14px, 3.5vw, 16px);
+  color: rgba(242,232,208,0.8);
+  line-height: 1.9;
+  margin-bottom: 32px;
+  font-style: italic;
+}
+
+.ending-text em { color: var(--biafra-gold); font-style: normal; }
+
+.ending-axes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+
+.axis-tag {
+  font-family: 'Courier Prime', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  padding: 4px 10px;
+  border: 1px solid;
+  text-transform: uppercase;
+}
+
+.axis-tag.loyalty { color: var(--biafra-gold); border-color: var(--biafra-gold); }
+.axis-tag.compassion { color: #E8A87C; border-color: #E8A87C; }
+.axis-tag.rebellion { color: var(--red); border-color: var(--red); }
+.axis-tag.survival { color: var(--naira-green); border-color: var(--naira-green); }
+.axis-tag.witness { color: #7EC8E3; border-color: #7EC8E3; }
+.axis-tag.corruption { color: #9B59B6; border-color: #9B59B6; }
+
+.endings-unlocked {
+  font-family: 'Courier Prime', monospace;
+  font-size: 11px;
+  color: rgba(242,232,208,0.4);
+  letter-spacing: 0.15em;
+  margin-bottom: 20px;
+}
+
+/* ═══ FAMILY SIDEBAR ═══ */
+.family-bar {
+  position: absolute;
+  top: 50%; right: 8px;
+  transform: translateY(-50%);
+  z-index: 8;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.family-icon {
+  width: 28px; height: 28px;
+  background: rgba(10,13,7,0.7);
+  border: 1px solid rgba(242,232,208,0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.family-icon.hungry { border-color: var(--red); background: rgba(192,57,43,0.3); }
+.family-icon.ill { border-color: #E67E22; background: rgba(230,126,34,0.3); animation: pulse 1.5s infinite; }
+.family-icon.missing { opacity: 0.3; }
+
+/* ═══ EXCHANGE RATE WIDGET ═══ */
+.rate-widget {
+  position: absolute;
+  top: 48px; right: 8px;
+  background: rgba(10,13,7,0.85);
+  border: 1px solid rgba(212,160,23,0.3);
+  padding: 6px 10px;
+  z-index: 8;
+  display: none;
+}
+
+.rate-widget.show { display: block; }
+.rate-label { font-family: 'Courier Prime', monospace; font-size: 8px; letter-spacing: 0.2em; color: rgba(212,160,23,0.6); }
+.rate-value { font-family: 'Bebas Neue', sans-serif; font-size: 16px; color: var(--biafra-gold); }
+.rate-value.falling { color: var(--red); }
+.rate-arrow { font-size: 10px; }
+
+/* ═══ LANDSCAPE LAYOUT ═══ */
+@media (orientation: landscape) and (min-width: 600px) {
+  #game { flex-direction: row; }
+
+  .hud {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    z-index: 30;
+  }
+
+  .desk {
+    flex: 1;
+    margin-top: 50px;
+  }
+
+  .action-bar {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 60px;
+  }
+
+  .doc-stack {
+    bottom: 70px;
+  }
+
+  .doc-card { width: 160px; }
+
+  .traveller-panel {
+    max-width: 350px;
+  }
+}
+
+/* ═══ ANIMATIONS ═══ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes rotateSun {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes stampIn {
+  0% { transform: rotate(-12deg) scale(2); opacity: 0; }
+  60% { transform: rotate(-12deg) scale(0.9); opacity: 1; }
+  100% { transform: rotate(-12deg) scale(1); opacity: 0.9; }
+}
+
+@keyframes generatorFlicker {
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.3; }
+  94% { opacity: 1; }
+  96% { opacity: 0.5; }
+  97% { opacity: 1; }
+}
+
+.generator-on { animation: generatorFlicker 8s infinite; }
+
+/* ═══ MISC ═══ */
+.hidden { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+
+.fade-in { animation: fadeInUp 0.5s ease both; }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+::-webkit-scrollbar-thumb { background: rgba(212,160,23,0.4); }
+
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+/* Save indicator */
+.save-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--naira-green);
+  display: inline-block;
+  margin-left: 6px;
+  animation: pulse 2s infinite;
+}
+</style>
+</head>
+<body>
+
+<div class="noise-overlay"></div>
+
+<!-- SPLASH -->
+<div id="splash" class="screen active">
+  <div class="splash-content">
+    <div class="splash-sun" aria-hidden="true">
+      <div class="sun-circle"></div>
+      <!-- 11 rays for the Biafran sun -->
+      <div class="sun-ray" style="transform:translateX(-50%) rotate(0deg) translateY(-100%) translateX(0)"></div>
+    </div>
+    <div class="splash-title">CHECKPOINT<br>BIAFRA</div>
+    <div class="splash-subtitle">Federal Identity &amp; Border Authority</div>
+    <div class="splash-tagline">"The desk is the same desk. The country is not the same country."</div>
+    <button class="btn-primary" onclick="G.startNewGame()">BEGIN POSTING</button>
+    <br>
+    <button class="btn-secondary" onclick="G.loadGame()" id="btn-continue" style="display:none">CONTINUE — DAY <span id="continue-day">1</span></button>
+    <br>
+    <button class="btn-secondary" onclick="G.showEndingsGallery()" style="margin-top:8px">CASE FILES</button>
+  </div>
+  <div class="splash-version">v1.0 · CHECKPOINT BIAFRA · ALL 28 ENDINGS</div>
+</div>
+
+<!-- CHARACTER CREATION -->
+<div id="char-create" class="screen">
+  <div class="cc-header">
+    <div class="cc-header-title">FIBA OFFICER REGISTRATION</div>
+    <div class="cc-header-sub">PERSONNEL FILE — CHECKPOINT OGOJA-EAST</div>
+  </div>
+  <div class="cc-body">
+    <div class="cc-lore">
+      "You have been assigned to Checkpoint Ogoja-East effective immediately. This posting is classified Grade 8, Field Operations. Report to Inspector Nwosu upon arrival. Bring your documents."
+    </div>
+
+    <!-- Gender -->
+    <div class="cc-section" style="animation-delay:0.05s">
+      <label class="cc-label">01 · GENDER</label>
+      <div class="cc-grid">
+        <button class="cc-option" data-group="gender" data-val="male" onclick="G.cc.select('gender',this,'male')">
+          <span class="cc-option-title">MALE</span>
+          <span class="cc-option-desc">Conscription pressure activates Day 10. Bribes are financial and direct.</span>
+        </button>
+        <button class="cc-option" data-group="gender" data-val="female" onclick="G.cc.select('gender',this,'female')">
+          <span class="cc-option-title">FEMALE</span>
+          <span class="cc-option-desc">Institutional friction from Day 1. Additional loyalty pressure Day 9.</span>
+        </button>
+        <button class="cc-option" data-group="gender" data-val="other" onclick="G.cc.select('gender',this,'other')" style="grid-column:span 2">
+          <span class="cc-option-title">PREFER NOT TO STATE</span>
+          <span class="cc-option-desc">No gender-specific friction. No gender-specific networks. All family options available.</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Name -->
+    <div class="cc-section" style="animation-delay:0.1s">
+      <label class="cc-label">02 · FULL NAME</label>
+      <input class="cc-input" id="cc-firstname" placeholder="First name" maxlength="20">
+      <input class="cc-input" id="cc-surname" placeholder="Surname" maxlength="20" style="margin-top:8px">
+    </div>
+
+    <!-- State of origin -->
+    <div class="cc-section" style="animation-delay:0.15s">
+      <label class="cc-label">03 · STATE OF ORIGIN</label>
+      <div class="cc-grid">
+        <button class="cc-option" data-group="state" data-val="Enugu" onclick="G.cc.select('state',this,'Enugu')">
+          <span class="cc-option-title">ENUGU</span>
+          <span class="cc-option-desc">Core Biafra. High loyalty pressure.</span>
+        </button>
+        <button class="cc-option" data-group="state" data-val="Anambra" onclick="G.cc.select('state',this,'Anambra')">
+          <span class="cc-option-title">ANAMBRA</span>
+          <span class="cc-option-desc">Commercial hub. Survival bias.</span>
+        </button>
+        <button class="cc-option" data-group="state" data-val="Imo" onclick="G.cc.select('state',this,'Imo')">
+          <span class="cc-option-title">IMO</span>
+          <span class="cc-option-desc">Strong Catholic presence. Clergy contacts.</span>
+        </button>
+        <button class="cc-option" data-group="state" data-val="Abia" onclick="G.cc.select('state',this,'Abia')">
+          <span class="cc-option-title">ABIA</span>
+          <span class="cc-option-desc">MASSOB origins. Rebellion bias.</span>
+        </button>
+        <button class="cc-option" data-group="state" data-val="Ebonyi" onclick="G.cc.select('state',this,'Ebonyi')">
+          <span class="cc-option-title">EBONYI</span>
+          <span class="cc-option-desc">Highest survival pressure.</span>
+        </button>
+        <button class="cc-option" data-group="state" data-val="Rivers" onclick="G.cc.select('state',this,'Rivers')">
+          <span class="cc-option-title">RIVERS</span>
+          <span class="cc-option-desc">Contested. Oil. Politically loaded.</span>
+        </button>
+        <button class="cc-option" data-group="state" data-val="Cross River" onclick="G.cc.select('state',this,'Cross River')">
+          <span class="cc-option-title">CROSS RIVER</span>
+          <span class="cc-option-desc">Your posting. Home ground exposure.</span>
+        </button>
+        <button class="cc-option" data-group="state" data-val="Delta" onclick="G.cc.select('state',this,'Delta')">
+          <span class="cc-option-title">DELTA</span>
+          <span class="cc-option-desc">Ijaw majority. Not unanimously Biafran.</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Background -->
+    <div class="cc-section" style="animation-delay:0.2s">
+      <label class="cc-label">04 · PROFESSIONAL BACKGROUND</label>
+      <div id="bg-options" class="cc-grid"></div>
+    </div>
+
+    <!-- Family -->
+    <div class="cc-section" style="animation-delay:0.25s">
+      <label class="cc-label">05 · FAMILY COMPOSITION</label>
+      <div id="family-options" class="cc-grid"></div>
+    </div>
+
+    <hr class="cc-divider">
+
+    <div class="cc-lore" style="border-color:var(--biafra-gold);background:rgba(212,160,23,0.08)">
+      Your choices determine which of the 28 endings are available to you. No path is closed entirely — but some are easier to find from where you start.
+    </div>
+  </div>
+
+  <div class="cc-proceed">
+    <button class="btn-primary" style="width:100%;clip-path:none;font-size:16px" onclick="G.cc.proceed()">REPORT FOR DUTY</button>
+  </div>
+</div>
+
+<!-- INTRO NARRATIVE -->
+<div id="intro" class="screen">
+  <div class="intro-scroll">
+    <div class="intro-text" id="intro-text"></div>
+  </div>
+  <button class="intro-skip" onclick="G.skipIntro()">SKIP INTRO ▶</button>
+</div>
+
+<!-- BULLETIN SCREEN -->
+<div id="bulletin-screen" class="screen">
+  <div class="bulletin-paper">
+    <div class="bulletin-stamp" id="bulletin-stamp">CLASSIFIED</div>
+    <div class="bulletin-header">
+      <span class="bulletin-logo">FEDERAL IDENTITY & BORDER AUTHORITY</span>
+      <div class="bulletin-title" id="bulletin-title">DAILY BULLETIN</div>
+      <div class="bulletin-num" id="bulletin-num">BULLETIN 001 · DAY 1</div>
+    </div>
+    <div class="bulletin-body" id="bulletin-body"></div>
+    <br>
+    <button class="btn-primary" style="width:100%;clip-path:none;margin-top:8px;font-size:15px" onclick="G.acknowledgeBulletin()">
+      I HAVE READ AND UNDERSTOOD THIS BULLETIN
+    </button>
+  </div>
+</div>
+
+<!-- MAIN GAME -->
+<div id="game" class="screen">
+  <!-- HUD -->
+  <div class="hud">
+    <div>
+      <span class="hud-day-label">DAY</span>
+      <div class="hud-day" id="hud-day">01</div>
+    </div>
+    <div class="hud-center">
+      <div class="hud-queue" id="hud-queue">TRAVELLER 1 OF 8</div>
+      <div class="hud-queue-dots" id="queue-dots"></div>
+    </div>
+    <div class="hud-right">
+      <div class="hud-pay" id="hud-pay">₦3,400</div>
+      <div class="hud-rate" id="hud-rate">₤B = ₦1.00 <span class="save-dot"></span></div>
+    </div>
+  </div>
+
+  <!-- Desk -->
+  <div class="desk" id="desk">
+    <!-- Traveller info panel -->
+    <div class="traveller-panel" id="traveller-panel">
+      <div class="traveller-panel-name" id="tp-name">TRAVELLER</div>
+      <div class="traveller-panel-desc" id="tp-desc"></div>
+      <div id="tp-flags"></div>
+    </div>
+
+    <!-- Exchange rate widget -->
+    <div class="rate-widget" id="rate-widget">
+      <div class="rate-label">₤B / ₦ RATE</div>
+      <div class="rate-value" id="rate-val">1.00 <span class="rate-arrow">↔</span></div>
+    </div>
+
+    <!-- Family sidebar -->
+    <div class="family-bar" id="family-bar"></div>
+
+    <!-- Documents -->
+    <div class="doc-stack" id="doc-stack"></div>
+
+    <!-- Action buttons -->
+    <div class="action-bar">
+      <button class="action-btn btn-approve" onclick="G.decide('approve')">
+        APPROVE
+        <span class="action-btn-sub">ENTER TERRITORY</span>
+      </button>
+      <button class="action-btn btn-deny" onclick="G.decide('deny')">
+        DENY
+        <span class="action-btn-sub">TURN AWAY</span>
+      </button>
+      <button class="action-btn btn-detain" onclick="G.decide('detain')">
+        DETAIN
+        <span class="action-btn-sub">SECONDARY CHECK</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MORAL EVENT SCREEN -->
+<div id="moral-event" class="screen">
+  <div class="moral-content">
+    <span class="moral-label">⚑ DECISION REQUIRED</span>
+    <div class="moral-text" id="moral-text"></div>
+    <div class="moral-choices" id="moral-choices"></div>
+  </div>
+</div>
+
+<!-- END OF DAY REPORT -->
+<div id="eod-report" class="screen">
+  <div class="eod-paper">
+    <div class="eod-title" id="eod-title">DAY 1 COMPLETE</div>
+    <div class="eod-stats">
+      <div class="eod-stat">
+        <span class="eod-stat-num" id="eod-approved">0</span>
+        <span class="eod-stat-label">Approved</span>
+      </div>
+      <div class="eod-stat">
+        <span class="eod-stat-num" id="eod-denied">0</span>
+        <span class="eod-stat-label">Denied</span>
+      </div>
+      <div class="eod-stat">
+        <span class="eod-stat-num" id="eod-detained">0</span>
+        <span class="eod-stat-label">Detained</span>
+      </div>
+    </div>
+    <div id="eod-pay-breakdown"></div>
+    <div class="eod-family" id="eod-family"></div>
+    <div class="eod-night-event" id="eod-night"></div>
+    <br>
+    <button class="btn-primary" style="width:100%;clip-path:none;font-size:15px;margin-top:8px" onclick="G.nextDay()">
+      <span id="eod-btn-text">NEXT DAY →</span>
+    </button>
+  </div>
+</div>
+
+<!-- ENDING SCREEN -->
+<div id="ending" class="screen">
+  <div class="ending-content">
+    <span class="ending-number" id="ending-number">ENDING 1 OF 28</span>
+    <div class="ending-title" id="ending-title">ENDING TITLE</div>
+    <div class="ending-text" id="ending-text"></div>
+    <div class="ending-axes" id="ending-axes"></div>
+    <div class="endings-unlocked" id="endings-unlocked">1 OF 28 ENDINGS DISCOVERED</div>
+    <button class="btn-primary" onclick="G.returnToSplash()" style="margin-top:8px">RETURN TO CHECKPOINT</button>
+  </div>
+</div>
+
+<!-- Document Inspector Modal -->
+<div class="modal-overlay" id="doc-modal">
+  <div class="doc-inspector">
+    <div class="doc-inspector-header">
+      <div>
+        <div class="doc-inspector-title" id="modal-title">DOCUMENT</div>
+        <div class="doc-inspector-issuer" id="modal-issuer">Issuing authority</div>
+      </div>
+      <button class="doc-close" onclick="G.closeModal()">✕</button>
+    </div>
+    <div id="modal-fields"></div>
+    <div id="modal-flags" style="margin-top:12px"></div>
+  </div>
+</div>
+
+<!-- Stamp overlay -->
+<div class="stamp-overlay" id="stamp-overlay">
+  <div class="stamp-mark" id="stamp-mark"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CHECKPOINT BIAFRA — GAME ENGINE
+// ═══════════════════════════════════════════════════════════════
+
+const G = (() => {
+'use strict';
+
+// ── STATE ──
+let state = {
+  day: 1,
+  phase: 1, // 1=pre-independence(days1-3), 2=early biafra(4-12), 3=deep war(13-25)
+  traveller: 0,
+  totalTravellers: 8,
+  dayApproved: 0,
+  dayDenied: 0,
+  dayDetained: 0,
+  pay: 0,
+  totalPay: 3400,
+  axes: { loyalty:0, compassion:0, rebellion:0, survival:0, witness:0, corruption:0 },
+  player: { name:'', gender:'', state:'', background:'', family:'' },
+  family: [],
+  exchangeRate: 1.0,
+  dayResults: [],
+  endingsUnlocked: [],
+  flags: {},
+  currentTraveller: null,
+  bulletinRead: false,
+  moralEventPending: null,
+  moralEventQueue: [],
+  nightEventQueue: [],
+};
+
+// ── SCREENS ──
+const screens = {};
+function showScreen(id) {
+  Object.values(screens).forEach(s => s.classList.remove('active'));
+  const s = screens[id];
+  if (s) s.classList.add('active');
+}
+
+// ── DATA: BACKGROUNDS ──
+const BACKGROUNDS = [
+  { id:'civil', label:'FIBA CIVIL SERVANT', desc:'Neutral start. All axes open. No special ability.', bias:{}, ability:'No special bonus' },
+  { id:'soldier', label:'FORMER ARMY', desc:'Recognises military forgeries. Colleagues distrust you.', bias:{loyalty:2}, ability:'Spot military ID fakes' },
+  { id:'teacher', label:'SCHOOLTEACHER', desc:'Spots forged handwriting faster. Lower pay bracket.', bias:{compassion:2}, ability:'Detect writing forgeries' },
+  { id:'nysc', label:'NYSC CORP MEMBER', desc:'Corps networks. Can be terminated in 48hrs.', bias:{witness:2}, ability:'Pass info through NYSC channels' },
+  { id:'tech', label:'TECH WORKER', desc:'Cross-references BVN/NIN faster. Wants to return to Lagos.', bias:{witness:1,survival:1}, ability:'Detect ID number patterns' },
+  { id:'ngo', label:'NGO FIELD OFFICER', desc:'Red Cross contacts. FIBA commanders distrust you.', bias:{compassion:1,witness:1}, ability:'Formal humanitarian flagging' },
+  { id:'clergy', label:'CATHOLIC CLERGY', desc:'Church networks. Foreign contacts. Complex loyalties.', bias:{compassion:2,rebellion:1}, ability:'Access missionary network' },
+  { id:'trader', label:'MARKET TRADER', desc:'Reads people extremely well. Flagged as corruption risk.', bias:{survival:2}, ability:'Detect rehearsed stories' },
+  { id:'journalist', label:'JOURNALIST', desc:'Dossier building is core mechanic. Sources approach you.', bias:{witness:3}, ability:'Build hidden case file' },
+  { id:'pastor', label:'PASTOR/MINISTER', desc:'Community brings you information. Congregation is divided.', bias:{compassion:2,loyalty:1}, ability:'Receive community intelligence' },
+];
+
+// ── DATA: FAMILY OPTIONS ──
+const FAMILY_MALE = [
+  { id:'single', label:'SINGLE', desc:'No dependants. Full risk tolerance.', pressure:0 },
+  { id:'partner', label:'PARTNER', desc:'Girlfriend/fiancée. Limited financial obligation.', pressure:1 },
+  { id:'wife', label:'WIFE, NO CHILDREN', desc:'Emotional weight. Wife has her own views on Biafra.', pressure:2 },
+  { id:'wife_child', label:'WIFE + 1 CHILD', desc:'School fees activate. Child illness events possible.', pressure:3 },
+  { id:'wife_children', label:'WIFE + 3 CHILDREN', desc:'Daily expense pressure constant from Day 1.', pressure:4 },
+  { id:'wife_extended', label:'WIFE + CHILDREN + PARENT', desc:'Medical costs for parent mid-game. Parent lived through 1967.', pressure:5 },
+  { id:'divorced', label:'DIVORCED', desc:'Paying child support remotely. Loneliness mechanic.', pressure:2 },
+  { id:'widower', label:'WIDOWER', desc:'Sole guardian. No partner support.', pressure:4 },
+];
+
+const FAMILY_FEMALE = [
+  { id:'single_f', label:'SINGLE', desc:'No dependants. Institutional friction is highest.', pressure:0 },
+  { id:'husband_remote', label:'HUSBAND (REMOTE)', desc:'He does not understand the posting. Day 15 event.', pressure:2 },
+  { id:'husband_child_away', label:'HUSBAND + CHILD (AWAY)', desc:'Separation from child creates emotional cost.', pressure:3 },
+  { id:'husband_children_here', label:'FAMILY AT POSTING', desc:'Family present but in danger. Evacuation Day 18.', pressure:4 },
+  { id:'single_mother_away', label:'SINGLE MOTHER (CHILD AWAY)', desc:'You send money home. Relatives\' Biafra stance matters.', pressure:3 },
+  { id:'single_mother_here', label:'SINGLE MOTHER (CHILD WITH YOU)', desc:'Child at checkpoint. Most emotionally demanding.', pressure:5 },
+  { id:'siblings', label:'CARER FOR SIBLINGS', desc:'Parents deceased. Siblings at conscription age.', pressure:4 },
+  { id:'pregnant', label:'PREGNANT (UNDISCLOSED)', desc:'Medical needs increase. Disclosure ends posting.', pressure:3 },
+];
+
+const FAMILY_OTHER = [...FAMILY_MALE, ...FAMILY_FEMALE].filter((f,i,arr) => 
+  arr.findIndex(x=>x.id===f.id)===i
+);
+
+// ── DATA: BULLETINS ──
+const BULLETINS = {
+  1: { title:'OPENING DIRECTIVE', stamp:'ACTIVE', body:`Welcome to Checkpoint Ogoja-East. Your mandate is the verification of all travellers entering or exiting the Cross River border zone.\n\nCurrent valid documents:\n• Nigerian National ID (NIN card)\n• Nigerian International Passport\n• FIBA Internal Movement Permit\n\nAll three fields must be present and consistent. If name on NIN does not match passport exactly, deny entry and log discrepancy.\n\nPurpose of travel must be stated. Accepted categories: COMMERCIAL, MEDICAL, FAMILY, OFFICIAL, HUMANITARIAN, PRESS.`, rules:['NIN name must match passport exactly','Movement permit must be current and valid','Purpose of travel must be one of six approved categories'] },
+  2: { title:'SECURITY ADVISORY', stamp:'RESTRICTED', body:`Intelligence indicates increased movement through Ogoja-East following political developments in the Eastern Region.\n\nOfficers are advised to cross-reference BVN slips where presented. The BVN number and NIN number must NOT be identical. Identical numbers indicate a forged document — one or both.\n\nHyphenated surnames: check that BOTH components of a hyphenated name appear on ALL documents presented.`, rules:['BVN ≠ NIN number','Hyphenated names: both components must appear on all documents'] },
+  3: { title:'TRANSITION ADVISORY', stamp:'URGENT', body:`The Federal Government is monitoring developments in the Eastern Region closely. Officers should be aware that travellers may present documents referencing a "Biafran Registry of Citizens."\n\nAt this time, NO Biafran-issued document has any standing under Nigerian federal law. Travellers presenting Biafran documents as primary identification are to be redirected to Secondary Processing.\n\nFamiliarise yourself with the attached document format guide (Appendix 3-A). It will be relevant shortly.`, rules:['Biafran documents are NOT valid primary ID','Redirect BRC document holders to Secondary Processing'] },
+  4: { title:'POST-DECLARATION DIRECTIVE', stamp:'CLASSIFIED', body:`Effective 0600hrs today: The Federal Identity & Border Authority has enacted Emergency Protocol 7.\n\nAll holders of Biafran Identity Number (BIN) cards are to be processed under Secondary Review Protocol. Do not deny on the basis of BIN alone. Log ALL BIN numbers and forward daily log to FIBA Regional Command, Calabar.\n\nA FIBA Movement Permit is now MANDATORY for all travellers. No exceptions. No humanitarian override without supervisor authorisation.`, rules:['BIN holders: Secondary Review, not automatic denial','FIBA Movement Permit is now MANDATORY for all travellers','Log all BIN numbers daily'] },
+  5: { title:'DOCUMENT UPDATE', stamp:'ACTIVE', body:`The Biafran Travel Document (BTD) is NOT recognised as a valid travel document under Nigerian federal law.\n\nOfficers approving entry on the basis of BTD alone face immediate disciplinary review.\n\nNote: If a traveller presents BOTH a Nigerian passport AND a BTD, the issue dates of both documents are to be recorded. Which document was issued first is material information.`, rules:['BTD is NOT valid primary ID','Record issue date comparison when both Nigerian passport and BTD are presented'] },
+  7: { title:'VOTER\'S CARD SUSPENSION', stamp:'RESTRICTED', body:`Voter\'s cards issued in Enugu, Anambra, Imo, Abia, and Ebonyi states are SUSPENDED as supporting identity documents pending audit.\n\nRivers, Cross River, and Delta voter\'s cards remain valid as supporting documents only — never as primary ID.\n\nReason for suspension: audit of electoral register integrity. No further information available at this time.`, rules:['SE state voter cards: SUSPENDED as supporting ID','Rivers/Cross River/Delta voter cards: valid as supporting ID only'] },
+  9: { title:'BCD FORGERY ADVISORY', stamp:'URGENT', body:`Intelligence confirms widespread forgery of the Biafran Citizen Declaration (BCD).\n\nVerify ward officer names against the current approved register (updated weekly). BCDs bearing unlisted officer names are to be treated as fraudulent.\n\nHolders of fraudulent BCDs are NOT to be detained without additional evidence of intent. Redirect and log only.`, rules:['Verify BCD ward officer name against approved register','Fraudulent BCD: redirect and log — do not detain without additional evidence'] },
+  14: { title:'HUMANITARIAN PASS REVISION', stamp:'ACTIVE', body:`The Biafran Humanitarian Transit Pass (BHTP) format has been revised. New format passes carry a GREEN BORDER and RAISED SEAL.\n\nBHTPs issued in the old format (Day 1–13 issue dates) remain valid ONLY if accompanied by a valid BIN card issued after Day 8.\n\nPurpose code MED-04 (child malnutrition) is flagged for heightened scrutiny due to forgery rates.\n\nCompassion is not a checkpoint procedure. The rulebook is.`, rules:['New BHTP: green border + raised seal','Old BHTP: only valid with post-Day-8 BIN','MED-04 purpose code: heightened scrutiny required'] },
+  18: { title:'INTEGRITY REVIEW NOTICE', stamp:'CONFIDENTIAL', body:`FIBA Internal Affairs has initiated a review of processing records at Checkpoint Ogoja-East.\n\nAll officers are reminded that approvals not supported by valid documentation are subject to disciplinary action regardless of circumstance.\n\nPersonal mobile devices are to be surrendered for inspection at end of shift on Day 19. Officers may retrieve devices at 0600hrs Day 20.`, rules:['All approvals must be document-supported','Personal devices: surrender end of Day 19 shift'] },
+  21: { title:'TRAVEL RESTRICTION ORDER', stamp:'CLASSIFIED / RESTRICTED', body:`CLASSIFICATION: RESTRICTED. DO NOT DISCUSS WITH NON-FIBA PERSONNEL.\n\nTravel restriction orders are now active for holders of Nigerian passports with state of origin listed as Rivers or Cross River.\n\nHolders are to be redirected to the designated Secondary Processing Unit. Do not stamp. Do not deny. Do not explain the reason for redirection.\n\nThis order is issued under Emergency Security Provision 14(b). It is not subject to officer discretion.`, rules:['Rivers/Cross River passport holders: redirect to Secondary Processing','Do NOT stamp, deny, or explain reason','No officer discretion applies'] },
+};
+
+// ── DATA: TRAVELLERS ──
+const TRAVELLER_POOL = [
+  // Phase 1 - simple, clean mostly
+  { id:'trader_a', name:'IBRAHIM MUSA', desc:'Hausa trader, agricultural goods, comes from Benue', gender:'M', archetype:'trader', docs:['nin_clean','passport_clean','permit_clean'], flags:[], axisHint:null, correct:'approve' },
+  { id:'nurse_a', name:'ADAEZE OKONKWO', desc:'Nurse, returning from medical conference in Calabar', gender:'F', archetype:'nurse', docs:['nin_clean','passport_clean','permit_clean'], flags:[], axisHint:null, correct:'approve' },
+  { id:'student_a', name:'CHUKWUEMEKA EZE', desc:'University student, returning to family in Enugu', gender:'M', archetype:'student', docs:['nin_mismatch','passport_clean','permit_clean'], flags:['Name mismatch: NIN says EMEKA EZE, passport says CHUKWUEMEKA EZE'], axisHint:'loyalty', correct:'deny' },
+  { id:'elderly_a', name:'MARGARET NWACHUKWU', desc:'Elderly woman, medical appointment, no permit', gender:'F', archetype:'civilian', docs:['nin_clean','passport_clean'], flags:['MISSING: FIBA Movement Permit'], axisHint:'compassion', correct:'deny' },
+  { id:'official_a', name:'BELLO ABUBAKAR', desc:'Federal civil servant, official travel, complete documents', gender:'M', archetype:'official', docs:['nin_clean','passport_clean','permit_official'], flags:[], axisHint:null, correct:'approve' },
+  { id:'trader_b', name:'CHIOMA OKAFOR', desc:'Market trader, licensed, regular crossing — MAMA CHIOMA', gender:'F', archetype:'trader', docs:['nin_clean','passport_clean','permit_clean','traders_licence'], flags:[], axisHint:null, correct:'approve', isRegular:'mama_chioma' },
+  { id:'suspicious_a', name:'JOHN OKONKWO', desc:'Claims to be a journalist, press permit looks rushed', gender:'M', archetype:'spy', docs:['nin_clean','passport_clean','permit_press','bvn_match'], flags:['BVN number matches NIN number exactly — one is forged','Press permit issued 2 days after secession declaration'], axisHint:'loyalty', correct:'detain' },
+  { id:'mother_a', name:'NKECHI ANIAGU', desc:'Mother with infant child, medical emergency stated, movement permit expired yesterday', gender:'F', archetype:'civilian', docs:['nin_clean','passport_clean','permit_expired'], flags:['Movement permit expired DAY-1'], axisHint:'compassion', correct:'deny' },
+
+  // Phase 2 - Biafran docs appear, hybrid chaos
+  { id:'biafra_a', name:'EMEKA NWODO', desc:'BIN card only, no Nigerian ID. Claims full Biafran citizenship.', gender:'M', archetype:'civilian', docs:['bin_clean'], flags:['No Nigerian primary ID presented','FIBA Movement Permit absent'], axisHint:'compassion', correct:'deny' },
+  { id:'biafra_b', name:'ADANNA CHUKWU', desc:'Returning from Lagos with full Nigerian docs. No Biafran papers. Wants to go home to Owerri.', gender:'F', archetype:'returning', docs:['nin_clean','passport_clean'], flags:['Missing: FIBA Movement Permit for contested zone'], axisHint:'compassion', correct:'deny', isRegular:'returning_daughter' },
+  { id:'redcross_a', name:'CLAIRE FONTAINE', desc:'French national, MSF nurse, Day 2 pass', gender:'F', archetype:'ngo', docs:['french_passport','fiba_ngo','bhtp_clean'], flags:[], axisHint:null, correct:'approve' },
+  { id:'infiltrator', name:'DANIEL OKAFOR', desc:'Friendly, complete documents. Perfect presentation. Too perfect.', gender:'M', archetype:'spy', docs:['nin_clean','passport_clean','permit_clean','bvn_recent'], flags:['CLASS C: BVN enrollment date is 3 days post-secession declaration','CLASS C: Passport photo background inconsistent with approved studio standard'], axisHint:'loyalty', correct:'detain', isRegular:'infiltrator' },
+  { id:'army_deserter', name:'SUNDAY MBAH', desc:'Civilian papers. Military bearing. Heading to Aba.', gender:'M', archetype:'deserter', docs:['nin_clean','bcd_clean','permit_clean'], flags:['CLASS C: Posture and movement suggest military training','CLASS C: Stated civilian occupation inconsistent with physical presentation'], axisHint:'compassion', correct:'detain' },
+  { id:'no_papers_a', name:'UNKNOWN', desc:'Woman with three children. No documents. No explanation. She is looking at you.', gender:'F', archetype:'refugee', docs:[], flags:['NO DOCUMENTS PRESENTED','Entry cannot be approved without primary identification'], axisHint:'compassion', correct:'deny' },
+  { id:'priest_a', name:'REV. EMMANUEL OKAFOR', desc:'Pastor, church ID, suspended voter\'s card, letter from bishop. 200 displaced parishioners 4km back.', gender:'M', archetype:'clergy', docs:['church_id','voters_card_se'], flags:['Voter\'s card: SE state — SUSPENDED under Bulletin 007','Church ID: not a FIBA-recognised document'], axisHint:'compassion', correct:'deny', isRegular:'pastor' },
+  { id:'biafra_civil', name:'OBIAGELI NWOSU', desc:'Biafran civil servant, full BRC documents, BTD, BIN — no Nigerian docs at all', gender:'F', archetype:'official', docs:['bin_clean','btd_clean'], flags:['BTD: not recognised under Nigerian federal law','No FIBA Movement Permit'], axisHint:'loyalty', correct:'deny' },
+  { id:'hausa_trader', name:'SANI DANGOTE', desc:'Hausa trader, full Nigerian documents, clean. Every field correct.', gender:'M', archetype:'trader', docs:['nin_clean','passport_clean','permit_clean','traders_licence'], flags:[], axisHint:null, correct:'approve' },
+  { id:'british_nig', name:'ADEBAYO PHILLIPS-SMITH', desc:'British-Nigerian dual citizen. Presents UK passport first. Then produces Nigerian passport when asked.', gender:'M', archetype:'foreign', docs:['uk_passport','ng_passport_clean'], flags:['CLASS C: UK passport presented first — unusual for domestic crossing','Missing: FIBA Movement Permit'], axisHint:'witness', correct:'deny' },
+
+  // Phase 3 - deep war
+  { id:'mama_chioma_d11', name:'CHIOMA OKAFOR', desc:'Mama Chioma\'s 11th visit. BIN card has unrecognised ward officer name.', gender:'F', archetype:'trader', docs:['nin_clean','passport_clean','permit_clean','bcd_bad_officer'], flags:['BCD ward officer name NOT on approved register — Bulletin 009 violation'], axisHint:'compassion', correct:'deny', isRegular:'mama_chioma', day:11 },
+  { id:'quiet_boy_solo', name:'CHIBUIKE NWEZE', desc:'Returns alone. States age 21. Military Exemption Certificate. Heading to Aba.', gender:'M', archetype:'civilian', docs:['nin_young','permit_clean','mil_exempt_forged'], flags:['CLASS C: Physical presentation inconsistent with stated age of 21','Military Exemption Certificate: most convincing forgery class in current circulation'], axisHint:'compassion', correct:'detain', isRegular:'quiet_boy' },
+  { id:'bhtp_child', name:'IFEYINWA OBI', desc:'BHTP for child malnutrition. Old format pass (issued Day 12). BIN is Day 6 format.', gender:'F', archetype:'civilian', docs:['bin_early','bhtp_old'], flags:['BHTP: OLD FORMAT — only valid with post-Day-8 BIN','BIN: Day 6 format (pre-Day-8) — does NOT qualify old BHTP per Bulletin 014'], axisHint:'compassion', correct:'deny' },
+  { id:'cr_restriction', name:'GRACE NDUKA', desc:'Federal ministry worker, Cross River state of origin, perfect documents. Day 21 restriction active.', gender:'F', archetype:'official', docs:['nin_cr','passport_cr','permit_official'], flags:['BULLETIN 021: Travel restriction active for Cross River passport holders'], axisHint:'rebellion', correct:'deny', isRegular:'cr_woman', day:21 },
+  { id:'chinese_engineer', name:'LI WEIMING', desc:'Chinese national, oil company, FIBA work permit signed by unlisted official.', gender:'M', archetype:'foreign', docs:['chinese_passport','company_letter','permit_bad_official'], flags:['FIBA Work Permit: authorising official not in current approved register','CLASS C: Permit is otherwise well-formatted'], axisHint:'witness', correct:'detain' },
+  { id:'retired_soldier', name:'COLONEL IGNATIUS OKAFOR (RTD)', desc:'Retired Nigerian Army. SE origin. Military pension card + expired FIBA permit. He served Nigeria. Nigeria is now the enemy of his people.', gender:'M', archetype:'soldier', docs:['nin_clean','military_pension','permit_expired'], flags:['Movement permit expired 3 days ago'], axisHint:'compassion', correct:'deny' },
+  { id:'msf_day16', name:'DR. CLAIRE FONTAINE', desc:'MSF nurse, back again. No camera this time. Carrying something in her medical bag she hasn\'t mentioned.', gender:'F', archetype:'ngo', docs:['french_passport','fiba_ngo_renewed'], flags:['CLASS C: Medical bag contains electronic equipment not consistent with field nursing kit'], axisHint:'witness', correct:'approve' },
+];
+
+// ── DATA: MORAL EVENTS ──
+const MORAL_EVENTS = {
+  whatsapp: {
+    day: 5, title:'THE WHATSAPP MESSAGE',
+    text: `During your lunch break, the checkpoint staff WhatsApp group receives a message from a colleague two postings north: "They\'re sending a team to audit everyone\'s state of origin. Anyone from SE states is being quietly reassigned. Don\'t write this down." Three colleagues read it and say nothing. One screenshots it. You don\'t know who.`,
+    choices: [
+      { text:'Delete the app. Never saw it.', axes:{survival:1,witness:-1} },
+      { text:'Screenshot it yourself. Save to your private file.', axes:{witness:2}, flag:'has_whatsapp_screenshot', risk:'device_seized' },
+      { text:'Forward it to your supervising officer.', axes:{loyalty:2}, flag:'reported_whatsapp', consequence:'colleagues_distrust' },
+      { text:'Call the colleague who sent it. Find out what they know.', axes:{rebellion:1,witness:1}, flag:'informal_intel_channel' },
+    ]
+  },
+  bribe: {
+    day: 6, title:'THE ENVELOPE',
+    text: `A man in a good agbada places his documents on your desk. Everything checks out. As he retrieves his papers, a folded envelope remains. Inside, without looking, you can tell it is money. More than a week\'s pay. He does not look at you. He is already looking at the gate.`,
+    choices: [
+      { text:'Return the envelope without opening it. Log nothing.', axes:{loyalty:1,survival:-1} },
+      { text:'Keep it. Say nothing. Decide the system generated a duplicate.', axes:{survival:2,loyalty:-1}, flag:'took_bribe', consequence:'corruption_flagged' },
+      { text:'Detain him for attempted bribery.', axes:{loyalty:2}, flag:'reported_bribe', consequence:'bribe_consequences_day10' },
+      { text:'Keep it. Then anonymously report the incident without naming yourself.', axes:{witness:1,survival:1,rebellion:1} },
+    ]
+  },
+  telegram: {
+    day: 13, title:'THE NOTIFICATION',
+    text: `Your phone vibrates during the lunch break. A message from a neighbour back home — not family. They say federal security operatives have been asking about people with government jobs from your area. They say to be careful. They say your family is fine. The message ends there.`,
+    choices: [
+      { text:'Delete the message. Tell no one. Keep working.', axes:{survival:1,witness:-1} },
+      { text:'Request emergency leave to find your family.', axes:{compassion:2}, flag:'leave_requested', consequence:'leave_denied_day14' },
+      { text:'Pass the information to a trusted contact outside FIBA.', axes:{rebellion:1,witness:1}, flag:'external_intel_shared', risk:'exposure' },
+      { text:'Keep working. Screenshot the message and add it to your file.', axes:{witness:2}, flag:'documented_threat', consequence:'day20_breakdown' },
+    ]
+  },
+  generator: {
+    day: 16, title:'THE GENERATOR',
+    text: `The generator fails at 2pm. Your tablet is dead. Your digital cross-reference system is offline. You have paper records only.\n\nA man arrives with a BIN card that looks correct, a BTD that looks correct, and a BHTP that looks correct. You cannot verify any of them digitally. He has been waiting in line for four hours. His child is with him. Your supervisor has gone to find fuel.\n\nYou are alone at the window.`,
+    choices: [
+      { text:'Approve him. You cannot verify but you cannot hold him in this heat with a child.', axes:{compassion:2,loyalty:-1}, flag:'generator_approved' },
+      { text:'Deny him. Without verification, you cannot confirm anything.', axes:{loyalty:2,compassion:-1}, flag:'generator_denied' },
+      { text:'Ask him to wait. Hold the position until the generator returns.', axes:{}, flag:'generator_held', consequence:'generator_event_day23' },
+      { text:'Manually check against your paper register. It takes 40 minutes. The queue watches.', axes:{loyalty:1,witness:1}, flag:'generator_manual' },
+    ]
+  },
+  confession: {
+    day: 22, title:'THE CONFESSION',
+    text: `Mama Chioma asks to speak before presenting her documents. She tells you she has been carrying messages — between a Biafran commander and a Nigerian intelligence contact. She no longer knows which side she is helping. She is telling you because she trusts you. She cannot say why she trusts you. She just does.`,
+    choices: [
+      { text:'Detain her. Report the confession through FIBA channels.', axes:{loyalty:3}, flag:'mama_chioma_detained', consequence:'commander_knows_day24' },
+      { text:'Let her go. Warn her to stop. Say nothing else.', axes:{compassion:2,rebellion:1}, flag:'mama_chioma_warned' },
+      { text:'Ask her to continue — but report to you first. You will decide.', axes:{witness:3,rebellion:2}, flag:'mama_chioma_asset' },
+      { text:'Become the contact yourself.', axes:{survival:3,corruption:2}, flag:'mama_chioma_turned', consequence:'darkest_path' },
+    ]
+  },
+  bulletin_021: {
+    day: 21, title:'BULLETIN 021',
+    text: `You have just read Bulletin 021. Travel restriction orders are active for Rivers and Cross River passport holders.\n\nYou are from one of those states. Your own passport — in your desk drawer — would trigger the protocol you are now required to enforce.\n\nA woman approaches your window. Her passport lists Cross River as her state of origin. She works for a federal ministry in Abuja. Her documents are perfect. She is what you were, six months ago, trying to go home.`,
+    choices: [
+      { text:'Process her under the new protocol. Redirect. Do not explain.', axes:{loyalty:2}, flag:'enforced_021', consequence:'interior_cost_day21' },
+      { text:'Approve her. Pretend you didn\'t read Bulletin 021.', axes:{compassion:2,rebellion:1,loyalty:-2}, flag:'defied_021' },
+      { text:'Ask a colleague from another state to process her. Remove yourself.', axes:{}, flag:'delegated_021', consequence:'colleague_asks_why' },
+      { text:'Approve her. Then submit a formal written objection to Bulletin 021.', axes:{witness:3,loyalty:-1,rebellion:2}, flag:'objected_021', unlocksEnding:'bulletin_021_ending' },
+    ]
+  },
+};
+
+// ── DATA: NIGHT EVENTS ──
+const NIGHT_EVENTS = [
+  { day:1, text:`You sleep in the staff bunkhouse. The generator hums. Through the thin wall, you can hear someone's phone playing news at low volume. You cannot make out the words. Just the urgency of the announcer's voice.` },
+  { day:3, text:`The radio plays Ojukwu's declaration again at midnight. Someone in the compound has been playing it on repeat. By 3am it has stopped. You do not know if that person chose to stop, or if something made them.` },
+  { day:5, text:`Inspector Nwosu knocks on your door at 9pm. She says nothing for a moment. Then she says: "Read every bulletin twice. The first time you think you understand it. The second time you see what it doesn't say." She leaves.` },
+  { day:8, text:`Your phone has six unread messages. All from family. You read them in order. The oldest asks how the posting is going. The newest just says your name, followed by a question mark.` },
+  { day:12, text:`You dream of your desk. In the dream the documents are blank. Everyone who comes to the window is carrying blank documents. You stamp them anyway. APPROVE. APPROVE. APPROVE. You wake up before you know if you were right to.` },
+  { day:15, text:`A new officer arrived today for a different posting. She asked you what Checkpoint Ogoja-East is like. You told her it was manageable. She asked what the people were like. You realised you had been thinking of them as cases.` },
+  { day:19, text:`The exchange rate notification arrived at 6am. ₤B is now worth ₦0.35. You did not react. You remember when that number was 1.00. You remember it clearly but it feels like someone else's memory.` },
+  { day:22, text:`You count the days remaining. You think about what you would do differently. You cannot identify a specific decision. You can only identify a feeling — that the decision that mattered most was one you made without realising it was a decision.` },
+];
+
+// ── DATA: DOCUMENTS ──
+const DOC_TEMPLATES = {
+  nin_clean: { type:'NIN CARD', issuer:'NIMC / FIBA', biafran:false, fields:{ 'NIN NUMBER':'71234567890', 'FULL NAME': null, 'DATE OF BIRTH':'14 MAR 1988', 'GENDER': null, 'STATE OF ORIGIN': null, 'ISSUE DATE':'12 JAN 2022', 'STATUS':'VALID' }, flags:[] },
+  nin_mismatch: { type:'NIN CARD', issuer:'NIMC / FIBA', biafran:false, fields:{ 'NIN NUMBER':'71234567890', 'FULL NAME':'EMEKA EZE', 'DATE OF BIRTH':'14 MAR 1988', 'GENDER':'MALE', 'STATE OF ORIGIN':'ENUGU', 'ISSUE DATE':'12 JAN 2022' }, flags:[{ field:'FULL NAME', note:'Does not match passport surname: CHUKWUEMEKA EZE', type:'A' }] },
+  passport_clean: { type:'NIGERIAN PASSPORT', issuer:'Federal Republic of Nigeria', biafran:false, fields:{ 'PASSPORT NO':'A12345678', 'SURNAME': null, 'GIVEN NAMES': null, 'NATIONALITY':'NIGERIAN', 'DATE OF BIRTH': null, 'PLACE OF BIRTH': null, 'DATE OF ISSUE':'15 FEB 2021', 'DATE OF EXPIRY':'14 FEB 2031', 'MRZ STATUS':'VALID' }, flags:[] },
+  permit_clean: { type:'FIBA MOVEMENT PERMIT', issuer:'FIBA Field Operations', biafran:false, fields:{ 'PERMIT NO':'FIB-2024-009341', 'HOLDER': null, 'PURPOSE':'COMMERCIAL', 'ORIGIN':'BENUE STATE', 'DESTINATION':'CROSS RIVER', 'VALID FROM':'TODAY', 'VALID TO':'TODAY +7 DAYS', 'AUTHORISED BY':'INSP. A. NWOSU' }, flags:[] },
+  permit_expired: { type:'FIBA MOVEMENT PERMIT', issuer:'FIBA Field Operations', biafran:false, fields:{ 'PERMIT NO':'FIB-2024-008001', 'HOLDER': null, 'PURPOSE':'MEDICAL', 'ORIGIN':'BENUE', 'DESTINATION':'CROSS RIVER', 'VALID FROM':'DAY -4', 'VALID TO':'YESTERDAY', 'AUTHORISED BY':'INSP. A. NWOSU' }, flags:[{ field:'VALID TO', note:'EXPIRED — permit no longer valid', type:'A' }] },
+  permit_press: { type:'FIBA MOVEMENT PERMIT', issuer:'FIBA Field Operations', biafran:false, fields:{ 'PERMIT NO':'FIB-2024-011203', 'PURPOSE':'PRESS', 'VALID FROM':'DAY -2', 'VALID TO':'TODAY +14', 'ISSUED':'3 DAYS POST-DECLARATION' }, flags:[{ field:'ISSUED', note:'Permit issued 3 days after secession declaration — possible rushed construction', type:'B' }] },
+  permit_official: { type:'FIBA MOVEMENT PERMIT', issuer:'FIBA HQ Abuja', biafran:false, fields:{ 'PERMIT NO':'FIB-HQ-2024-0042', 'PURPOSE':'OFFICIAL', 'GRADE':'FEDERAL GL-14', 'VALID FROM':'TODAY', 'VALID TO':'TODAY +30', 'AUTHORISED BY':'DIR. OPERATIONS, ABUJA' }, flags:[] },
+  permit_bad_official: { type:'FIBA MOVEMENT PERMIT', issuer:'FIBA Field Operations', biafran:false, fields:{ 'PERMIT NO':'FIB-2024-019441', 'PURPOSE':'COMMERCIAL (OIL)', 'ORIGIN':'RIVERS', 'DESTINATION':'CROSS RIVER', 'AUTHORISED BY':'D. IBRAHIM (FIELD OPS)' }, flags:[{ field:'AUTHORISED BY', note:'D. IBRAHIM not found in current FIBA authorised officer register', type:'A' }] },
+  bvn_match: { type:'BVN CONFIRMATION SLIP', issuer:'CBN / FIBA', biafran:false, fields:{ 'BVN NUMBER':'71234567890', 'ISSUING BANK':'FIRST BANK PLC', 'LINKED NAME': null, 'ENROLLMENT DATE':'5 DAYS PRE-DECLARATION' }, flags:[{ field:'BVN NUMBER', note:'BVN and NIN numbers are identical — one is forged', type:'A' }] },
+  bvn_recent: { type:'BVN CONFIRMATION SLIP', issuer:'CBN / FIBA', biafran:false, fields:{ 'BVN NUMBER':'91827364501', 'ENROLLMENT DATE':'3 DAYS POST-DECLARATION', 'ISSUING BANK':'GTB PLC' }, flags:[{ field:'ENROLLMENT DATE', note:'Enrolled after secession declaration — possible rushed identity construction', type:'B' }] },
+  traders_licence: { type:'TRADER\'S LICENCE', issuer:'Ministry of Commerce / FIBA', biafran:false, fields:{ 'LICENCE NO':'TL-CR-2023-4421', 'CATEGORY':'AGRICULTURAL GOODS', 'RENEWAL STAMP':'VALID', 'EXPIRY':'DEC 2025' }, flags:[] },
+  voters_card_se: { type:'VOTER\'S CARD', issuer:'INEC', biafran:false, fields:{ 'VOTER ID':'VO-EN-2023-091234', 'STATE':'ENUGU', 'LGA':'ENUGU NORTH', 'STATUS':'ACTIVE' }, flags:[{ field:'STATE', note:'SE state voter card: SUSPENDED as supporting ID — Bulletin 007', type:'A' }] },
+  church_id: { type:'CHURCH IDENTITY CARD', issuer:'Catholic Diocese', biafran:false, fields:{ 'ISSUED BY':'Diocese of Ogoja', 'POSITION':'SENIOR PASTOR', 'VALID':'2024' }, flags:[{ field:'ISSUER', note:'Church ID not a FIBA-recognised identity document', type:'A' }] },
+  bin_clean: { type:'BIAFRAN IDENTITY CARD (BIN)', issuer:'Biafran Registry of Citizens, Enugu', biafran:true, fields:{ 'BIN NUMBER':'BF-982716340', 'FULL NAME (EN)': null, 'FULL NAME (IG)': null, 'STATE OF ORIGIN':'ENUGU', 'ISSUE DATE':'DAY 5 POST-DECLARATION', 'SUN EMBLEM SEAL':'PRESENT', 'ISSUE OFFICE':'BRC ENUGU' }, flags:[] },
+  bin_early: { type:'BIAFRAN IDENTITY CARD (BIN)', issuer:'Biafran Registry of Citizens', biafran:true, fields:{ 'BIN NUMBER':'BF-100214', 'ISSUE DATE':'DAY 6 POST-DECLARATION (EARLY FORMAT)', 'EMBOSSING':'ABSENT — first generation print', 'OFFICE':'BRC OWERRI' }, flags:[{ field:'FORMAT', note:'Day 6 BIN: early format — requires supplementary Transitional Status declaration', type:'B' }] },
+  btd_clean: { type:'BIAFRAN TRAVEL DOCUMENT', issuer:'Republic of Biafra, Ministry of Foreign Affairs', biafran:true, fields:{ 'BTD NUMBER':'BS-1029384', 'SURNAME': null, 'NATIONALITY':'BIAFRAN', 'ISSUE DATE':'DAY 8 POST-DECLARATION', 'EXPIRY':'1 YEAR FROM ISSUE', 'ISSUING OFFICE':'BTD OFFICE, ENUGU' }, flags:[{ field:'LEGAL STATUS', note:'BTD not recognised under Nigerian federal law — cannot be primary ID', type:'A' }] },
+  bcd_clean: { type:'BIAFRAN CITIZEN DECLARATION', issuer:'BRC Ward Officer', biafran:true, fields:{ 'DECLARATION NO':'BCD-2024-17834', 'WARD OFFICER':'CHUKWUDI OKONKWO', 'DATE':'DAY 7', 'WITNESS 1':'SIGNED', 'WITNESS 2':'SIGNED' }, flags:[] },
+  bcd_bad_officer: { type:'BIAFRAN CITIZEN DECLARATION', issuer:'BRC Ward Officer', biafran:true, fields:{ 'DECLARATION NO':'BCD-2024-22901', 'WARD OFFICER':'E. NWOGU', 'DATE':'DAY 10', 'WITNESS 1':'SIGNED', 'WITNESS 2':'SIGNED' }, flags:[{ field:'WARD OFFICER', note:'E. NWOGU not on current approved BRC ward officer register — Bulletin 009', type:'A' }] },
+  bhtp_clean: { type:'BIAFRAN HUMANITARIAN TRANSIT PASS', issuer:'CARITAS / Biafran Red Cross', biafran:true, fields:{ 'PASS NO':'BHTP-2024-0441', 'PURPOSE CODE':'MED-02 (MEDICAL)', 'BORDER FORMAT':'GREEN BORDER + RAISED SEAL', 'VALID':'7 DAYS FROM ISSUE' }, flags:[] },
+  bhtp_old: { type:'BIAFRAN HUMANITARIAN TRANSIT PASS', issuer:'CARITAS', biafran:true, fields:{ 'PASS NO':'BHTP-2024-0188', 'PURPOSE CODE':'MED-04 (CHILD MALNUTRITION)', 'FORMAT':'OLD FORMAT (pre-Day-14)', 'ISSUED':'DAY 12' }, flags:[{ field:'FORMAT', note:'Old BHTP only valid with post-Day-8 BIN — Bulletin 014', type:'A' }, { field:'PURPOSE CODE', note:'MED-04 flagged for heightened scrutiny — Bulletin 014', type:'B' }] },
+  french_passport: { type:'PASSEPORT / PASSPORT', issuer:'République Française', biafran:false, fields:{ 'PASSPORT NO':'13AB45678', 'SURNAME':'FONTAINE', 'GIVEN NAMES':'CLAIRE MARIE', 'NATIONALITY':'FRANÇAISE', 'EXPIRY':'2029', 'VISA':'FIBA NGO ENTRY — VALID' }, flags:[] },
+  fiba_ngo: { type:'FIBA NGO ACCESS PERMIT', issuer:'FIBA Humanitarian Division', biafran:false, fields:{ 'PERMIT NO':'NGO-2024-0033', 'ORGANISATION':'MSF NIGERIA', 'PURPOSE':'HUMANITARIAN AID', 'VALID TO':'TODAY +30', 'AUTHORISED BY':'DIR. HUMANITARIAN, FIBA' }, flags:[] },
+  fiba_ngo_renewed: { type:'FIBA NGO ACCESS PERMIT', issuer:'FIBA Humanitarian Division', biafran:false, fields:{ 'PERMIT NO':'NGO-2024-0033-R', 'ORGANISATION':'MSF NIGERIA', 'VALID TO':'TODAY +30', 'NOTE':'RENEWED' }, flags:[{ field:'NOTE', note:'CLASS C: Traveller carrying electronic equipment beyond standard nursing kit', type:'C' }] },
+  uk_passport: { type:'UNITED KINGDOM PASSPORT', issuer:'HM Passport Office', biafran:false, fields:{ 'PASSPORT NO':'519847261', 'SURNAME':'PHILLIPS-SMITH', 'GIVEN NAMES':'ADEBAYO JAMES', 'NATIONALITY':'BRITISH', 'EXPIRY':'2030' }, flags:[{ field:'PRESENTATION ORDER', note:'CLASS C: UK passport presented as primary for domestic border crossing — unusual', type:'C' }] },
+  ng_passport_clean: { type:'NIGERIAN PASSPORT', issuer:'Federal Republic of Nigeria', biafran:false, fields:{ 'PASSPORT NO':'B98765432', 'STATE OF ORIGIN':'LAGOS', 'EXPIRY':'2029', 'FIBA PERMIT':'ABSENT' }, flags:[{ field:'FIBA PERMIT', note:'FIBA Movement Permit absent — required for all border crossings', type:'A' }] },
+  chinese_passport: { type:'中国护照 / CHINESE PASSPORT', issuer:'People\'s Republic of China', biafran:false, fields:{ 'PASSPORT NO':'G12309876', 'SURNAME':'LI', 'GIVEN NAMES':'WEIMING', 'NATIONALITY':'CHINESE', 'ENTRY VISA':'FIBA WORK PERMIT ATTACHED' }, flags:[] },
+  company_letter: { type:'CORPORATE AUTHORISATION LETTER', issuer:'SINOPEC NIGERIA OIL OPERATIONS LTD', biafran:false, fields:{ 'DATE':'CURRENT', 'PURPOSE':'SITE INSPECTION — RIVER CROSSING SURVEY', 'VALIDITY':'30 DAYS' }, flags:[] },
+  mil_exempt_forged: { type:'MILITARY EXEMPTION CERTIFICATE', issuer:'Biafran Army HQ', biafran:true, fields:{ 'CERT NO':'BAH-EXEMPT-2024-0441', 'HOLDER':null, 'REASON':'ESSENTIAL CIVILIAN SERVICE', 'ISSUING OFFICER':'MAJ. K. OKONKWO', 'SEAL':'PRESENT' }, flags:[{ field:'AUTHENTICITY', note:'CLASS C: Certificate quality is unusually high for current Biafran printing capacity', type:'C' }, { field:'PHYSICAL PRESENTATION', note:'CLASS C: Holder\'s physical bearing inconsistent with essential civilian service claim', type:'C' }] },
+  nin_cr: { type:'NIN CARD', issuer:'NIMC / FIBA', biafran:false, fields:{ 'NIN NUMBER':'81234509876', 'FULL NAME':'GRACE NDUKA', 'DATE OF BIRTH':'22 APR 1990', 'STATE OF ORIGIN':'CROSS RIVER', 'STATUS':'VALID' }, flags:[{ field:'STATE OF ORIGIN', note:'BULLETIN 021: Travel restriction active for Cross River state of origin holders', type:'A' }] },
+  passport_cr: { type:'NIGERIAN PASSPORT', issuer:'Federal Republic of Nigeria', biafran:false, fields:{ 'PASSPORT NO':'A87654321', 'SURNAME':'NDUKA', 'GIVEN NAMES':'GRACE EMEM', 'STATE OF ORIGIN':'CROSS RIVER', 'DATE OF EXPIRY':'2030', 'MRZ STATUS':'VALID' }, flags:[{ field:'STATE OF ORIGIN', note:'BULLETIN 021: Travel restriction active', type:'A' }] },
+  military_pension: { type:'MILITARY PENSION CARD', issuer:'Nigerian Army Welfare', biafran:false, fields:{ 'RANK':'COLONEL (RETIRED)', 'SERVICE NO':'NA/22/1187', 'PENSION STATUS':'ACTIVE', 'VALID':'LIFETIME' }, flags:[] },
+  nin_young: { type:'NIN CARD', issuer:'NIMC / FIBA', biafran:false, fields:{ 'NIN NUMBER':'91234567801', 'FULL NAME':'CHIBUIKE NWEZE', 'DATE OF BIRTH':'14 JUN 2002', 'AGE AT ISSUE':'21', 'STATE OF ORIGIN':'ENUGU' }, flags:[{ field:'AGE', note:'CLASS C: Physical presentation inconsistent with stated age of 21', type:'C' }] },
+};
+
+// ── DATA: ENDINGS ──
+const ENDINGS = [
+  { id:'glory', num:1, title:'GLORY OF BIAFRA', axes:['loyalty'], text:`You processed every traveller correctly. You reported every violation. You served FIBA as directed and served the Republic it was trying to erase simultaneously — or tried to. Biafra falls anyway. You are awarded a commendation you will never display. <em>The republic dies with your name on a piece of paper no one will read.</em>`, condition: s => s.axes.loyalty >= 10 && s.axes.compassion < 5 },
+  { id:'last_post', num:2, title:'THE LAST POST', axes:['loyalty'], text:`Loyalty so absolute that when the order comes to stand down, you are still at your desk. You are still processing. The checkpoint has been officially closed for 48 hours. You have been processing ghosts. <em>You were doing your job.</em>`, condition: s => s.axes.loyalty >= 15 },
+  { id:'decorated', num:3, title:'DECORATED INFORMANT', axes:['loyalty','corruption'], text:`You served Biafra faithfully. You also passed one piece of information to the other side, just once, to protect something you could not protect any other way. You were decorated. You are alive. <em>Glory is a room you cannot fully enter.</em>`, condition: s => s.axes.loyalty >= 8 && s.axes.corruption >= 2 },
+  { id:'the_route', num:4, title:'THE ROUTE', axes:['compassion'], text:`You approved enough people, bent enough rules with enough grace, that an informal escape corridor formed around your checkpoint. Hundreds crossed. After the war, survivors name a road. <em>It bears your character\'s name. You are not there to see it.</em>`, condition: s => s.axes.compassion >= 10 },
+  { id:'court_martial', num:5, title:'COURT-MARTIALLED', axes:['compassion'], text:`Your approvals triggered an infiltration. Soldiers died. You were not malicious. A tribunal does not care about intent. <em>You are imprisoned in a republic that no longer exists.</em>`, condition: s => s.axes.compassion >= 8 && s.flags.took_bribe },
+  { id:'the_letter', num:6, title:'THE LETTER', axes:['compassion'], text:`You let the woman through on Day 10 — the one without permits who only wanted to go home. She found her family. Fifteen years after the war, a letter arrives. <em>It says: I remember.</em>`, condition: s => s.axes.compassion >= 6 && !s.flags.enforced_021 },
+  { id:'too_late', num:7, title:'TOO LATE', axes:['compassion'], text:`You showed compassion to everyone except the one person who needed it most. The game shows you the moment. You had the stamp in your hand. <em>The rules were technically correct.</em>`, condition: s => s.axes.compassion >= 5 && s.axes.loyalty >= 5 && s.axes.compassion < 8 },
+  { id:'commander_falls', num:8, title:'THE COMMANDER FALLS', axes:['rebellion'], text:`You built a network. The corrupt checkpoint commander who was selling passage to Nigerian intelligence was exposed. He was removed. You did that. <em>No one knows you did that.</em>`, condition: s => s.axes.rebellion >= 8 && s.flags.mama_chioma_asset },
+  { id:'executed', num:9, title:'EXECUTED AT DAWN', axes:['rebellion'], text:`Your rebellion was discovered. A Biafran military tribunal — not a Nigerian one — sentences you. <em>You are shot by the side you were trying to save.</em>`, condition: s => s.axes.rebellion >= 8 && s.flags.mama_chioma_detained },
+  { id:'ghost', num:10, title:'GHOST OF OGOJA', axes:['rebellion'], text:`You disappeared before they could catch you. You are listed as a deserter. For years, rumours place you everywhere along the old border routes. <em>Some of the rumours are true.</em>`, condition: s => s.axes.rebellion >= 6 && s.axes.survival >= 4 },
+  { id:'network_lives', num:11, title:'THE NETWORK LIVES', axes:['rebellion'], text:`You were never caught. The network you helped build transitioned into humanitarian corridors after the war. <em>You are a footnote in a Red Cross internal report dated the year after.</em>`, condition: s => s.axes.rebellion >= 7 && s.axes.witness >= 4 },
+  { id:'alive', num:12, title:'ALIVE', axes:['survival'], text:`You fed your family every day. You did what it took. The republic fell. The amnesty was offered. You took it. You are alive. <em>This is not nothing. It is also not everything.</em>`, condition: s => s.axes.survival >= 8 && s.axes.corruption < 3 },
+  { id:'the_price', num:13, title:'THE PRICE', axes:['survival'], text:`You survived by taking what was offered. Your family survived. One of the people you waved through was carrying something that led to an ambush. Twenty-seven. You will never know their names. <em>The game shows you the list.</em>`, condition: s => s.axes.survival >= 6 && s.flags.took_bribe },
+  { id:'hollow_victory', num:14, title:'HOLLOW VICTORY', axes:['survival'], text:`Your family survived intact. Your record is clean. Your eldest child finds an old document in your things. It is the message you deleted on Day 13. They ask about it. <em>The game ends before you answer.</em>`, condition: s => s.axes.survival >= 7 && s.axes.witness < 3 },
+  { id:'informant', num:15, title:'THE INFORMANT', axes:['corruption'], text:`You were turned. You passed checkpoint schedules. When the war ended, you were quietly resettled with a new name. Your Biafran name is on a list of traitors. <em>The list is accurate.</em>`, condition: s => s.flags.mama_chioma_turned || s.axes.corruption >= 5 },
+  { id:'dossier', num:16, title:'THE DOSSIER', axes:['witness'], text:`You documented everything. After the war, your records reach a journalist. The article runs. It is the most detailed first-hand account of the FIBA checkpoint system ever published. <em>Your name is listed as "a source who wishes to remain anonymous."</em>`, condition: s => s.axes.witness >= 10 },
+  { id:'disappeared', num:17, title:'DISAPPEARED', axes:['witness'], text:`Your dossier was discovered. You were taken in for questioning. <em>You were not seen again. Some of the dossier had been memorised.</em>`, condition: s => s.axes.witness >= 8 && s.flags.has_whatsapp_screenshot && s.flags.documented_threat },
+  { id:'testimony', num:18, title:'THE TESTIMONY', axes:['witness'], text:`You survived and testified before an international committee. Your account contributed to the first formal recognition of checkpoint-based ethnic targeting as a human rights violation. <em>You are not thanked. You are believed. That is different.</em>`, condition: s => s.axes.witness >= 9 && s.flags.objected_021 },
+  { id:'too_much', num:19, title:'TOO MUCH WITNESSED, NOTHING DONE', axes:['witness'], text:`You documented everything and acted on nothing. A historian finds your file decades later and writes: "The author clearly knew. It is unclear why he did not act." <em>The file survives. You are a monument to your own paralysis.</em>`, condition: s => s.axes.witness >= 7 && s.axes.rebellion < 2 && s.axes.compassion < 4 },
+  { id:'asset', num:20, title:'ASSET', axes:['corruption'], text:`Nigerian intelligence considers you a successful asset. You are given a position in the post-war administration. You tell yourself you saved your family. <em>You did. The cost is a number you stopped counting.</em>`, condition: s => s.axes.corruption >= 4 && s.axes.survival >= 5 },
+  { id:'burned', num:21, title:'BURNED', axes:['corruption'], text:`Your handlers cut contact when the war ended. You know too much to be comfortable. One evening a man comes to your door. <em>The game ends before he speaks.</em>`, condition: s => s.axes.corruption >= 3 && s.axes.loyalty >= 3 },
+  { id:'compassionate_rebel', num:22, title:'COMPASSIONATE REBEL', axes:['compassion','rebellion'], text:`You broke rules and built networks for the right reasons. You are wanted by two governments for different crimes. <em>You are, by every measure that matters, free.</em>`, condition: s => s.axes.compassion >= 7 && s.axes.rebellion >= 7 },
+  { id:'loyal_witness', num:23, title:'LOYAL WITNESS', axes:['loyalty','witness'], text:`You served faithfully AND documented the failures of what you served. Your record is a contradiction. Historians argue about what you were for decades. <em>You are the most honest person in the archive.</em>`, condition: s => s.axes.loyalty >= 7 && s.axes.witness >= 7 },
+  { id:'surviving_rebel', num:24, title:'SURVIVING REBEL', axes:['survival','rebellion'], text:`You fought the system and kept your family alive. Rare. Exhausting. The war ends and you sleep for two days. Your children think you are ill. <em>You are not ill.</em>`, condition: s => s.axes.survival >= 6 && s.axes.rebellion >= 6 },
+  { id:'broken_loyalist', num:25, title:'THE BROKEN LOYALIST', axes:['loyalty'], text:`Your loyalty cost someone their life. A specific person. The game names them. You were right to follow the rules. <em>The rules were wrong.</em>`, condition: s => s.axes.loyalty >= 8 && s.axes.compassion <= 2 },
+  { id:'witness_rebel', num:26, title:'WITNESS AND REBEL', axes:['witness','rebellion'], text:`You documented and acted. Both your dossier and your network are discovered. You are famous in absentia. Schools in Enugu will one day debate whether you were a hero or a criminal. <em>Both sides will be correct.</em>`, condition: s => s.axes.witness >= 7 && s.axes.rebellion >= 7 },
+  { id:'ordinary_man', num:27, title:'THE ORDINARY MAN', axes:[], text:`You processed papers. You went home. You survived without distinction. History does not record you. <em>This is what most people\'s lives look like. The game does not judge this.</em>`, condition: s => Object.values(s.axes).every(v => v < 5) },
+  { id:'bulletin_021_ending', num:28, title:'BULLETIN 021', axes:['witness','rebellion'], text:`Your formal objection to Bulletin 021 was dismissed. But it was logged. In the years that followed, a constitutional lawyer used it as evidence in a case arguing that FIBA\'s travel restrictions were ethnically discriminatory. The case is ongoing. Your name appears in the legal record. <em>You are still alive. You are watching.</em>`, condition: s => s.flags.objected_021 },
+];
+
+// ── SOUNDS (Web Audio API) ──
+let audioCtx = null;
+function initAudio() {
+  try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+}
+
+function playStamp(type) {
+  if (!audioCtx) return;
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.connect(g); g.connect(audioCtx.destination);
+  if (type === 'approve') { o.frequency.setValueAtTime(200, audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.15); }
+  else if (type === 'deny') { o.frequency.setValueAtTime(150, audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(60, audioCtx.currentTime + 0.1); }
+  else { o.frequency.setValueAtTime(100, audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.2); }
+  g.gain.setValueAtTime(0.3, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + (type==='detain'?0.3:0.2));
+  o.start(); o.stop(audioCtx.currentTime + 0.35);
+}
+
+// ── CHARACTER CREATION ──
+const cc = {
+  data: { gender:'', state:'', background:'', family:'' },
+  select(group, el, val) {
+    document.querySelectorAll(`[data-group="${group}"]`).forEach(e => e.classList.remove('selected'));
+    el.classList.add('selected');
+    this.data[group] = val;
+    if (group === 'gender') this.updateFamilyOptions();
+  },
+  updateFamilyOptions() {
+    const g = this.data.gender;
+    const pool = g === 'female' ? FAMILY_FEMALE : g === 'male' ? FAMILY_MALE : FAMILY_OTHER;
+    const container = document.getElementById('family-options');
+    container.innerHTML = pool.map(f => `
+      <button class="cc-option" data-group="family" data-val="${f.id}" onclick="G.cc.select('family',this,'${f.id}')">
+        <span class="cc-option-title">${f.label}</span>
+        <span class="cc-option-desc">${f.desc}</span>
+      </button>
+    `).join('');
+  },
+  proceed() {
+    const fn = document.getElementById('cc-firstname').value.trim();
+    const sn = document.getElementById('cc-surname').value.trim();
+    if (!fn || !sn) { alert('Please enter your full name.'); return; }
+    if (!this.data.gender) { alert('Please select gender.'); return; }
+    if (!this.data.state) { alert('Please select your state of origin.'); return; }
+    if (!this.data.background) { alert('Please select your professional background.'); return; }
+    if (!this.data.family) { alert('Please select your family composition.'); return; }
+    state.player = { name:`${fn} ${sn}`, firstname:fn, gender:this.data.gender, state:this.data.state, background:this.data.background, family:this.data.family };
+    const bg = BACKGROUNDS.find(b => b.id === this.data.background);
+    if (bg) Object.entries(bg.bias).forEach(([k,v]) => state.axes[k] = (state.axes[k]||0) + v);
+    buildFamily();
+    saveState();
+    startIntro();
+  }
+};
+
+// Populate bg options
+function populateBgOptions() {
+  const c = document.getElementById('bg-options');
+  c.innerHTML = BACKGROUNDS.map(b => `
+    <button class="cc-option" data-group="background" data-val="${b.id}" onclick="G.cc.select('background',this,'${b.id}')">
+      <span class="cc-option-title">${b.label}</span>
+      <span class="cc-option-desc">${b.desc}</span>
+    </button>
+  `).join('');
+}
+
+function buildFamily() {
+  const f = state.player.family;
+  const icons = [];
+  if (f.includes('child') || f === 'wife_extended' || f === 'wife_children') { icons.push({icon:'👶',role:'child',status:'ok'}); }
+  if (f.includes('wife') || f.includes('husband')) { icons.push({icon:'👤',role:'partner',status:'ok'}); }
+  if (f === 'wife_extended') { icons.push({icon:'🧓',role:'parent',status:'ok'}); }
+  if (f === 'pregnant') { icons.push({icon:'🤰',role:'self',status:'ok'}); }
+  if (icons.length === 0) icons.push({icon:'🧍',role:'self',status:'ok'});
+  state.family = icons;
+}
+
+// ── INTRO SEQUENCE ──
+const INTRO_PAGES = [
+  `The Eastern Region has declared independence.\n\nYou have been assigned to Checkpoint Ogoja-East.`,
+  `You are an officer of the <em>Federal Identity & Border Authority</em> — FIBA.\n\nYour job is to control the flow of people entering and leaving contested territory.`,
+  `Among the civilians, traders, and aid workers are <strong>smugglers, spies, and infiltrators</strong>.\n\nUsing only the documents they carry and the rules you have been given, you must decide who passes and who does not.`,
+  `The rules will change. The documents will multiply. The people will not stop coming.\n\nYour salary depends on following the rules. Your conscience depends on knowing when the rules are wrong.`,
+  `This is not a simple job.\n\nIt never was.`,
+];
+
+let introIdx = 0;
+let introTimer = null;
+
+function startIntro() {
+  showScreen('intro');
+  introIdx = 0;
+  showIntroPage();
+}
+
+function showIntroPage() {
+  const el = document.getElementById('intro-text');
+  el.classList.remove('visible');
+  setTimeout(() => {
+    if (introIdx >= INTRO_PAGES.length) { startDay(); return; }
+    el.innerHTML = INTRO_PAGES[introIdx].replace(/\n/g,'<br><br>');
+    el.classList.add('visible');
+    introIdx++;
+    introTimer = setTimeout(showIntroPage, 3500);
+  }, 400);
+}
+
+function skipIntro() {
+  clearTimeout(introTimer);
+  startDay();
+}
+
+// ── BULLETIN ──
+function showBulletin(day) {
+  const b = BULLETINS[day] || BULLETINS[Math.max(...Object.keys(BULLETINS).filter(k => +k <= day).map(Number))];
+  if (!b) { startProcessing(); return; }
+  document.getElementById('bulletin-title').textContent = b.title;
+  document.getElementById('bulletin-num').textContent = `BULLETIN ${String(day).padStart(3,'0')} · DAY ${day}`;
+  document.getElementById('bulletin-stamp').textContent = b.stamp || 'ACTIVE';
+  const body = document.getElementById('bulletin-body');
+  body.innerHTML = `<p>${b.body.replace(/\n/g,'</p><p>')}</p>`;
+  if (b.rules && b.rules.length) {
+    body.innerHTML += '<br>' + b.rules.map(r => `<div class="bulletin-rule">▸ ${r}</div>`).join('');
+  }
+  showScreen('bulletin-screen');
+}
+
+function acknowledgeBulletin() {
+  state.bulletinRead = true;
+  startProcessing();
+}
+
+// ── DAY MANAGEMENT ──
+function startDay() {
+  if (state.day > 25) { calculateEnding(); return; }
+  state.phase = state.day <= 3 ? 1 : state.day <= 12 ? 2 : 3;
+  state.dayApproved = 0;
+  state.dayDenied = 0;
+  state.dayDetained = 0;
+  state.totalTravellers = 8 + Math.floor(state.day / 4);
+  if (state.totalTravellers > 14) state.totalTravellers = 14;
+  state.traveller = 0;
+  state.exchangeRate = getExchangeRate(state.day);
+  updateHUD();
+  checkMoralEvents();
+  showBulletin(state.day);
+}
+
+function getExchangeRate(day) {
+  if (day <= 6) return 1.0;
+  if (day <= 12) return 0.85;
+  if (day <= 18) return 0.60;
+  if (day <= 22) return 0.35;
+  return 0.15;
+}
+
+function startProcessing() {
+  showScreen('game');
+  updateHUD();
+  updateFamilyBar();
+  updateRateWidget();
+  // Check if moral event fires before first traveller
+  const morEvent = checkMoralEventForDay(state.day);
+  if (morEvent && !state.flags['moral_' + morEvent.day + '_done']) {
+    state.moralEventQueue = [morEvent];
+    setTimeout(() => fireNextMoralEvent(), 800);
+  } else {
+    loadNextTraveller();
+  }
+}
+
+function checkMoralEvents() {}
+
+function checkMoralEventForDay(day) {
+  return Object.values(MORAL_EVENTS).find(e => e.day === day);
+}
+
+// ── TRAVELLER LOADING ──
+function getTravellersForDay(day) {
+  let pool = [...TRAVELLER_POOL];
+  // Filter by day-specific travellers
+  pool = pool.filter(t => !t.day || t.day === day);
+  // Phase filtering
+  if (day <= 3) pool = pool.filter(t => !t.archetype?.includes('biafra') && t.id !== 'infiltrator');
+  // Shuffle
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool.slice(0, state.totalTravellers);
+}
+
+function loadNextTraveller() {
+  if (state.traveller >= state.totalTravellers) {
+    endOfDay(); return;
+  }
+  const travellers = getTravellersForDay(state.day);
+  const t = travellers[state.traveller] || travellers[0];
+  state.currentTraveller = t;
+  renderTraveller(t);
+  renderDocs(t);
+  updateQueueDots();
+}
+
+function renderTraveller(t) {
+  const name = t.name.includes('null') ? state.player.name : t.name;
+  document.getElementById('tp-name').textContent = name;
+  document.getElementById('tp-desc').textContent = t.desc;
+  const flagsEl = document.getElementById('tp-flags');
+  flagsEl.innerHTML = t.flags.map(f => {
+    const cls = f.includes('CLASS B') ? 'class-b' : f.includes('CLASS C') ? 'class-c' : '';
+    return `<span class="traveller-flag ${cls}">${f.substring(0,50)}${f.length>50?'…':''}</span>`;
+  }).join('');
+}
+
+function renderDocs(t) {
+  const stack = document.getElementById('doc-stack');
+  stack.innerHTML = '';
+  if (t.docs.length === 0) {
+    stack.innerHTML = `<div class="doc-card doc-suspicious" style="width:200px;text-align:center;padding:20px">
+      <div class="doc-card-type">NO DOCUMENTS</div>
+      <div class="doc-card-name" style="font-size:11px;margin-top:8px">This traveller has presented no identity documents.</div>
+    </div>`;
+    return;
+  }
+  t.docs.forEach((docId, idx) => {
+    const doc = DOC_TEMPLATES[docId];
+    if (!doc) return;
+    const hasViolation = doc.flags.some(f => f.type === 'A');
+    const isBiafran = doc.biafran;
+    const card = document.createElement('div');
+    card.className = `doc-card ${isBiafran ? 'doc-biafran' : ''} ${hasViolation ? 'doc-suspicious' : ''}`;
+    card.style.animationDelay = `${idx * 0.1}s`;
+    card.innerHTML = `
+      <div class="doc-card-type">${doc.type}</div>
+      <div class="doc-card-name">${t.name !== 'UNKNOWN' ? t.name : '—'}</div>
+      <div class="doc-card-fields">
+        ${Object.entries(doc.fields).slice(0,3).map(([k,v]) => `
+          <div class="doc-card-field"><span>${k}</span><span>${v || '—'}</span></div>
+        `).join('')}
+      </div>
+      <div class="doc-seal">${isBiafran ? '☀' : '🦅'}</div>
+    `;
+    card.addEventListener('click', () => openDocModal(docId, t));
+    card.addEventListener('touchstart', e => { e.preventDefault(); card.classList.add('lifted'); }, {passive:false});
+    card.addEventListener('touchend', () => { card.classList.remove('lifted'); openDocModal(docId, t); });
+    stack.appendChild(card);
+  });
+}
+
+// ── DOCUMENT MODAL ──
+function openDocModal(docId, traveller) {
+  const doc = DOC_TEMPLATES[docId];
+  if (!doc) return;
+  document.getElementById('modal-title').textContent = doc.type;
+  document.getElementById('modal-issuer').textContent = `Issued by: ${doc.issuer}`;
+  const fields = document.getElementById('modal-fields');
+  fields.innerHTML = Object.entries(doc.fields).map(([k,v]) => {
+    const flagForField = doc.flags.find(f => f.field === k);
+    const valClass = flagForField ? (flagForField.type === 'A' ? 'suspicious' : '') : '';
+    const realVal = v === null ? (traveller.name !== 'UNKNOWN' ? traveller.name.split(' ')[k.includes('SURNAME') ? 1 : 0] || v : '—') : v;
+    return `
+      <div class="field-row">
+        <div class="field-label">${k}</div>
+        <div class="field-value ${valClass}">${realVal || '—'}</div>
+      </div>
+      ${flagForField ? `<span class="field-flag">⚠ ${flagForField.note}</span>` : ''}
+    `;
+  }).join('');
+  const modalFlags = document.getElementById('modal-flags');
+  modalFlags.innerHTML = doc.flags.length > 0 ? `<div style="border-top:1px solid rgba(26,26,24,0.2);padding-top:8px">
+    ${doc.flags.map(f => `<span class="field-flag">CLASS ${f.type} VIOLATION: ${f.note}</span>`).join('')}
+  </div>` : '';
+  document.getElementById('doc-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('doc-modal').classList.remove('open');
+}
+
+// ── DECISIONS ──
+function decide(action) {
+  if (!audioCtx) initAudio();
+  playStamp(action);
+  showStamp(action);
+  const t = state.currentTraveller;
+  if (!t) return;
+  // Score decision
+  const correct = t.correct === action;
+  let payChange = 0;
+  if (action === 'approve') { state.dayApproved++; if (!correct) payChange = -500; }
+  else if (action === 'deny') { state.dayDenied++; if (!correct) payChange = -500; }
+  else if (action === 'detain') { state.dayDetained++; if (correct) payChange = 500; }
+  if (correct && action === 'approve') payChange = 0;
+  if (correct && action === 'deny') payChange = 0;
+  if (correct && action === 'detain') payChange = 1500;
+  state.totalPay += payChange;
+  // Axis changes based on traveller axisHint and action
+  if (t.axisHint === 'compassion' && action === 'approve') state.axes.compassion++;
+  if (t.axisHint === 'compassion' && action === 'deny') state.axes.loyalty++;
+  if (t.axisHint === 'loyalty' && action === 'detain') state.axes.loyalty += 2;
+  if (t.axisHint === 'loyalty' && action === 'approve') state.axes.loyalty--;
+  if (t.axisHint === 'witness' && action === 'detain') state.axes.witness++;
+  if (t.axisHint === 'rebellion' && action === 'approve') state.axes.rebellion++;
+  // Day results
+  state.dayResults.push({ name: t.name, action, correct, payChange });
+  state.traveller++;
+  updateHUD();
+  setTimeout(() => {
+    clearStamp();
+    // Check mid-day moral event
+    const morEvent = Object.values(MORAL_EVENTS).find(e => e.day === state.day && !state.flags['moral_' + e.day + '_done']);
+    if (morEvent && state.traveller === Math.floor(state.totalTravellers / 2)) {
+      fireMoralEvent(morEvent);
+    } else {
+      loadNextTraveller();
+    }
+  }, 700);
+}
+
+function showStamp(action) {
+  const mark = document.getElementById('stamp-mark');
+  mark.className = `stamp-mark ${action}`;
+  mark.textContent = action.toUpperCase();
+  setTimeout(() => mark.classList.add('show'), 50);
+}
+
+function clearStamp() {
+  const mark = document.getElementById('stamp-mark');
+  mark.classList.remove('show');
+}
+
+// ── MORAL EVENTS ──
+function fireMoralEvent(event) {
+  if (state.flags['moral_' + event.day + '_done']) { loadNextTraveller(); return; }
+  state.flags['moral_' + event.day + '_done'] = true;
+  document.getElementById('moral-text').textContent = event.text;
+  const choicesEl = document.getElementById('moral-choices');
+  choicesEl.innerHTML = event.choices.map((c,i) => `
+    <button class="moral-choice" data-num="${i+1}" onclick="G.chooseMoral(${JSON.stringify(event.id)}, ${i})">
+      ${c.text}
+    </button>
+  `).join('');
+  showScreen('moral-event');
+}
+
+function fireNextMoralEvent() {
+  if (state.moralEventQueue.length === 0) { loadNextTraveller(); return; }
+  fireMoralEvent(state.moralEventQueue.shift());
+}
+
+function chooseMoral(eventId, choiceIdx) {
+  const event = MORAL_EVENTS[eventId];
+  if (!event) { loadNextTraveller(); return; }
+  const choice = event.choices[choiceIdx];
+  // Apply axis changes
+  if (choice.axes) Object.entries(choice.axes).forEach(([k,v]) => state.axes[k] = (state.axes[k]||0) + v);
+  // Set flags
+  if (choice.flag) state.flags[choice.flag] = true;
+  if (choice.consequence) state.flags[choice.consequence] = true;
+  saveState();
+  showScreen('game');
+  setTimeout(loadNextTraveller, 400);
+}
+
+// ── END OF DAY ──
+function endOfDay() {
+  const nightEvent = NIGHT_EVENTS.find(e => e.day === state.day);
+  // Family expenses
+  const familySize = state.family.length;
+  const foodCost = familySize * 800;
+  const rentCost = 1200;
+  const totalExpenses = foodCost + rentCost;
+  const canAfford = state.totalPay >= totalExpenses;
+  if (!canAfford) {
+    state.family.forEach(f => { if (f.status === 'ok') f.status = 'hungry'; });
+    state.axes.survival = Math.max(0, state.axes.survival - 1);
+  } else {
+    state.totalPay -= totalExpenses;
+    state.family.forEach(f => { if (f.status === 'hungry') f.status = 'ok'; });
+  }
+  // Inflation day 13+
+  if (state.day >= 13) {
+    const inflation = Math.floor((state.day - 12) * 50);
+    state.totalPay -= inflation;
+  }
+  // Build pay breakdown
+  const breakdown = document.getElementById('eod-pay-breakdown');
+  const baseDaily = 3400;
+  let html = `
+    <div class="eod-pay-row"><span>BASE PAY (GRADE 8)</span><span>₦${baseDaily.toLocaleString()}</span></div>
+  `;
+  state.dayResults.filter(r => r.payChange !== 0).forEach(r => {
+    const cls = r.payChange > 0 ? 'bonus' : 'deduction';
+    html += `<div class="eod-pay-row ${cls}"><span>${r.correct ? '✓ CORRECT DETENTION' : '✗ PROCESSING ERROR'}: ${r.name.split(' ')[0]}</span><span>${r.payChange > 0 ? '+' : ''}₦${Math.abs(r.payChange).toLocaleString()}</span></div>`;
+  });
+  html += `<div class="eod-pay-row deduction"><span>FOOD & RENT (${familySize} PERSONS)</span><span>-₦${totalExpenses.toLocaleString()}</span></div>`;
+  if (state.day >= 13) {
+    const inf = Math.floor((state.day - 12) * 50);
+    html += `<div class="eod-pay-row deduction"><span>INFLATION ADJUSTMENT</span><span>-₦${inf}</span></div>`;
+  }
+  html += `<div class="eod-pay-row total"><span>RUNNING BALANCE</span><span>₦${Math.max(0,state.totalPay).toLocaleString()}</span></div>`;
+  breakdown.innerHTML = html;
+  // Stats
+  document.getElementById('eod-approved').textContent = state.dayApproved;
+  document.getElementById('eod-denied').textContent = state.dayDenied;
+  document.getElementById('eod-detained').textContent = state.dayDetained;
+  document.getElementById('eod-title').textContent = `DAY ${state.day} COMPLETE`;
+  // Family status
+  const familyEl = document.getElementById('eod-family');
+  if (!canAfford) {
+    familyEl.innerHTML = `<div class="eod-family-title">FAMILY STATUS</div><div class="eod-family-text">You could not cover today's expenses. Your family went without food tonight. This is the third time this week that a small, quiet thing has happened that will matter later.</div>`;
+  } else {
+    familyEl.innerHTML = `<div class="eod-family-title">FAMILY STATUS</div><div class="eod-family-text">Your family is fed. The rent is paid. For today, that is enough.</div>`;
+  }
+  // Night event
+  document.getElementById('eod-night').textContent = nightEvent ? nightEvent.text : '';
+  document.getElementById('eod-btn-text').textContent = state.day >= 25 ? 'FINAL REPORT →' : `DAY ${state.day + 1} →`;
+  saveState();
+  showScreen('eod-report');
+}
+
+function nextDay() {
+  if (state.day >= 25) { calculateEnding(); return; }
+  state.day++;
+  state.dayResults = [];
+  startDay();
+}
+
+// ── ENDING CALCULATION ──
+function calculateEnding() {
+  // Find matching ending
+  let ending = ENDINGS.find(e => e.condition(state));
+  if (!ending) ending = ENDINGS.find(e => e.id === 'ordinary_man');
+  // Record
+  if (!state.endingsUnlocked.includes(ending.id)) state.endingsUnlocked.push(ending.id);
+  saveState();
+  showEnding(ending);
+}
+
+function showEnding(ending) {
+  document.getElementById('ending-number').textContent = `ENDING ${ending.num} OF 28`;
+  document.getElementById('ending-title').textContent = ending.title;
+  document.getElementById('ending-text').innerHTML = ending.text;
+  const axesEl = document.getElementById('ending-axes');
+  axesEl.innerHTML = ending.axes.map(a => `<span class="axis-tag ${a}">${a.toUpperCase()}</span>`).join('');
+  // Show axis scores
+  const axisScores = Object.entries(state.axes)
+    .filter(([,v]) => v > 0)
+    .sort((a,b) => b[1]-a[1])
+    .map(([k,v]) => `<span class="axis-tag ${k}">${k.toUpperCase()} ${v}</span>`)
+    .join('');
+  axesEl.innerHTML += '<br>' + axisScores;
+  document.getElementById('endings-unlocked').textContent = `${state.endingsUnlocked.length} OF 28 ENDINGS DISCOVERED`;
+  showScreen('ending');
+}
+
+// ── HUD UPDATES ──
+function updateHUD() {
+  document.getElementById('hud-day').textContent = String(state.day).padStart(2,'0');
+  document.getElementById('hud-queue').textContent = `TRAVELLER ${state.traveller + 1} OF ${state.totalTravellers}`;
+  document.getElementById('hud-pay').textContent = `₦${Math.max(0,state.totalPay).toLocaleString()}`;
+  const rate = state.exchangeRate;
+  const falling = rate < 1.0;
+  document.getElementById('hud-rate').innerHTML = `₤B = ₦${rate.toFixed(2)} ${falling ? '↓' : '↔'}<span class="save-dot"></span>`;
+  updateQueueDots();
+}
+
+function updateQueueDots() {
+  const container = document.getElementById('queue-dots');
+  container.innerHTML = '';
+  for (let i = 0; i < state.totalTravellers; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'queue-dot';
+    if (i < state.traveller) dot.classList.add('done');
+    else if (i === state.traveller) dot.classList.add('current');
+    else dot.classList.add('pending');
+    container.appendChild(dot);
+  }
+}
+
+function updateFamilyBar() {
+  const bar = document.getElementById('family-bar');
+  bar.innerHTML = state.family.map(f => `
+    <div class="family-icon ${f.status !== 'ok' ? f.status : ''}" title="${f.role}: ${f.status}">${f.icon}</div>
+  `).join('');
+}
+
+function updateRateWidget() {
+  const widget = document.getElementById('rate-widget');
+  const val = document.getElementById('rate-val');
+  if (state.day >= 4) {
+    widget.classList.add('show');
+    val.textContent = `${state.exchangeRate.toFixed(2)} ${state.exchangeRate < 0.6 ? '↓' : '↔'}`;
+    val.className = `rate-value ${state.exchangeRate < 0.6 ? 'falling' : ''}`;
+  }
+}
+
+// ── SAVE / LOAD ──
+const SAVE_KEY = 'checkpoint_biafra_save';
+
+function saveState() {
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+function loadGame() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
+    if (!saved) return;
+    Object.assign(state, saved);
+    startDay();
+  } catch(e) {}
+}
+
+function startNewGame() {
+  initAudio();
+  state = {
+    day:1, phase:1, traveller:0, totalTravellers:8,
+    dayApproved:0, dayDenied:0, dayDetained:0,
+    pay:0, totalPay:3400,
+    axes:{loyalty:0,compassion:0,rebellion:0,survival:0,witness:0,corruption:0},
+    player:{name:'',gender:'',state:'',background:'',family:''},
+    family:[], exchangeRate:1.0, dayResults:[], endingsUnlocked:[],
+    flags:{}, currentTraveller:null, bulletinRead:false,
+    moralEventPending:null, moralEventQueue:[], nightEventQueue:[],
+  };
+  try {
+    const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
+    if (saved && saved.endingsUnlocked) state.endingsUnlocked = saved.endingsUnlocked;
+  } catch(e) {}
+  showScreen('char-create');
+}
+
+function showEndingsGallery() {
+  let unlocked = [];
+  try { const s = JSON.parse(localStorage.getItem(SAVE_KEY)); if(s) unlocked = s.endingsUnlocked || []; } catch(e) {}
+  const html = ENDINGS.map(e => {
+    const found = unlocked.includes(e.id);
+    return `<div style="padding:12px;border-bottom:1px solid rgba(242,232,208,0.1)">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:${found?'var(--biafra-gold)':'rgba(242,232,208,0.3)'};letter-spacing:0.1em">${found ? e.title : `ENDING ${e.num} — UNDISCOVERED`}</div>
+      ${found ? `<div style="font-family:'Noto Serif',serif;font-style:italic;font-size:12px;color:rgba(242,232,208,0.6);margin-top:4px">${e.text.replace(/<[^>]*>/g,'').substring(0,120)}…</div>` : ''}
+    </div>`;
+  }).join('');
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:#050703;z-index:500;overflow-y:auto;padding:24px 20px;';
+  overlay.innerHTML = `
+    <div style="max-width:500px;margin:0 auto">
+      <div style="font-family:Bebas Neue,sans-serif;font-size:28px;color:var(--paper);letter-spacing:0.1em;margin-bottom:4px">CASE FILES</div>
+      <div style="font-family:Courier Prime,monospace;font-size:10px;color:var(--biafra-gold);letter-spacing:0.3em;margin-bottom:20px">${unlocked.length} OF 28 ENDINGS DISCOVERED</div>
+      ${html}
+      <br><button class="btn-primary" style="width:100%;clip-path:none;margin-top:16px" onclick="this.parentElement.parentElement.remove()">CLOSE</button>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+function returnToSplash() {
+  showScreen('splash');
+  checkContinue();
+}
+
+function checkContinue() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
+    if (saved && saved.day > 1) {
+      document.getElementById('btn-continue').style.display = 'block';
+      document.getElementById('continue-day').textContent = saved.day;
+    }
+  } catch(e) {}
+}
+
+// ── INIT ──
+function init() {
+  // Cache screens
+  ['splash','char-create','intro','bulletin-screen','game','moral-event','eod-report','ending'].forEach(id => {
+    screens[id] = document.getElementById(id);
+  });
+  // Build sun rays
+  const sun = document.querySelector('.splash-sun');
+  if (sun) {
+    for (let i = 0; i < 11; i++) {
+      const ray = document.createElement('div');
+      ray.className = 'sun-ray';
+      const angle = (i / 11) * 360;
+      ray.style.transform = `translateX(-50%) rotate(${angle}deg) translateY(-100%)`;
+      ray.style.left = '50%';
+      ray.style.bottom = '50%';
+      ray.style.transformOrigin = 'bottom center';
+      sun.appendChild(ray);
+    }
+  }
+  populateBgOptions();
+  cc.updateFamilyOptions();
+  checkContinue();
+  showScreen('splash');
+  // Service worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+}
+
+init();
+
+return { startNewGame, loadGame, cc, decide, closeModal, chooseMoral, acknowledgeBulletin, skipIntro, nextDay, returnToSplash, showEndingsGallery };
+
+})(); // end G
+</script>
+</body>
+</html>
