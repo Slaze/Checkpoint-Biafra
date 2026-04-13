@@ -271,6 +271,21 @@ html, body {
 .cc-option-title { font-weight: 700; display: block; margin-bottom: 2px; font-size: 13px; }
 .cc-option-desc { font-size: 10px; opacity: 0.7; }
 
+/* Error highlight */
+.cc-error { position: relative; }
+.cc-error::after {
+  content: '← REQUIRED';
+  font-family: 'Courier Prime', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--red);
+  position: absolute;
+  top: 0; right: 0;
+}
+.cc-error .cc-label { color: var(--red); }
+.cc-error .cc-option:not(.selected) { border-color: rgba(192,57,43,0.4); }
+.cc-input-error { border-bottom-color: var(--red) !important; background: rgba(192,57,43,0.08) !important; }
+
 .cc-divider {
   border: none;
   border-top: 1px solid rgba(242,232,208,0.1);
@@ -1270,6 +1285,19 @@ html, body {
 
 <div class="noise-overlay"></div>
 
+<!-- BACKGROUND MUSIC — AaRON: Maybe on the Moon -->
+<!-- Hidden YouTube player — loads on first user interaction -->
+<div id="music-container" style="position:fixed;bottom:-9999px;left:-9999px;width:1px;height:1px;overflow:hidden;pointer-events:none;" aria-hidden="true">
+  <div id="yt-player"></div>
+</div>
+<button id="music-toggle" onclick="G.toggleMusic()" style="
+  position:fixed;bottom:20px;right:16px;z-index:999;
+  background:rgba(10,13,7,0.85);border:1px solid rgba(212,160,23,0.3);
+  color:rgba(212,160,23,0.7);font-family:'Courier Prime',monospace;
+  font-size:9px;letter-spacing:0.2em;padding:6px 10px;cursor:pointer;
+  transition:all 0.2s;display:none;
+" title="Toggle music">♪ MUSIC</button>
+
 <!-- SPLASH -->
 <div id="splash" class="screen active">
   <div class="splash-content">
@@ -1281,13 +1309,13 @@ html, body {
     <div class="splash-title">CHECKPOINT<br>BIAFRA</div>
     <div class="splash-subtitle">Federal Identity &amp; Border Authority</div>
     <div class="splash-tagline">"The desk is the same desk. The country is not the same country."</div>
-    <button class="btn-primary" onclick="G.startNewGame()">BEGIN POSTING</button>
+    <button class="btn-primary" onclick="G.startNewGame()">BEGIN WORK SHIFTS</button>
     <br>
     <button class="btn-secondary" onclick="G.loadGame()" id="btn-continue" style="display:none">CONTINUE — DAY <span id="continue-day">1</span></button>
     <br>
     <button class="btn-secondary" onclick="G.showEndingsGallery()" style="margin-top:8px">CASE FILES</button>
   </div>
-  <div class="splash-version">v1.0 · CHECKPOINT BIAFRA · ALL 28 ENDINGS</div>
+  <div class="splash-version">v1.0 · CHECKPOINT BIAFRA · 28 DAYS TO SOVEREIGN STATE COLLAPSE</div>
 </div>
 
 <!-- CHARACTER CREATION -->
@@ -1303,86 +1331,71 @@ html, body {
 
     <!-- Gender -->
     <div class="cc-section" style="animation-delay:0.05s">
-      <label class="cc-label">01 · GENDER</label>
+      <label class="cc-label">01 · SELECT YOUR GENDER</label>
       <div class="cc-grid">
         <button class="cc-option" data-group="gender" data-val="male" onclick="G.cc.select('gender',this,'male')">
           <span class="cc-option-title">MALE</span>
-          <span class="cc-option-desc">Conscription pressure activates Day 10. Bribes are financial and direct.</span>
         </button>
         <button class="cc-option" data-group="gender" data-val="female" onclick="G.cc.select('gender',this,'female')">
           <span class="cc-option-title">FEMALE</span>
-          <span class="cc-option-desc">Institutional friction from Day 1. Additional loyalty pressure Day 9.</span>
         </button>
         <button class="cc-option" data-group="gender" data-val="other" onclick="G.cc.select('gender',this,'other')" style="grid-column:span 2">
           <span class="cc-option-title">PREFER NOT TO STATE</span>
-          <span class="cc-option-desc">No gender-specific friction. No gender-specific networks. All family options available.</span>
         </button>
       </div>
     </div>
 
     <!-- Name -->
     <div class="cc-section" style="animation-delay:0.1s">
-      <label class="cc-label">02 · FULL NAME</label>
+      <label class="cc-label">02 · ENTER YOUR FULL NAME</label>
       <input class="cc-input" id="cc-firstname" placeholder="First name" maxlength="20">
       <input class="cc-input" id="cc-surname" placeholder="Surname" maxlength="20" style="margin-top:8px">
     </div>
 
     <!-- State of origin -->
     <div class="cc-section" style="animation-delay:0.15s">
-      <label class="cc-label">03 · STATE OF ORIGIN</label>
+      <label class="cc-label">03 · SELECT YOUR STATE OF ORIGIN</label>
       <div class="cc-grid">
         <button class="cc-option" data-group="state" data-val="Enugu" onclick="G.cc.select('state',this,'Enugu')">
           <span class="cc-option-title">ENUGU</span>
-          <span class="cc-option-desc">Core Biafra. High loyalty pressure.</span>
         </button>
         <button class="cc-option" data-group="state" data-val="Anambra" onclick="G.cc.select('state',this,'Anambra')">
           <span class="cc-option-title">ANAMBRA</span>
-          <span class="cc-option-desc">Commercial hub. Survival bias.</span>
         </button>
         <button class="cc-option" data-group="state" data-val="Imo" onclick="G.cc.select('state',this,'Imo')">
           <span class="cc-option-title">IMO</span>
-          <span class="cc-option-desc">Strong Catholic presence. Clergy contacts.</span>
         </button>
         <button class="cc-option" data-group="state" data-val="Abia" onclick="G.cc.select('state',this,'Abia')">
           <span class="cc-option-title">ABIA</span>
-          <span class="cc-option-desc">MASSOB origins. Rebellion bias.</span>
         </button>
         <button class="cc-option" data-group="state" data-val="Ebonyi" onclick="G.cc.select('state',this,'Ebonyi')">
           <span class="cc-option-title">EBONYI</span>
-          <span class="cc-option-desc">Highest survival pressure.</span>
         </button>
         <button class="cc-option" data-group="state" data-val="Rivers" onclick="G.cc.select('state',this,'Rivers')">
           <span class="cc-option-title">RIVERS</span>
-          <span class="cc-option-desc">Contested. Oil. Politically loaded.</span>
         </button>
         <button class="cc-option" data-group="state" data-val="Cross River" onclick="G.cc.select('state',this,'Cross River')">
           <span class="cc-option-title">CROSS RIVER</span>
-          <span class="cc-option-desc">Your posting. Home ground exposure.</span>
         </button>
         <button class="cc-option" data-group="state" data-val="Delta" onclick="G.cc.select('state',this,'Delta')">
           <span class="cc-option-title">DELTA</span>
-          <span class="cc-option-desc">Ijaw majority. Not unanimously Biafran.</span>
         </button>
       </div>
     </div>
 
     <!-- Background -->
     <div class="cc-section" style="animation-delay:0.2s">
-      <label class="cc-label">04 · PROFESSIONAL BACKGROUND</label>
+      <label class="cc-label">04 · SELECT YOUR PROFESSIONAL BACKGROUND</label>
       <div id="bg-options" class="cc-grid"></div>
     </div>
 
     <!-- Family -->
     <div class="cc-section" style="animation-delay:0.25s">
-      <label class="cc-label">05 · FAMILY COMPOSITION</label>
+      <label class="cc-label">05 · SELECT YOUR FAMILY COMPOSITION</label>
       <div id="family-options" class="cc-grid"></div>
     </div>
 
     <hr class="cc-divider">
-
-    <div class="cc-lore" style="border-color:var(--biafra-gold);background:rgba(212,160,23,0.08)">
-      Your choices determine which of the 28 endings are available to you. No path is closed entirely — but some are easier to find from where you start.
-    </div>
   </div>
 
   <div class="cc-proceed">
@@ -1512,11 +1525,10 @@ html, body {
 <!-- ENDING SCREEN -->
 <div id="ending" class="screen">
   <div class="ending-content">
-    <span class="ending-number" id="ending-number">ENDING 1 OF 28</span>
     <div class="ending-title" id="ending-title">ENDING TITLE</div>
     <div class="ending-text" id="ending-text"></div>
     <div class="ending-axes" id="ending-axes"></div>
-    <div class="endings-unlocked" id="endings-unlocked">1 OF 28 ENDINGS DISCOVERED</div>
+    <div class="endings-unlocked" id="endings-unlocked"></div>
     <button class="btn-primary" onclick="G.returnToSplash()" style="margin-top:8px">RETURN TO CHECKPOINT</button>
   </div>
 </div>
@@ -1584,39 +1596,49 @@ function showScreen(id) {
 
 // ── DATA: BACKGROUNDS ──
 const BACKGROUNDS = [
-  { id:'civil', label:'FIBA CIVIL SERVANT', desc:'Neutral start. All axes open. No special ability.', bias:{}, ability:'No special bonus' },
-  { id:'soldier', label:'FORMER ARMY', desc:'Recognises military forgeries. Colleagues distrust you.', bias:{loyalty:2}, ability:'Spot military ID fakes' },
-  { id:'teacher', label:'SCHOOLTEACHER', desc:'Spots forged handwriting faster. Lower pay bracket.', bias:{compassion:2}, ability:'Detect writing forgeries' },
-  { id:'nysc', label:'NYSC CORP MEMBER', desc:'Corps networks. Can be terminated in 48hrs.', bias:{witness:2}, ability:'Pass info through NYSC channels' },
-  { id:'tech', label:'TECH WORKER', desc:'Cross-references BVN/NIN faster. Wants to return to Lagos.', bias:{witness:1,survival:1}, ability:'Detect ID number patterns' },
-  { id:'ngo', label:'NGO FIELD OFFICER', desc:'Red Cross contacts. FIBA commanders distrust you.', bias:{compassion:1,witness:1}, ability:'Formal humanitarian flagging' },
-  { id:'clergy', label:'CATHOLIC CLERGY', desc:'Church networks. Foreign contacts. Complex loyalties.', bias:{compassion:2,rebellion:1}, ability:'Access missionary network' },
-  { id:'trader', label:'MARKET TRADER', desc:'Reads people extremely well. Flagged as corruption risk.', bias:{survival:2}, ability:'Detect rehearsed stories' },
-  { id:'journalist', label:'JOURNALIST', desc:'Dossier building is core mechanic. Sources approach you.', bias:{witness:3}, ability:'Build hidden case file' },
-  { id:'pastor', label:'PASTOR/MINISTER', desc:'Community brings you information. Congregation is divided.', bias:{compassion:2,loyalty:1}, ability:'Receive community intelligence' },
+  { id:'civil', label:'FIBA CIVIL SERVANT', desc:'Federal civil servant. Posted to Checkpoint Ogoja-East by administrative order.', bias:{} },
+  { id:'soldier', label:'FORMER NIGERIAN ARMY', desc:'Medically discharged. Returned to civilian life before the secession.', bias:{loyalty:2} },
+  { id:'teacher', label:'SECONDARY SCHOOL TEACHER', desc:'Reassigned from classroom to field posting. Your school is still open — for now.', bias:{compassion:2} },
+  { id:'nysc', label:'NYSC CORP MEMBER', desc:'Your service year has been indefinitely extended. No explanation was given.', bias:{witness:2} },
+  { id:'tech', label:'TECH WORKER', desc:'Lagos-based software engineer. Emergency reassigned to FIBA field operations.', bias:{witness:1,survival:1} },
+  { id:'ngo', label:'NGO FIELD OFFICER', desc:'Seconded to FIBA from an international humanitarian organisation.', bias:{compassion:1,witness:1} },
+  { id:'clergy', label:'CATHOLIC CLERGY (LAICISED)', desc:'Formerly of the Diocese of Ogoja. Now a civil officer. Some things do not leave you.', bias:{compassion:2,rebellion:1} },
+  { id:'trader', label:'LICENSED MARKET TRADER', desc:'Forced into a FIBA posting. Your stall is still there. You think about it.', bias:{survival:2} },
+  { id:'journalist', label:'JOURNALIST', desc:'Press credentials suspended. Reassigned. You still notice everything.', bias:{witness:3} },
+  { id:'pastor', label:'PENTECOSTAL PASTOR', desc:'Community leader. Your congregation is divided. Your posting divides you further.', bias:{compassion:2,loyalty:1} },
+  { id:'doctor', label:'MEDICAL DOCTOR', desc:'Diverted from clinical practice into field health screening for FIBA.', bias:{compassion:2,witness:1} },
+  { id:'lawyer', label:'LAWYER', desc:'Formerly in private practice. You know exactly which rules are being broken here.', bias:{witness:2,rebellion:1} },
+  { id:'banker', label:'BANKER', desc:'Seconded from a commercial bank by FIBA\'s financial intelligence unit.', bias:{survival:2,witness:1} },
+  { id:'artisan_welder', label:'ARTISAN — WELDER / FABRICATOR', desc:'Skilled tradesman. Posted after your workshop was commandeered for military use.', bias:{survival:1,rebellion:1} },
+  { id:'artisan_tailor', label:'ARTISAN — TAILOR / FASHION DESIGNER', desc:'You know how fabric is cut, how uniforms are made. You notice what people wear.', bias:{witness:1,compassion:1} },
+  { id:'artisan_mechanic', label:'ARTISAN — AUTO MECHANIC', desc:'You have seen what has been moving through this road for months. Now you stamp papers instead.', bias:{survival:2} },
+  { id:'pharmacist', label:'PHARMACIST', desc:'Licensed dispenser. Reassigned after the drug supply chain collapsed in the east.', bias:{compassion:2} },
+  { id:'police', label:'NIGERIA POLICE FORCE (TRANSFERRED)', desc:'Transferred from state CID to FIBA border operations. You have interrogated people before.', bias:{loyalty:2,witness:1} },
+  { id:'accountant', label:'ACCOUNTANT / AUDITOR', desc:'Numbers do not lie. You have been watching the pay figures with interest.', bias:{survival:1,witness:2} },
+  { id:'nurse', label:'REGISTERED NURSE', desc:'Diverted to FIBA medical screening unit at the checkpoint. You see what the documents don\'t say.', bias:{compassion:3} },
 ];
 
 // ── DATA: FAMILY OPTIONS ──
 const FAMILY_MALE = [
-  { id:'single', label:'SINGLE', desc:'No dependants. Full risk tolerance.', pressure:0 },
-  { id:'partner', label:'PARTNER', desc:'Girlfriend/fiancée. Limited financial obligation.', pressure:1 },
-  { id:'wife', label:'WIFE, NO CHILDREN', desc:'Emotional weight. Wife has her own views on Biafra.', pressure:2 },
-  { id:'wife_child', label:'WIFE + 1 CHILD', desc:'School fees activate. Child illness events possible.', pressure:3 },
-  { id:'wife_children', label:'WIFE + 3 CHILDREN', desc:'Daily expense pressure constant from Day 1.', pressure:4 },
-  { id:'wife_extended', label:'WIFE + CHILDREN + PARENT', desc:'Medical costs for parent mid-game. Parent lived through 1967.', pressure:5 },
-  { id:'divorced', label:'DIVORCED', desc:'Paying child support remotely. Loneliness mechanic.', pressure:2 },
-  { id:'widower', label:'WIDOWER', desc:'Sole guardian. No partner support.', pressure:4 },
+  { id:'single', label:'SINGLE', desc:'No dependants. Living alone at the posting.' },
+  { id:'partner', label:'PARTNER', desc:'In a relationship. Not yet married.' },
+  { id:'wife', label:'WIFE, NO CHILDREN', desc:'Married. No children at this time.' },
+  { id:'wife_child', label:'WIFE + 1 CHILD', desc:'Married with one child.' },
+  { id:'wife_children', label:'WIFE + 3 CHILDREN', desc:'Married with three children.' },
+  { id:'wife_extended', label:'WIFE + CHILDREN + ELDERLY PARENT', desc:'Extended household. Spouse, children, and one aged parent.' },
+  { id:'divorced', label:'DIVORCED', desc:'Separated. Children live with former spouse.' },
+  { id:'widower', label:'WIDOWER', desc:'Spouse deceased. Sole guardian of the children.' },
 ];
 
 const FAMILY_FEMALE = [
-  { id:'single_f', label:'SINGLE', desc:'No dependants. Institutional friction is highest.', pressure:0 },
-  { id:'husband_remote', label:'HUSBAND (REMOTE)', desc:'He does not understand the posting. Day 15 event.', pressure:2 },
-  { id:'husband_child_away', label:'HUSBAND + CHILD (AWAY)', desc:'Separation from child creates emotional cost.', pressure:3 },
-  { id:'husband_children_here', label:'FAMILY AT POSTING', desc:'Family present but in danger. Evacuation Day 18.', pressure:4 },
-  { id:'single_mother_away', label:'SINGLE MOTHER (CHILD AWAY)', desc:'You send money home. Relatives\' Biafra stance matters.', pressure:3 },
-  { id:'single_mother_here', label:'SINGLE MOTHER (CHILD WITH YOU)', desc:'Child at checkpoint. Most emotionally demanding.', pressure:5 },
-  { id:'siblings', label:'CARER FOR SIBLINGS', desc:'Parents deceased. Siblings at conscription age.', pressure:4 },
-  { id:'pregnant', label:'PREGNANT (UNDISCLOSED)', desc:'Medical needs increase. Disclosure ends posting.', pressure:3 },
+  { id:'single_f', label:'SINGLE', desc:'No dependants. Living alone at the posting.' },
+  { id:'husband_remote', label:'HUSBAND (WORKING REMOTELY)', desc:'Married. Husband is stationed elsewhere.' },
+  { id:'husband_child_away', label:'HUSBAND + CHILD (NOT AT POSTING)', desc:'Married with one child. Family remains behind.' },
+  { id:'husband_children_here', label:'HUSBAND + CHILDREN (AT POSTING)', desc:'Married. Family has relocated with you to Ogoja-East.' },
+  { id:'single_mother_away', label:'SINGLE MOTHER — CHILD WITH RELATIVES', desc:'Child is in the care of family back home.' },
+  { id:'single_mother_here', label:'SINGLE MOTHER — CHILD WITH YOU', desc:'Child is at the posting with you.' },
+  { id:'siblings', label:'CARER FOR YOUNGER SIBLINGS', desc:'Parents deceased. You are raising your siblings.' },
+  { id:'pregnant', label:'PREGNANT', desc:'First trimester. The posting continues.' },
 ];
 
 const FAMILY_OTHER = [...FAMILY_MALE, ...FAMILY_FEMALE].filter((f,i,arr) => 
@@ -1841,6 +1863,9 @@ const cc = {
     document.querySelectorAll(`[data-group="${group}"]`).forEach(e => e.classList.remove('selected'));
     el.classList.add('selected');
     this.data[group] = val;
+    // Clear error highlight on this section
+    const section = el.closest('.cc-section');
+    if (section) { section.classList.remove('cc-error'); }
     if (group === 'gender') this.updateFamilyOptions();
   },
   updateFamilyOptions() {
@@ -1857,11 +1882,38 @@ const cc = {
   proceed() {
     const fn = document.getElementById('cc-firstname').value.trim();
     const sn = document.getElementById('cc-surname').value.trim();
-    if (!fn || !sn) { alert('Please enter your full name.'); return; }
-    if (!this.data.gender) { alert('Please select gender.'); return; }
-    if (!this.data.state) { alert('Please select your state of origin.'); return; }
-    if (!this.data.background) { alert('Please select your professional background.'); return; }
-    if (!this.data.family) { alert('Please select your family composition.'); return; }
+    let errors = [];
+    // Clear all errors first
+    document.querySelectorAll('.cc-section').forEach(s => s.classList.remove('cc-error'));
+    document.querySelectorAll('.cc-input').forEach(i => i.classList.remove('cc-input-error'));
+    // Validate each field
+    if (!this.data.gender) {
+      errors.push('gender');
+      document.querySelectorAll('[data-group="gender"]')[0]?.closest('.cc-section')?.classList.add('cc-error');
+    }
+    if (!fn || !sn) {
+      errors.push('name');
+      if (!fn) document.getElementById('cc-firstname').classList.add('cc-input-error');
+      if (!sn) document.getElementById('cc-surname').classList.add('cc-input-error');
+    }
+    if (!this.data.state) {
+      errors.push('state');
+      document.querySelectorAll('[data-group="state"]')[0]?.closest('.cc-section')?.classList.add('cc-error');
+    }
+    if (!this.data.background) {
+      errors.push('background');
+      document.getElementById('bg-options')?.closest('.cc-section')?.classList.add('cc-error');
+    }
+    if (!this.data.family) {
+      errors.push('family');
+      document.getElementById('family-options')?.closest('.cc-section')?.classList.add('cc-error');
+    }
+    if (errors.length > 0) {
+      // Scroll to first error
+      const firstError = document.querySelector('.cc-error, .cc-input-error');
+      if (firstError) firstError.scrollIntoView({ behavior:'smooth', block:'center' });
+      return;
+    }
     state.player = { name:`${fn} ${sn}`, firstname:fn, gender:this.data.gender, state:this.data.state, background:this.data.background, family:this.data.family };
     const bg = BACKGROUNDS.find(b => b.id === this.data.background);
     if (bg) Object.entries(bg.bias).forEach(([k,v]) => state.axes[k] = (state.axes[k]||0) + v);
@@ -1955,10 +2007,12 @@ function startDay() {
   state.dayApproved = 0;
   state.dayDenied = 0;
   state.dayDetained = 0;
-  state.totalTravellers = 8 + Math.floor(state.day / 4);
-  if (state.totalTravellers > 14) state.totalTravellers = 14;
+  state.totalTravellers = Math.min(14, 8 + Math.floor(state.day / 4));
   state.traveller = 0;
   state.exchangeRate = getExchangeRate(state.day);
+  // Cache this day's traveller list so the index stays stable
+  state.dayTravellers = getTravellersForDay(state.day);
+  state.totalTravellers = state.dayTravellers.length;
   updateHUD();
   checkMoralEvents();
   showBulletin(state.day);
@@ -2009,15 +2063,19 @@ function getTravellersForDay(day) {
 }
 
 function loadNextTraveller() {
-  if (state.traveller >= state.totalTravellers) {
+  if (!state.dayTravellers || state.dayTravellers.length === 0) {
+    state.dayTravellers = getTravellersForDay(state.day);
+    state.totalTravellers = state.dayTravellers.length;
+  }
+  if (state.traveller >= state.dayTravellers.length) {
     endOfDay(); return;
   }
-  const travellers = getTravellersForDay(state.day);
-  const t = travellers[state.traveller] || travellers[0];
+  const t = state.dayTravellers[state.traveller];
   state.currentTraveller = t;
   renderTraveller(t);
   renderDocs(t);
   updateQueueDots();
+  updateHUD();
 }
 
 function renderTraveller(t) {
@@ -2242,6 +2300,7 @@ function nextDay() {
   if (state.day >= 25) { calculateEnding(); return; }
   state.day++;
   state.dayResults = [];
+  state.dayTravellers = [];
   startDay();
 }
 
@@ -2257,19 +2316,18 @@ function calculateEnding() {
 }
 
 function showEnding(ending) {
-  document.getElementById('ending-number').textContent = `ENDING ${ending.num} OF 28`;
   document.getElementById('ending-title').textContent = ending.title;
   document.getElementById('ending-text').innerHTML = ending.text;
   const axesEl = document.getElementById('ending-axes');
   axesEl.innerHTML = ending.axes.map(a => `<span class="axis-tag ${a}">${a.toUpperCase()}</span>`).join('');
-  // Show axis scores
+  // Show axis scores quietly — no counts, no hints
   const axisScores = Object.entries(state.axes)
     .filter(([,v]) => v > 0)
     .sort((a,b) => b[1]-a[1])
-    .map(([k,v]) => `<span class="axis-tag ${k}">${k.toUpperCase()} ${v}</span>`)
+    .map(([k,v]) => `<span class="axis-tag ${k}">${k.toUpperCase()}</span>`)
     .join('');
-  axesEl.innerHTML += '<br>' + axisScores;
-  document.getElementById('endings-unlocked').textContent = `${state.endingsUnlocked.length} OF 28 ENDINGS DISCOVERED`;
+  if (axisScores) axesEl.innerHTML += '<br>' + axisScores;
+  document.getElementById('endings-unlocked').textContent = '';
   showScreen('ending');
 }
 
@@ -2338,7 +2396,7 @@ function startNewGame() {
     pay:0, totalPay:3400,
     axes:{loyalty:0,compassion:0,rebellion:0,survival:0,witness:0,corruption:0},
     player:{name:'',gender:'',state:'',background:'',family:''},
-    family:[], exchangeRate:1.0, dayResults:[], endingsUnlocked:[],
+    family:[], exchangeRate:1.0, dayResults:[], dayTravellers:[], endingsUnlocked:[],
     flags:{}, currentTraveller:null, bulletinRead:false,
     moralEventPending:null, moralEventQueue:[], nightEventQueue:[],
   };
@@ -2352,19 +2410,19 @@ function startNewGame() {
 function showEndingsGallery() {
   let unlocked = [];
   try { const s = JSON.parse(localStorage.getItem(SAVE_KEY)); if(s) unlocked = s.endingsUnlocked || []; } catch(e) {}
-  const html = ENDINGS.map(e => {
+  const html = ENDINGS.map((e, idx) => {
     const found = unlocked.includes(e.id);
     return `<div style="padding:12px;border-bottom:1px solid rgba(242,232,208,0.1)">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:${found?'var(--biafra-gold)':'rgba(242,232,208,0.3)'};letter-spacing:0.1em">${found ? e.title : `ENDING ${e.num} — UNDISCOVERED`}</div>
-      ${found ? `<div style="font-family:'Noto Serif',serif;font-style:italic;font-size:12px;color:rgba(242,232,208,0.6);margin-top:4px">${e.text.replace(/<[^>]*>/g,'').substring(0,120)}…</div>` : ''}
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:${found?'var(--biafra-gold)':'rgba(242,232,208,0.15)'};letter-spacing:0.1em">${found ? e.title : `CASE ${String(idx+1).padStart(2,'0')} — FILE SEALED`}</div>
+      ${found ? `<div style="font-family:'Noto Serif',serif;font-style:italic;font-size:12px;color:rgba(242,232,208,0.6);margin-top:4px;line-height:1.5">${e.text.replace(/<[^>]*>/g,'').substring(0,140)}…</div>` : ''}
     </div>`;
   }).join('');
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;background:#050703;z-index:500;overflow-y:auto;padding:24px 20px;';
   overlay.innerHTML = `
     <div style="max-width:500px;margin:0 auto">
-      <div style="font-family:Bebas Neue,sans-serif;font-size:28px;color:var(--paper);letter-spacing:0.1em;margin-bottom:4px">CASE FILES</div>
-      <div style="font-family:Courier Prime,monospace;font-size:10px;color:var(--biafra-gold);letter-spacing:0.3em;margin-bottom:20px">${unlocked.length} OF 28 ENDINGS DISCOVERED</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--paper);letter-spacing:0.1em;margin-bottom:4px">CASE FILES</div>
+      <div style="font-family:'Courier Prime',monospace;font-size:10px;color:rgba(242,232,208,0.4);letter-spacing:0.3em;margin-bottom:20px">CASES ATTENDED: ${unlocked.length}</div>
       ${html}
       <br><button class="btn-primary" style="width:100%;clip-path:none;margin-top:16px" onclick="this.parentElement.parentElement.remove()">CLOSE</button>
     </div>`;
@@ -2418,9 +2476,85 @@ function init() {
 
 init();
 
-return { startNewGame, loadGame, cc, decide, closeModal, chooseMoral, acknowledgeBulletin, skipIntro, nextDay, returnToSplash, showEndingsGallery };
+return { startNewGame, loadGame, cc, decide, closeModal, chooseMoral, acknowledgeBulletin, skipIntro, nextDay, returnToSplash, showEndingsGallery, toggleMusic: () => _toggleMusic() };
 
 })(); // end G
+<!-- YouTube IFrame API -->
+<script>
+// ── MUSIC: AaRON — Maybe on the Moon ──
+// YouTube video ID for "Maybe on the Moon" by AaRON
+const MUSIC_VIDEO_ID = 'SMBoP_zvauI';
+let ytPlayer = null;
+let musicReady = false;
+let musicEnabled = true;
+let musicInitialised = false;
+
+function loadYouTubeAPI() {
+  if (musicInitialised) return;
+  musicInitialised = true;
+  const tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(tag);
+}
+
+window.onYouTubeIframeAPIReady = function() {
+  ytPlayer = new YT.Player('yt-player', {
+    height: '1',
+    width: '1',
+    videoId: MUSIC_VIDEO_ID,
+    playerVars: {
+      autoplay: 1,
+      loop: 1,
+      playlist: MUSIC_VIDEO_ID,
+      controls: 0,
+      disablekb: 1,
+      fs: 0,
+      modestbranding: 1,
+      rel: 0,
+      iv_load_policy: 3,
+    },
+    events: {
+      onReady: function(e) {
+        musicReady = true;
+        e.target.setVolume(35);
+        if (musicEnabled) e.target.playVideo();
+        document.getElementById('music-toggle').style.display = 'block';
+      },
+      onStateChange: function(e) {
+        // Restart if ended (loop fallback)
+        if (e.data === YT.PlayerState.ENDED) {
+          e.target.playVideo();
+        }
+      }
+    }
+  });
+};
+
+// Expose toggle to G object after init — patched in below
+function _toggleMusic() {
+  if (!ytPlayer || !musicReady) return;
+  musicEnabled = !musicEnabled;
+  const btn = document.getElementById('music-toggle');
+  if (musicEnabled) {
+    ytPlayer.playVideo();
+    btn.style.color = 'rgba(212,160,23,0.7)';
+    btn.textContent = '♪ MUSIC';
+  } else {
+    ytPlayer.pauseVideo();
+    btn.style.color = 'rgba(242,232,208,0.2)';
+    btn.textContent = '♪ OFF';
+  }
+}
+
+// Load YouTube API on first user interaction with the page
+document.addEventListener('click', function initMusic() {
+  loadYouTubeAPI();
+  document.removeEventListener('click', initMusic);
+}, { once: true });
+document.addEventListener('touchstart', function initMusicTouch() {
+  loadYouTubeAPI();
+  document.removeEventListener('touchstart', initMusicTouch);
+}, { once: true });
 </script>
 </body>
 </html>
