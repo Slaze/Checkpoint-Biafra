@@ -1,59 +1,70 @@
-// CHECKPOINT BIAFRA — Service Worker
-// Enables full offline play after first load
+// CHECKPOINT BIAFRA — Service Worker v2
+// Full offline PWA for iOS Safari home screen install
 
-const CACHE_NAME = 'checkpoint-biafra-v1';
-const ASSETS = [
+const CACHE = 'checkpoint-biafra-v2';
+const CORE = [
+  './',
   './index.html',
   './manifest.json',
-  'https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap',
 ];
 
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(ASSETS.map(url => new Request(url, { mode: 'no-cors' })));
-    }).catch(() => {
-      return caches.open(CACHE_NAME).then(cache => cache.add('./index.html'));
-    })
+// Install: cache core assets immediately
+self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open(CACHE).then(cache => {
+      return cache.addAll(CORE).catch(() => cache.add('./index.html'));
+    }).then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-    )
+// Activate: purge old caches
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
-self.addEventListener('fetch', event => {
-  // Cache-first for game assets, network-first for fonts
-  if (event.request.url.includes('fonts.googleapis') || event.request.url.includes('fonts.gstatic')) {
-    event.respondWith(
-      caches.open(CACHE_NAME).then(cache =>
-        cache.match(event.request).then(cached => {
-          const fetchPromise = fetch(event.request).then(response => {
-            cache.put(event.request, response.clone());
-            return response;
-          });
-          return cached || fetchPromise;
+// Fetch: cache-first for app shell, network-first for fonts/YouTube
+self.addEventListener('fetch', e => {
+  const url = e.request.url;
+
+  // Never intercept YouTube/Google API calls — music must go to network
+  if (url.includes('youtube.com') || url.includes('ytimg.com') || url.includes('googlevideo.com')) {
+    return;
+  }
+
+  // Fonts: stale-while-revalidate
+  if (url.includes('fonts.googleapis.com') || url.includes('fonts.gstatic.com')) {
+    e.respondWith(
+      caches.open(CACHE).then(cache =>
+        cache.match(e.request).then(cached => {
+          const fresh = fetch(e.request).then(r => { cache.put(e.request, r.clone()); return r; });
+          return cached || fresh;
         })
       )
     );
-  } else {
-    event.respondWith(
-      caches.match(event.request).then(cached => {
-        if (cached) return cached;
-        return fetch(event.request).then(response => {
-          if (response.ok) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-          }
-          return response;
-        }).catch(() => caches.match('./index.html'));
-      })
-    );
+    return;
   }
+
+  // App shell: cache-first, fallback to network, fallback to index.html
+  e.respondWith(
+    caches.match(e.request).then(cached => {
+      if (cached) return cached;
+      return fetch(e.request).then(response => {
+        // Only cache valid same-origin responses
+        if (response && response.status === 200 && response.type === 'basic') {
+          const clone = response.clone();
+          caches.open(CACHE).then(cache => cache.put(e.request, clone));
+        }
+        return response;
+      }).catch(() => caches.match('./index.html'));
+    })
+  );
+});
+
+// Background sync — re-cache on reconnect
+self.addEventListener('message', e => {
+  if (e.data === 'SKIP_WAITING') self.skipWaiting();
 });
