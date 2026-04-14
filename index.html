@@ -5,9 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#2C3E1F">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Checkpoint Biafra">
-<meta name="description" content="A border checkpoint game set during the Biafran secession.">
+<meta name="description" content="A border checkpoint game set during the Biafran secession. 28 days. 28 endings.">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-tap-highlight" content="no">
+<!-- iOS splash / icon hints -->
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
+<link rel="apple-touch-startup-image" href="icon-512.png">
 <title>CHECKPOINT BIAFRA</title>
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -54,7 +62,19 @@ html, body {
 }
 
 /* ═══ SCREENS ═══ */
-.screen { position: fixed; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10; }
+.screen {
+  position: fixed;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  height: 100dvh; /* dynamic viewport height - fixes iOS Safari */
+}
 .screen.active { display: flex; }
 
 /* ═══ SPLASH ═══ */
@@ -178,8 +198,10 @@ html, body {
 #char-create {
   background: var(--olive);
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 0;
   justify-content: flex-start;
+  touch-action: pan-y;
 }
 
 .cc-header {
@@ -364,6 +386,9 @@ html, body {
 #bulletin-screen {
   background: rgba(10,13,7,0.97);
   padding: 20px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
 .bulletin-paper {
@@ -447,6 +472,9 @@ html, body {
   background: var(--olive);
   padding: 0;
   flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
 }
 
 /* Top HUD */
@@ -459,6 +487,7 @@ html, body {
   justify-content: space-between;
   z-index: 20;
   flex-shrink: 0;
+  width: 100%;
 }
 
 .hud-day {
@@ -528,13 +557,16 @@ html, body {
 
 /* Desk area */
 .desk {
-  flex: 1;
+  flex: 1 1 0;
+  min-height: 0;
   position: relative;
   overflow: hidden;
   background: 
     var(--desk-texture),
     radial-gradient(ellipse at 40% 60%, #3a5028 0%, var(--olive) 60%, var(--olive-dark) 100%);
   cursor: default;
+  display: flex;
+  flex-direction: column;
 }
 
 .desk::after {
@@ -546,14 +578,23 @@ html, body {
   z-index: 1;
 }
 
+.desk-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.35) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
 /* Traveller panel */
 .traveller-panel {
   position: absolute;
   top: 10px; left: 10px; right: 10px;
-  background: rgba(10,13,7,0.85);
+  background: rgba(10,13,7,0.88);
   border: 1px solid rgba(212,160,23,0.3);
   padding: 12px 14px;
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   z-index: 5;
   animation: slideDown 0.3s ease both;
 }
@@ -591,13 +632,17 @@ html, body {
 /* Documents on desk */
 .doc-stack {
   position: absolute;
-  bottom: 80px; left: 0; right: 0;
+  top: 110px;
+  bottom: 70px;
+  left: 0; right: 0;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 10px;
+  padding: 10px 10px 0;
   justify-content: center;
+  align-content: center;
   z-index: 3;
+  overflow: hidden;
 }
 
 .doc-card {
@@ -682,6 +727,7 @@ html, body {
   gap: 0;
   z-index: 10;
   flex-shrink: 0;
+  height: 64px;
 }
 
 .action-btn {
@@ -874,6 +920,9 @@ html, body {
   background: rgba(5,7,3,0.98);
   padding: 24px 20px;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  justify-content: flex-start;
 }
 
 .moral-content {
@@ -940,6 +989,9 @@ html, body {
   background: var(--olive-dark);
   padding: 24px 20px;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  justify-content: flex-start;
 }
 
 .eod-paper {
@@ -1265,7 +1317,7 @@ html, body {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 1000;
+  z-index: 2;
   opacity: 0.03;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
@@ -1283,6 +1335,86 @@ html, body {
 </head>
 <body>
 
+<!-- PWA INSTALL CAVEAT — shows once on first visit -->
+<div id="pwa-caveat" style="
+  position:fixed;inset:0;z-index:9999;
+  background:rgba(10,13,7,0.97);
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;font-family:'Noto Serif',serif;
+">
+  <div style="
+    max-width:420px;width:100%;
+    background:#1A2610;
+    border:1px solid rgba(212,160,23,0.4);
+    padding:28px 24px;
+    position:relative;
+  ">
+    <div style="
+      font-family:'Bebas Neue',sans-serif;
+      font-size:11px;letter-spacing:0.4em;
+      color:#D4A017;margin-bottom:12px;
+    ">CHECKPOINT BIAFRA · FIBA</div>
+    <div style="
+      font-family:'Bebas Neue',sans-serif;
+      font-size:24px;color:#F2E8D0;
+      letter-spacing:0.08em;line-height:1.1;
+      margin-bottom:16px;
+    ">BEFORE YOU BEGIN</div>
+    <div style="
+      font-size:14px;color:rgba(242,232,208,0.85);
+      line-height:1.8;margin-bottom:20px;
+    ">
+      This is a <strong style="color:#D4A017;">Progressive Web App (PWA)</strong> designed to be installed on your iOS home screen for the best experience.
+    </div>
+    <div style="
+      background:rgba(192,57,43,0.12);
+      border-left:3px solid #C0392B;
+      padding:12px 14px;
+      font-family:'Courier Prime',monospace;
+      font-size:12px;
+      color:rgba(242,232,208,0.9);
+      line-height:1.7;
+      margin-bottom:20px;
+    ">
+      <strong>If you haven't installed this game yet:</strong><br>
+      1. Tap the <strong>Share icon</strong> (□↑) in Safari<br>
+      2. Select <strong>"Add to Home Screen"</strong><br>
+      3. Open the app from your home screen<br><br>
+      On Mac: Click <strong>···</strong> in Safari toolbar → <strong>"Add to Dock"</strong><br><br>
+      Playing from the browser tab may cause the game to not function properly.
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button onclick="document.getElementById('pwa-caveat').style.display='none';localStorage.setItem('pwa_caveat_seen','1');" style="
+        flex:1;
+        background:#D4A017;color:#1A2610;
+        border:none;font-family:'Bebas Neue',sans-serif;
+        font-size:16px;letter-spacing:0.1em;
+        padding:12px 20px;cursor:pointer;
+        min-width:140px;
+      ">I UNDERSTAND — CONTINUE</button>
+      <button onclick="document.getElementById('pwa-caveat').style.display='none';localStorage.setItem('pwa_caveat_seen','1');" style="
+        flex:1;
+        background:transparent;color:rgba(242,232,208,0.5);
+        border:1px solid rgba(242,232,208,0.2);
+        font-family:'Courier Prime',monospace;
+        font-size:11px;letter-spacing:0.15em;
+        padding:12px 16px;cursor:pointer;
+        min-width:120px;
+      ">PLAY IN BROWSER</button>
+    </div>
+  </div>
+</div>
+<script>
+// Show PWA caveat only if not seen before
+(function() {
+  if (!localStorage.getItem('pwa_caveat_seen')) {
+    document.getElementById('pwa-caveat').style.display = 'flex';
+  } else {
+    document.getElementById('pwa-caveat').style.display = 'none';
+  }
+})();
+</script>
+
 <div class="noise-overlay"></div>
 
 <!-- BACKGROUND MUSIC — AaRON: Maybe on the Moon -->
@@ -1291,7 +1423,7 @@ html, body {
   <div id="yt-player"></div>
 </div>
 <button id="music-toggle" onclick="G.toggleMusic()" style="
-  position:fixed;bottom:20px;right:16px;z-index:999;
+  position:fixed;bottom:20px;right:16px;z-index:50;
   background:rgba(10,13,7,0.85);border:1px solid rgba(212,160,23,0.3);
   color:rgba(212,160,23,0.7);font-family:'Courier Prime',monospace;
   font-size:9px;letter-spacing:0.2em;padding:6px 10px;cursor:pointer;
@@ -1307,7 +1439,7 @@ html, body {
       <div class="sun-ray" style="transform:translateX(-50%) rotate(0deg) translateY(-100%) translateX(0)"></div>
     </div>
     <div class="splash-title">CHECKPOINT<br>BIAFRA</div>
-    <div class="splash-subtitle">Federal Identity &amp; Border Authority</div>
+    <div class="splash-subtitle">Federal Ministry of Identity &amp; Border Affairs</div>
     <div class="splash-tagline">"The desk is the same desk. The country is not the same country."</div>
     <button class="btn-primary" onclick="G.startNewGame()">BEGIN WORK SHIFTS</button>
     <br>
@@ -1416,7 +1548,7 @@ html, body {
   <div class="bulletin-paper">
     <div class="bulletin-stamp" id="bulletin-stamp">CLASSIFIED</div>
     <div class="bulletin-header">
-      <span class="bulletin-logo">FEDERAL IDENTITY & BORDER AUTHORITY</span>
+      <span class="bulletin-logo">FEDERAL MINISTRY OF IDENTITY AND BORDER AFFAIRS</span>
       <div class="bulletin-title" id="bulletin-title">DAILY BULLETIN</div>
       <div class="bulletin-num" id="bulletin-num">BULLETIN 001 · DAY 1</div>
     </div>
@@ -1446,11 +1578,12 @@ html, body {
     </div>
   </div>
 
-  <!-- Desk -->
+  <!-- Desk — fills remaining height -->
   <div class="desk" id="desk">
-    <!-- Traveller info panel -->
+
+    <!-- Traveller info panel — top of desk -->
     <div class="traveller-panel" id="traveller-panel">
-      <div class="traveller-panel-name" id="tp-name">TRAVELLER</div>
+      <div class="traveller-panel-name" id="tp-name">—</div>
       <div class="traveller-panel-desc" id="tp-desc"></div>
       <div id="tp-flags"></div>
     </div>
@@ -1464,10 +1597,13 @@ html, body {
     <!-- Family sidebar -->
     <div class="family-bar" id="family-bar"></div>
 
-    <!-- Documents -->
+    <!-- Desk vignette overlay -->
+    <div class="desk-vignette"></div>
+
+    <!-- Documents — centre of desk -->
     <div class="doc-stack" id="doc-stack"></div>
 
-    <!-- Action buttons -->
+    <!-- Action buttons — pinned to bottom -->
     <div class="action-bar">
       <button class="action-btn btn-approve" onclick="G.decide('approve')">
         APPROVE
@@ -2007,11 +2143,11 @@ function startDay() {
   state.dayApproved = 0;
   state.dayDenied = 0;
   state.dayDetained = 0;
-  state.totalTravellers = Math.min(14, 8 + Math.floor(state.day / 4));
   state.traveller = 0;
   state.exchangeRate = getExchangeRate(state.day);
-  // Cache this day's traveller list so the index stays stable
-  state.dayTravellers = getTravellersForDay(state.day);
+  // Build and cache this day's traveller list FIRST, then set totalTravellers from it
+  const targetCount = Math.min(14, 8 + Math.floor(state.day / 4));
+  state.dayTravellers = getTravellersForDay(state.day, targetCount);
   state.totalTravellers = state.dayTravellers.length;
   updateHUD();
   checkMoralEvents();
@@ -2031,46 +2167,61 @@ function startProcessing() {
   updateHUD();
   updateFamilyBar();
   updateRateWidget();
-  // Check if moral event fires before first traveller
-  const morEvent = checkMoralEventForDay(state.day);
-  if (morEvent && !state.flags['moral_' + morEvent.day + '_done']) {
-    state.moralEventQueue = [morEvent];
-    setTimeout(() => fireNextMoralEvent(), 800);
-  } else {
-    loadNextTraveller();
-  }
+  // Always load the first traveller — mid-day moral events fire inside decide()
+  setTimeout(() => loadNextTraveller(), 100);
 }
 
 function checkMoralEvents() {}
 
 function checkMoralEventForDay(day) {
-  return Object.values(MORAL_EVENTS).find(e => e.day === day);
+  return Object.values(MORAL_EVENTS).find(e => {
+    if (e.day !== day) return false;
+    // bulletin_021 only fires if player is from Rivers or Cross River
+    if (e.day === 21) {
+      const playerState = (state.player && state.player.state) || '';
+      return playerState === 'Rivers' || playerState === 'Cross River';
+    }
+    return true;
+  });
 }
 
 // ── TRAVELLER LOADING ──
-function getTravellersForDay(day) {
+function getTravellersForDay(day, count) {
+  count = count || 8;
   let pool = [...TRAVELLER_POOL];
-  // Filter by day-specific travellers
+  // Keep only day-specific travellers for that day, or non-day-specific ones
   pool = pool.filter(t => !t.day || t.day === day);
-  // Phase filtering
-  if (day <= 3) pool = pool.filter(t => !t.archetype?.includes('biafra') && t.id !== 'infiltrator');
-  // Shuffle
+  // Phase 1 (days 1-3): no Biafran-archetype travellers, no infiltrator
+  if (day <= 3) {
+    pool = pool.filter(t => {
+      if (t.id === 'infiltrator') return false;
+      if (t.id === 'biafra_a' || t.id === 'biafra_b' || t.id === 'biafra_civil') return false;
+      if (t.docs && t.docs.some(d => d.startsWith('bin') || d.startsWith('btd') || d.startsWith('bcd') || d.startsWith('bhtp'))) return false;
+      return true;
+    });
+  }
+  // Shuffle with Fisher-Yates
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]];
   }
-  return pool.slice(0, state.totalTravellers);
+  // Ensure we always have at least some travellers
+  if (pool.length === 0) pool = [...TRAVELLER_POOL].slice(0, count);
+  return pool.slice(0, count);
 }
 
 function loadNextTraveller() {
+  // Safety: rebuild list if somehow empty
   if (!state.dayTravellers || state.dayTravellers.length === 0) {
-    state.dayTravellers = getTravellersForDay(state.day);
+    const count = Math.min(14, 8 + Math.floor(state.day / 4));
+    state.dayTravellers = getTravellersForDay(state.day, count);
     state.totalTravellers = state.dayTravellers.length;
   }
   if (state.traveller >= state.dayTravellers.length) {
     endOfDay(); return;
   }
   const t = state.dayTravellers[state.traveller];
+  if (!t) { endOfDay(); return; }
   state.currentTraveller = t;
   renderTraveller(t);
   renderDocs(t);
@@ -2079,11 +2230,12 @@ function loadNextTraveller() {
 }
 
 function renderTraveller(t) {
-  const name = t.name.includes('null') ? state.player.name : t.name;
+  const rawName = t.name || 'UNKNOWN';
+  const name = (rawName === 'null' || rawName.includes('null')) ? (state.player.name || 'UNKNOWN') : rawName;
   document.getElementById('tp-name').textContent = name;
-  document.getElementById('tp-desc').textContent = t.desc;
+  document.getElementById('tp-desc').textContent = t.desc || '';
   const flagsEl = document.getElementById('tp-flags');
-  flagsEl.innerHTML = t.flags.map(f => {
+  flagsEl.innerHTML = (t.flags || []).map(f => {
     const cls = f.includes('CLASS B') ? 'class-b' : f.includes('CLASS C') ? 'class-c' : '';
     return `<span class="traveller-flag ${cls}">${f.substring(0,50)}${f.length>50?'…':''}</span>`;
   }).join('');
@@ -2092,14 +2244,15 @@ function renderTraveller(t) {
 function renderDocs(t) {
   const stack = document.getElementById('doc-stack');
   stack.innerHTML = '';
-  if (t.docs.length === 0) {
+  const docs = t.docs || [];
+  if (docs.length === 0) {
     stack.innerHTML = `<div class="doc-card doc-suspicious" style="width:200px;text-align:center;padding:20px">
       <div class="doc-card-type">NO DOCUMENTS</div>
       <div class="doc-card-name" style="font-size:11px;margin-top:8px">This traveller has presented no identity documents.</div>
     </div>`;
     return;
   }
-  t.docs.forEach((docId, idx) => {
+  docs.forEach((docId, idx) => {
     const doc = DOC_TEMPLATES[docId];
     if (!doc) return;
     const hasViolation = doc.flags.some(f => f.type === 'A');
@@ -2107,9 +2260,10 @@ function renderDocs(t) {
     const card = document.createElement('div');
     card.className = `doc-card ${isBiafran ? 'doc-biafran' : ''} ${hasViolation ? 'doc-suspicious' : ''}`;
     card.style.animationDelay = `${idx * 0.1}s`;
+    const tName = (t.name && t.name !== 'UNKNOWN') ? t.name : '—';
     card.innerHTML = `
       <div class="doc-card-type">${doc.type}</div>
-      <div class="doc-card-name">${t.name !== 'UNKNOWN' ? t.name : '—'}</div>
+      <div class="doc-card-name">${tName}</div>
       <div class="doc-card-fields">
         ${Object.entries(doc.fields).slice(0,3).map(([k,v]) => `
           <div class="doc-card-field"><span>${k}</span><span>${v || '—'}</span></div>
@@ -2156,42 +2310,54 @@ function closeModal() {
 
 // ── DECISIONS ──
 function decide(action) {
+  const t = state.currentTraveller;
+  if (!t) { console.warn('decide: no currentTraveller'); return; }
   if (!audioCtx) initAudio();
   playStamp(action);
   showStamp(action);
-  const t = state.currentTraveller;
-  if (!t) return;
-  // Score decision
-  const correct = t.correct === action;
+
+  // Determine correctness and pay impact
+  const correct = (t.correct === action);
   let payChange = 0;
-  if (action === 'approve') { state.dayApproved++; if (!correct) payChange = -500; }
-  else if (action === 'deny') { state.dayDenied++; if (!correct) payChange = -500; }
-  else if (action === 'detain') { state.dayDetained++; if (correct) payChange = 500; }
-  if (correct && action === 'approve') payChange = 0;
-  if (correct && action === 'deny') payChange = 0;
-  if (correct && action === 'detain') payChange = 1500;
-  state.totalPay += payChange;
-  // Axis changes based on traveller axisHint and action
-  if (t.axisHint === 'compassion' && action === 'approve') state.axes.compassion++;
-  if (t.axisHint === 'compassion' && action === 'deny') state.axes.loyalty++;
-  if (t.axisHint === 'loyalty' && action === 'detain') state.axes.loyalty += 2;
-  if (t.axisHint === 'loyalty' && action === 'approve') state.axes.loyalty--;
-  if (t.axisHint === 'witness' && action === 'detain') state.axes.witness++;
-  if (t.axisHint === 'rebellion' && action === 'approve') state.axes.rebellion++;
-  // Day results
+  if (action === 'approve') {
+    state.dayApproved++;
+    payChange = correct ? 0 : -500;
+  } else if (action === 'deny') {
+    state.dayDenied++;
+    payChange = correct ? 0 : -500;
+  } else if (action === 'detain') {
+    state.dayDetained++;
+    payChange = correct ? 1500 : -500;
+  }
+  state.totalPay = Math.max(0, state.totalPay + payChange);
+
+  // Axis changes based on traveller hint and action
+  const hint = t.axisHint;
+  if (hint === 'compassion' && action === 'approve') state.axes.compassion++;
+  if (hint === 'compassion' && action === 'deny') state.axes.loyalty++;
+  if (hint === 'loyalty' && action === 'detain') state.axes.loyalty += 2;
+  if (hint === 'loyalty' && action === 'approve') state.axes.loyalty = Math.max(0, state.axes.loyalty - 1);
+  if (hint === 'witness' && action === 'detain') state.axes.witness++;
+  if (hint === 'rebellion' && action === 'approve') state.axes.rebellion++;
+  if (hint === 'survival' && action === 'approve') state.axes.survival++;
+
   state.dayResults.push({ name: t.name, action, correct, payChange });
   state.traveller++;
   updateHUD();
+
   setTimeout(() => {
     clearStamp();
-    // Check mid-day moral event
-    const morEvent = Object.values(MORAL_EVENTS).find(e => e.day === state.day && !state.flags['moral_' + e.day + '_done']);
-    if (morEvent && state.traveller === Math.floor(state.totalTravellers / 2)) {
+    // Mid-day moral event — only fire once, at halfway point, if event exists for today
+    const midpoint = Math.floor(state.dayTravellers.length / 2);
+    const morEvent = Object.values(MORAL_EVENTS).find(
+      e => e.day === state.day && !state.flags['moral_' + e.day + '_done']
+    );
+    if (morEvent && state.traveller === midpoint) {
       fireMoralEvent(morEvent);
     } else {
       loadNextTraveller();
     }
-  }, 700);
+  }, 750);
 }
 
 function showStamp(action) {
@@ -2241,57 +2407,58 @@ function chooseMoral(eventId, choiceIdx) {
 
 // ── END OF DAY ──
 function endOfDay() {
+  saveState();
   const nightEvent = NIGHT_EVENTS.find(e => e.day === state.day);
-  // Family expenses
-  const familySize = state.family.length;
+  const familySize = Math.max(1, state.family.length);
   const foodCost = familySize * 800;
   const rentCost = 1200;
   const totalExpenses = foodCost + rentCost;
   const canAfford = state.totalPay >= totalExpenses;
+
   if (!canAfford) {
     state.family.forEach(f => { if (f.status === 'ok') f.status = 'hungry'; });
-    state.axes.survival = Math.max(0, state.axes.survival - 1);
+    state.axes.survival = Math.max(0, (state.axes.survival || 0) - 1);
   } else {
     state.totalPay -= totalExpenses;
     state.family.forEach(f => { if (f.status === 'hungry') f.status = 'ok'; });
   }
-  // Inflation day 13+
+
+  // Inflation from day 13
   if (state.day >= 13) {
     const inflation = Math.floor((state.day - 12) * 50);
-    state.totalPay -= inflation;
+    state.totalPay = Math.max(0, state.totalPay - inflation);
   }
-  // Build pay breakdown
+
+  // Pay breakdown HTML
   const breakdown = document.getElementById('eod-pay-breakdown');
   const baseDaily = 3400;
-  let html = `
-    <div class="eod-pay-row"><span>BASE PAY (GRADE 8)</span><span>₦${baseDaily.toLocaleString()}</span></div>
-  `;
+  let html = `<div class="eod-pay-row"><span>BASE PAY (GRADE 8)</span><span>₦${baseDaily.toLocaleString()}</span></div>`;
   state.dayResults.filter(r => r.payChange !== 0).forEach(r => {
     const cls = r.payChange > 0 ? 'bonus' : 'deduction';
-    html += `<div class="eod-pay-row ${cls}"><span>${r.correct ? '✓ CORRECT DETENTION' : '✗ PROCESSING ERROR'}: ${r.name.split(' ')[0]}</span><span>${r.payChange > 0 ? '+' : ''}₦${Math.abs(r.payChange).toLocaleString()}</span></div>`;
+    const label = r.correct ? '✓ CORRECT DETENTION' : '✗ PROCESSING ERROR';
+    html += `<div class="eod-pay-row ${cls}"><span>${label}: ${(r.name||'').split(' ')[0]}</span><span>${r.payChange > 0 ? '+' : ''}₦${Math.abs(r.payChange).toLocaleString()}</span></div>`;
   });
-  html += `<div class="eod-pay-row deduction"><span>FOOD & RENT (${familySize} PERSONS)</span><span>-₦${totalExpenses.toLocaleString()}</span></div>`;
+  html += `<div class="eod-pay-row deduction"><span>FOOD & RENT (${familySize} persons)</span><span>-₦${totalExpenses.toLocaleString()}</span></div>`;
   if (state.day >= 13) {
     const inf = Math.floor((state.day - 12) * 50);
     html += `<div class="eod-pay-row deduction"><span>INFLATION ADJUSTMENT</span><span>-₦${inf}</span></div>`;
   }
-  html += `<div class="eod-pay-row total"><span>RUNNING BALANCE</span><span>₦${Math.max(0,state.totalPay).toLocaleString()}</span></div>`;
+  html += `<div class="eod-pay-row total"><span>RUNNING BALANCE</span><span>₦${Math.max(0, state.totalPay).toLocaleString()}</span></div>`;
   breakdown.innerHTML = html;
-  // Stats
+
   document.getElementById('eod-approved').textContent = state.dayApproved;
   document.getElementById('eod-denied').textContent = state.dayDenied;
   document.getElementById('eod-detained').textContent = state.dayDetained;
   document.getElementById('eod-title').textContent = `DAY ${state.day} COMPLETE`;
-  // Family status
+
   const familyEl = document.getElementById('eod-family');
-  if (!canAfford) {
-    familyEl.innerHTML = `<div class="eod-family-title">FAMILY STATUS</div><div class="eod-family-text">You could not cover today's expenses. Your family went without food tonight. This is the third time this week that a small, quiet thing has happened that will matter later.</div>`;
-  } else {
-    familyEl.innerHTML = `<div class="eod-family-title">FAMILY STATUS</div><div class="eod-family-text">Your family is fed. The rent is paid. For today, that is enough.</div>`;
-  }
-  // Night event
+  familyEl.innerHTML = canAfford
+    ? `<div class="eod-family-title">FAMILY STATUS</div><div class="eod-family-text">Your family is fed. The rent is paid. For today, that is enough.</div>`
+    : `<div class="eod-family-title">FAMILY STATUS</div><div class="eod-family-text">You could not cover today's expenses. Your family went without food tonight.</div>`;
+
   document.getElementById('eod-night').textContent = nightEvent ? nightEvent.text : '';
-  document.getElementById('eod-btn-text').textContent = state.day >= 25 ? 'FINAL REPORT →' : `DAY ${state.day + 1} →`;
+  document.getElementById('eod-btn-text').textContent = state.day >= 25 ? 'FINAL REPORT →' : `BEGIN DAY ${state.day + 1} →`;
+
   saveState();
   showScreen('eod-report');
 }
@@ -2306,10 +2473,21 @@ function nextDay() {
 
 // ── ENDING CALCULATION ──
 function calculateEnding() {
-  // Find matching ending
-  let ending = ENDINGS.find(e => e.condition(state));
-  if (!ending) ending = ENDINGS.find(e => e.id === 'ordinary_man');
-  // Record
+  // Ensure axes and flags exist
+  state.axes = state.axes || {};
+  state.flags = state.flags || {};
+  ['loyalty','compassion','rebellion','survival','witness','corruption'].forEach(k => {
+    if (typeof state.axes[k] !== 'number') state.axes[k] = 0;
+  });
+  let ending = null;
+  // Try each ending condition safely
+  for (const e of ENDINGS) {
+    try {
+      if (e.condition(state)) { ending = e; break; }
+    } catch(err) { /* skip bad condition */ }
+  }
+  if (!ending) ending = ENDINGS.find(e => e.id === 'ordinary_man') || ENDINGS[ENDINGS.length - 1];
+  if (!state.endingsUnlocked) state.endingsUnlocked = [];
   if (!state.endingsUnlocked.includes(ending.id)) state.endingsUnlocked.push(ending.id);
   saveState();
   showEnding(ending);
@@ -2384,8 +2562,14 @@ function loadGame() {
     const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
     if (!saved) return;
     Object.assign(state, saved);
+    // Reset traveller position to start of current day
+    state.traveller = 0;
+    state.dayTravellers = [];
+    state.dayResults = state.dayResults || [];
+    state.currentTraveller = null;
+    initAudio();
     startDay();
-  } catch(e) {}
+  } catch(e) { console.error('loadGame error:', e); }
 }
 
 function startNewGame() {
@@ -2468,9 +2652,24 @@ function init() {
   cc.updateFamilyOptions();
   checkContinue();
   showScreen('splash');
-  // Service worker
+  // Service worker — register as early as possible for iOS PWA
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+    navigator.serviceWorker.register('./sw.js', { scope: './' })
+      .then(reg => {
+        reg.addEventListener('updatefound', () => {
+          const newSW = reg.installing;
+          if (newSW) newSW.postMessage('SKIP_WAITING');
+        });
+      })
+      .catch(err => console.warn('SW registration failed:', err));
+  }
+  // Detect if running as installed PWA vs browser
+  const isStandalone = window.navigator.standalone === true ||
+    window.matchMedia('(display-mode: standalone)').matches ||
+    document.referrer.includes('android-app://');
+  if (isStandalone) {
+    // Running as installed PWA — hide caveat permanently
+    localStorage.setItem('pwa_caveat_seen', '1');
   }
 }
 
@@ -2479,7 +2678,9 @@ init();
 return { startNewGame, loadGame, cc, decide, closeModal, chooseMoral, acknowledgeBulletin, skipIntro, nextDay, returnToSplash, showEndingsGallery, toggleMusic: () => _toggleMusic() };
 
 })(); // end G
-<!-- YouTube IFrame API -->
+</script>
+
+<!-- YouTube IFrame API + Music Controller -->
 <script>
 // ── MUSIC: AaRON — Maybe on the Moon ──
 // YouTube video ID for "Maybe on the Moon" by AaRON
