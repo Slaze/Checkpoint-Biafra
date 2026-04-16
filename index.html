@@ -2,14 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#2C3E1F">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Checkpoint Biafra">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="description" content="A border checkpoint game set during the Biafran secession.">
 <title>CHECKPOINT BIAFRA</title>
 <link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%232C3E1F' width='100' height='100'/%3E%3Ccircle cx='50' cy='50' r='20' fill='%23D4A017'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect fill='%232C3E1F' width='180' height='180'/%3E%3Ccircle cx='90' cy='90' r='40' fill='%23D4A017'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
@@ -51,22 +54,10 @@ html, body {
   color: var(--ink);
   touch-action: none;
   user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
-  position: fixed;
 }
 
 /* ═══ SCREENS ═══ */
-.screen {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-  -webkit-overflow-scrolling: touch;
-}
+.screen { position: fixed; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10; }
 .screen.active { display: flex; }
 
 /* ═══ SPLASH ═══ */
@@ -76,8 +67,6 @@ html, body {
     radial-gradient(ellipse at 50% 30%, rgba(44,62,31,0.8) 0%, transparent 70%),
     repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(255,255,255,0.01) 40px, rgba(255,255,255,0.01) 41px),
     repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(255,255,255,0.01) 40px, rgba(255,255,255,0.01) 41px);
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .splash-content {
@@ -155,7 +144,7 @@ html, body {
   position: relative;
   overflow: hidden;
   transition: all 0.2s;
-  -webkit-appearance: none;
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
 }
 
 .btn-primary:hover, .btn-primary:active {
@@ -192,10 +181,8 @@ html, body {
 #char-create {
   background: var(--olive);
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
   padding: 0;
   justify-content: flex-start;
-  overscroll-behavior: contain;
 }
 
 .cc-header {
@@ -310,9 +297,7 @@ html, body {
   bottom: 0; left: 0; right: 0;
   background: var(--olive-dark);
   padding: 16px 20px;
-  padding-bottom: calc(16px + env(safe-area-inset-bottom));
   border-top: 1px solid rgba(242,232,208,0.1);
-  z-index: 10;
 }
 
 /* ═══ INTRO NARRATIVE ═══ */
@@ -367,9 +352,6 @@ html, body {
 #bulletin-screen {
   background: rgba(10,13,7,0.97);
   padding: 20px;
-  padding-top: max(20px, env(safe-area-inset-top));
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 .bulletin-paper {
@@ -380,9 +362,8 @@ html, body {
   position: relative;
   box-shadow: 4px 4px 0 rgba(0,0,0,0.4), 8px 8px 0 rgba(0,0,0,0.2);
   animation: slideDown 0.4s ease both;
-  max-height: calc(90vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  max-height: 80vh;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 .bulletin-paper::before {
@@ -461,7 +442,6 @@ html, body {
   background: var(--olive-dark);
   border-bottom: 2px solid rgba(212,160,23,0.3);
   padding: 8px 14px;
-  padding-top: max(8px, env(safe-area-inset-top));
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -599,8 +579,7 @@ html, body {
 /* Documents on desk */
 .doc-stack {
   position: absolute;
-  bottom: calc(80px + env(safe-area-inset-bottom));
-  left: 0; right: 0;
+  bottom: 80px; left: 0; right: 0;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -691,13 +670,11 @@ html, body {
   gap: 0;
   z-index: 10;
   flex-shrink: 0;
-  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .action-btn {
   flex: 1;
   padding: 14px 8px;
-  padding-bottom: calc(14px + env(safe-area-inset-bottom));
   border: none;
   font-family: 'Bebas Neue', sans-serif;
   font-size: 20px;
@@ -706,7 +683,6 @@ html, body {
   transition: all 0.15s;
   position: relative;
   overflow: hidden;
-  -webkit-appearance: none;
 }
 
 .action-btn::after {
@@ -749,14 +725,12 @@ html, body {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,0.8);
   z-index: 100;
   display: none;
   align-items: flex-end;
   justify-content: center;
   backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
 }
 
 .modal-overlay.open { display: flex; }
@@ -767,9 +741,7 @@ html, body {
   max-width: 600px;
   max-height: 85vh;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
   padding: 20px;
-  padding-bottom: max(20px, env(safe-area-inset-bottom));
   animation: slideUp 0.3s ease both;
   position: relative;
 }
@@ -889,11 +861,7 @@ html, body {
 #moral-event {
   background: rgba(5,7,3,0.98);
   padding: 24px 20px;
-  padding-top: max(24px, env(safe-area-inset-top));
-  padding-bottom: max(24px, env(safe-area-inset-bottom));
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
 }
 
 .moral-content {
@@ -959,10 +927,7 @@ html, body {
 #eod-report {
   background: var(--olive-dark);
   padding: 24px 20px;
-  padding-top: max(24px, env(safe-area-inset-top));
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
 }
 
 .eod-paper {
@@ -1084,11 +1049,7 @@ html, body {
 #ending {
   background: #050703;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
   padding: 40px 24px;
-  padding-top: max(40px, env(safe-area-inset-top));
-  padding-bottom: max(40px, env(safe-area-inset-bottom));
-  overscroll-behavior: contain;
 }
 
 .ending-content {
@@ -1428,7 +1389,7 @@ html, body {
   </div>
 
   <div class="cc-proceed">
-    <button class="btn-primary" style="width:100%;font-size:16px" onclick="G.cc.proceed()">REPORT FOR DUTY</button>
+    <button class="btn-primary" style="width:100%;clip-path:none;font-size:16px" onclick="G.cc.proceed()">REPORT FOR DUTY</button>
   </div>
 </div>
 
@@ -1451,7 +1412,7 @@ html, body {
     </div>
     <div class="bulletin-body" id="bulletin-body"></div>
     <br>
-    <button class="btn-primary" style="width:100%;margin-top:8px;font-size:15px" onclick="G.acknowledgeBulletin()">
+    <button class="btn-primary" style="width:100%;clip-path:none;margin-top:8px;font-size:15px" onclick="G.acknowledgeBulletin()">
       I HAVE READ AND UNDERSTOOD THIS BULLETIN
     </button>
   </div>
@@ -1545,7 +1506,7 @@ html, body {
     <div class="eod-family" id="eod-family"></div>
     <div class="eod-night-event" id="eod-night"></div>
     <br>
-    <button class="btn-primary" style="width:100%;font-size:15px;margin-top:8px" onclick="G.nextDay()">
+    <button class="btn-primary" style="width:100%;clip-path:none;font-size:15px;margin-top:8px" onclick="G.nextDay()">
       <span id="eod-btn-text">NEXT DAY →</span>
     </button>
   </div>
@@ -1859,21 +1820,40 @@ const ENDINGS = [
 
 // ── SOUNDS (Web Audio API) ──
 let audioCtx = null;
+let audioInitialized = false;
+
 function initAudio() {
-  try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+  if (audioInitialized) return;
+  try { 
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)(); 
+    audioInitialized = true;
+  } catch(e) {
+    console.log('Audio not available');
+  }
+}
+
+function resumeAudio() {
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
 }
 
 function playStamp(type) {
   if (!audioCtx) return;
-  const o = audioCtx.createOscillator();
-  const g = audioCtx.createGain();
-  o.connect(g); g.connect(audioCtx.destination);
-  if (type === 'approve') { o.frequency.setValueAtTime(200, audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.15); }
-  else if (type === 'deny') { o.frequency.setValueAtTime(150, audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(60, audioCtx.currentTime + 0.1); }
-  else { o.frequency.setValueAtTime(100, audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.2); }
-  g.gain.setValueAtTime(0.3, audioCtx.currentTime);
-  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + (type==='detain'?0.3:0.2));
-  o.start(); o.stop(audioCtx.currentTime + 0.35);
+  try {
+    resumeAudio();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    if (type === 'approve') { o.frequency.setValueAtTime(200, audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.15); }
+    else if (type === 'deny') { o.frequency.setValueAtTime(150, audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(60, audioCtx.currentTime + 0.1); }
+    else { o.frequency.setValueAtTime(100, audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.2); }
+    g.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + (type==='detain'?0.3:0.2));
+    o.start(); o.stop(audioCtx.currentTime + 0.35);
+  } catch(e) {
+    console.log('Audio playback failed');
+  }
 }
 
 // ── CHARACTER CREATION ──
@@ -2000,7 +1980,6 @@ function startDay() {
   state.totalTravellers = 8 + Math.floor(state.day / 4);
   if (state.totalTravellers > 14) state.totalTravellers = 14;
   state.traveller = 0;
-  state.dayTravellers = [];
   state.exchangeRate = getExchangeRate(state.day);
   updateHUD();
   checkMoralEvents();
@@ -2020,7 +1999,14 @@ function startProcessing() {
   updateHUD();
   updateFamilyBar();
   updateRateWidget();
-  loadNextTraveller();
+  // Check if moral event fires before first traveller
+  const morEvent = checkMoralEventForDay(state.day);
+  if (morEvent && !state.flags['moral_' + morEvent.day + '_done']) {
+    state.moralEventQueue = [morEvent];
+    setTimeout(() => fireNextMoralEvent(), 800);
+  } else {
+    loadNextTraveller();
+  }
 }
 
 function checkMoralEvents() {}
@@ -2030,11 +2016,13 @@ function checkMoralEventForDay(day) {
 }
 
 // ── TRAVELLER LOADING ──
-function buildTravellersForDay(day) {
+function getTravellersForDay(day) {
   let pool = [...TRAVELLER_POOL];
+  // Filter by day-specific travellers
   pool = pool.filter(t => !t.day || t.day === day);
-  if (day <= 3) pool = pool.filter(t => !t.archetype || (!t.archetype.includes('biafra') && t.id !== 'infiltrator'));
-  // Fisher-Yates shuffle
+  // Phase filtering
+  if (day <= 3) pool = pool.filter(t => !t.archetype?.includes('biafra') && t.id !== 'infiltrator');
+  // Shuffle
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]];
@@ -2046,10 +2034,8 @@ function loadNextTraveller() {
   if (state.traveller >= state.totalTravellers) {
     endOfDay(); return;
   }
-  if (!state.dayTravellers || state.dayTravellers.length === 0) {
-    state.dayTravellers = buildTravellersForDay(state.day);
-  }
-  const t = state.dayTravellers[state.traveller] || state.dayTravellers[0];
+  const travellers = getTravellersForDay(state.day);
+  const t = travellers[state.traveller] || travellers[0];
   state.currentTraveller = t;
   renderTraveller(t);
   renderDocs(t);
@@ -2097,7 +2083,7 @@ function renderDocs(t) {
     `;
     card.addEventListener('click', () => openDocModal(docId, t));
     card.addEventListener('touchstart', e => { e.preventDefault(); card.classList.add('lifted'); }, {passive:false});
-    card.addEventListener('touchend', e => { e.preventDefault(); card.classList.remove('lifted'); openDocModal(docId, t); }, {passive:false});
+    card.addEventListener('touchend', () => { card.classList.remove('lifted'); openDocModal(docId, t); });
     stack.appendChild(card);
   });
 }
@@ -2135,6 +2121,7 @@ function closeModal() {
 // ── DECISIONS ──
 function decide(action) {
   if (!audioCtx) initAudio();
+  resumeAudio();
   playStamp(action);
   showStamp(action);
   const t = state.currentTraveller;
@@ -2162,10 +2149,9 @@ function decide(action) {
   updateHUD();
   setTimeout(() => {
     clearStamp();
-    // Check mid-day moral event at midpoint
-    const morEvent = checkMoralEventForDay(state.day);
-    const mid = Math.floor(state.totalTravellers / 2);
-    if (morEvent && state.traveller === mid && !state.flags['moral_' + morEvent.day + '_done']) {
+    // Check mid-day moral event
+    const morEvent = Object.values(MORAL_EVENTS).find(e => e.day === state.day && !state.flags['moral_' + e.day + '_done']);
+    if (morEvent && state.traveller === Math.floor(state.totalTravellers / 2)) {
       fireMoralEvent(morEvent);
     } else {
       loadNextTraveller();
@@ -2279,7 +2265,6 @@ function nextDay() {
   if (state.day >= 25) { calculateEnding(); return; }
   state.day++;
   state.dayResults = [];
-  state.dayTravellers = [];
   startDay();
 }
 
@@ -2356,25 +2341,40 @@ function updateRateWidget() {
 const SAVE_KEY = 'checkpoint_biafra_save';
 
 function saveState() {
-  try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch(e) {}
+  try { 
+    localStorage.setItem(SAVE_KEY, JSON.stringify(state)); 
+  } catch(e) {
+    console.log('Save failed (possibly private mode):', e);
+    // Fallback: save to sessionStorage if localStorage fails
+    try {
+      sessionStorage.setItem(SAVE_KEY, JSON.stringify(state));
+    } catch(e2) {
+      console.log('SessionStorage also failed');
+    }
+  }
 }
 
 function loadGame() {
   try {
-    const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
+    let saved = localStorage.getItem(SAVE_KEY);
+    if (!saved) {
+      // Try sessionStorage fallback
+      saved = sessionStorage.getItem(SAVE_KEY);
+    }
     if (!saved) return;
-    Object.assign(state, saved);
-    if (!state.dayTravellers) state.dayTravellers = [];
-    if (!state.family) state.family = [];
-    if (!state.flags) state.flags = {};
-    if (!state.axes) state.axes = {loyalty:0,compassion:0,rebellion:0,survival:0,witness:0,corruption:0};
-    if (!state.endingsUnlocked) state.endingsUnlocked = [];
+    const parsedState = JSON.parse(saved);
+    Object.assign(state, parsedState);
     startDay();
-  } catch(e) { console.error('Load error:', e); }
+  } catch(e) {
+    console.log('Load failed:', e);
+  }
 }
 
 function startNewGame() {
+  // Initialize audio on user interaction (required for iOS)
   initAudio();
+  resumeAudio();
+  
   state = {
     day:1, phase:1, traveller:0, totalTravellers:8,
     dayApproved:0, dayDenied:0, dayDetained:0,
@@ -2384,7 +2384,6 @@ function startNewGame() {
     family:[], exchangeRate:1.0, dayResults:[], endingsUnlocked:[],
     flags:{}, currentTraveller:null, bulletinRead:false,
     moralEventPending:null, moralEventQueue:[], nightEventQueue:[],
-    dayTravellers:[],
   };
   try {
     const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
@@ -2395,7 +2394,16 @@ function startNewGame() {
 
 function showEndingsGallery() {
   let unlocked = [];
-  try { const s = JSON.parse(localStorage.getItem(SAVE_KEY)); if(s) unlocked = s.endingsUnlocked || []; } catch(e) {}
+  try { 
+    let saved = localStorage.getItem(SAVE_KEY);
+    if (!saved) saved = sessionStorage.getItem(SAVE_KEY);
+    if (saved) {
+      const s = JSON.parse(saved);
+      if (s) unlocked = s.endingsUnlocked || [];
+    }
+  } catch(e) {
+    console.log('Could not load endings:', e);
+  }
   const html = ENDINGS.map(e => {
     const found = unlocked.includes(e.id);
     return `<div style="padding:12px;border-bottom:1px solid rgba(242,232,208,0.1)">
@@ -2410,7 +2418,7 @@ function showEndingsGallery() {
       <div style="font-family:Bebas Neue,sans-serif;font-size:28px;color:var(--paper);letter-spacing:0.1em;margin-bottom:4px">CASE FILES</div>
       <div style="font-family:Courier Prime,monospace;font-size:10px;color:var(--biafra-gold);letter-spacing:0.3em;margin-bottom:20px">${unlocked.length} OF 28 ENDINGS DISCOVERED</div>
       ${html}
-      <br><button class="btn-primary" style="width:100%;margin-top:16px" onclick="this.parentElement.parentElement.remove()">CLOSE</button>
+      <br><button class="btn-primary" style="width:100%;clip-path:none;margin-top:16px" onclick="this.parentElement.parentElement.remove()">CLOSE</button>
     </div>`;
   document.body.appendChild(overlay);
 }
@@ -2422,45 +2430,72 @@ function returnToSplash() {
 
 function checkContinue() {
   try {
-    const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
-    if (saved && saved.day > 1) {
-      document.getElementById('btn-continue').style.display = 'block';
-      document.getElementById('continue-day').textContent = saved.day;
+    let saved = localStorage.getItem(SAVE_KEY);
+    if (!saved) {
+      saved = sessionStorage.getItem(SAVE_KEY);
     }
-  } catch(e) {}
+    if (saved) {
+      const parsedSave = JSON.parse(saved);
+      if (parsedSave && parsedSave.day > 1) {
+        document.getElementById('btn-continue').style.display = 'block';
+        document.getElementById('continue-day').textContent = parsedSave.day;
+      }
+    }
+  } catch(e) {
+    console.log('CheckContinue failed:', e);
+  }
 }
 
 // ── INIT ──
 function init() {
-  // Cache screens
-  ['splash','char-create','intro','bulletin-screen','game','moral-event','eod-report','ending'].forEach(id => {
-    screens[id] = document.getElementById(id);
-  });
-  // Build sun rays
-  const sun = document.querySelector('.splash-sun');
-  if (sun) {
-    for (let i = 0; i < 11; i++) {
-      const ray = document.createElement('div');
-      ray.className = 'sun-ray';
-      const angle = (i / 11) * 360;
-      ray.style.transform = `translateX(-50%) rotate(${angle}deg) translateY(-100%)`;
-      ray.style.left = '50%';
-      ray.style.bottom = '50%';
-      ray.style.transformOrigin = 'bottom center';
-      sun.appendChild(ray);
+  try {
+    // Cache screens
+    ['splash','char-create','intro','bulletin-screen','game','moral-event','eod-report','ending'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) screens[id] = el;
+    });
+    
+    // Build sun rays
+    const sun = document.querySelector('.splash-sun');
+    if (sun) {
+      for (let i = 0; i < 11; i++) {
+        const ray = document.createElement('div');
+        ray.className = 'sun-ray';
+        const angle = (i / 11) * 360;
+        ray.style.transform = `translateX(-50%) rotate(${angle}deg) translateY(-100%)`;
+        ray.style.left = '50%';
+        ray.style.bottom = '50%';
+        ray.style.transformOrigin = 'bottom center';
+        sun.appendChild(ray);
+      }
     }
-  }
-  populateBgOptions();
-  cc.updateFamilyOptions();
-  checkContinue();
-  showScreen('splash');
-  // Service worker
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+    
+    populateBgOptions();
+    cc.updateFamilyOptions();
+    checkContinue();
+    showScreen('splash');
+    
+    // Service worker registration
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').then(() => {
+        console.log('SW registered');
+      }).catch(() => {
+        console.log('SW registration failed');
+      });
+    }
+    
+    console.log('Game initialized successfully');
+  } catch(e) {
+    console.error('Initialization error:', e);
   }
 }
 
-init();
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
 
 return { startNewGame, loadGame, cc, decide, closeModal, chooseMoral, acknowledgeBulletin, skipIntro, nextDay, returnToSplash, showEndingsGallery };
 
