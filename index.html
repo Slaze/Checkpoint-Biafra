@@ -57,7 +57,7 @@ html, body {
 }
 
 /* ═══ SCREENS ═══ */
-.screen { position: fixed; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10; }
+.screen { position: fixed; inset: 0; height: 100dvh; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10; }
 .screen.active { display: flex; }
 
 /* ═══ SPLASH ═══ */
@@ -1230,7 +1230,7 @@ html, body {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 1000;
+  z-index: 2;
   opacity: 0.03;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
@@ -2800,6 +2800,49 @@ if (document.readyState === 'loading') {
   init();
 }
 
+})();
+</script>
+<style>
+#install-caveat { position: fixed; inset: 0; z-index: 9999; display: none; background: #2C3E1F; color: #E8DFC4; font-family: "Courier Prime", monospace; align-items: center; justify-content: center; padding: 24px; text-align: center; }
+#install-caveat.active { display: flex; }
+#install-caveat .caveat-box { max-width: 480px; width: 100%; }
+#install-caveat h1 { font-family: "Bebas Neue", sans-serif; font-size: 32px; letter-spacing: 2px; margin: 0 0 16px 0; color: #D4B84A; }
+#install-caveat p { margin: 0 0 12px 0; line-height: 1.5; font-size: 14px; }
+#install-caveat .caveat-steps { text-align: left; margin: 16px 0; padding: 12px; border: 1px dashed #E8DFC4; font-size: 13px; line-height: 1.7; }
+#install-caveat button { display: block; width: 100%; margin: 8px 0; padding: 14px; background: transparent; color: #E8DFC4; border: 2px solid #E8DFC4; font-family: "Bebas Neue", sans-serif; font-size: 16px; letter-spacing: 2px; cursor: pointer; }
+#install-caveat button.primary { background: #D4B84A; color: #2C3E1F; border-color: #D4B84A; }
+</style>
+<div id="install-caveat" role="dialog" aria-modal="true">
+  <div class="caveat-box">
+    <h1>ADD TO HOME SCREEN</h1>
+    <p>This checkpoint is best experienced as an installed app. On iOS Safari:</p>
+    <div class="caveat-steps">1. Tap the Share button<br>2. Scroll down and tap Add to Home Screen<br>3. Tap Add</div>
+    <p>Then launch from the home screen icon for fullscreen, offline play.</p>
+    <button type="button" class="primary" id="caveat-continue">I UNDERSTAND — CONTINUE</button>
+    <button type="button" id="caveat-browser">PLAY IN BROWSER</button>
+  </div>
+</div>
+<script>
+(function(){
+  try {
+    var isStandalone = (window.navigator.standalone === true) || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
+    var caveatSeen = false;
+    try { caveatSeen = localStorage.getItem("caveatSeen") === "1"; } catch(e){}
+    if (!isStandalone && !caveatSeen) {
+      var el = document.getElementById("install-caveat");
+      if (el) {
+        el.classList.add("active");
+        var markSeen = function(){
+          try { localStorage.setItem("caveatSeen","1"); } catch(e){}
+          el.classList.remove("active");
+        };
+        var c1 = document.getElementById("caveat-continue");
+        var c2 = document.getElementById("caveat-browser");
+        if (c1) c1.addEventListener("click", markSeen);
+        if (c2) c2.addEventListener("click", markSeen);
+      }
+    }
+  } catch(e){ console.warn("caveat init failed", e); }
 })();
 </script>
 </body>
