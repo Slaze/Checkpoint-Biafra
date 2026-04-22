@@ -1528,6 +1528,17 @@ var BACKGROUNDS = [
   { id:'trader',   label:'MARKET TRADER',         desc:'Reads people well. Flagged as corruption risk.', bias:{survival:2} },
   { id:'journalist','label':'JOURNALIST',          desc:'Build case files. Sources approach you.', bias:{witness:3} },
   { id:'pastor',   label:'PASTOR/MINISTER',       desc:'Community brings information.', bias:{compassion:2,loyalty:1} },
+  { id:'palmoil',   label:'PALM OIL TRADER',     desc:'You know every backroad market.',                     bias:{survival:1,corruption:1} },
+  { id:'redcross',  label:'RED CROSS NURSE',     desc:'You have triaged the wounded from both sides.',       bias:{compassion:3} },
+  { id:'bbc',       label:'BBC CORRESPONDENT',   desc:'You filed dispatches from Umuahia until they expelled you.', bias:{witness:3} },
+  { id:'lecturer',  label:'NSUKKA LECTURER',     desc:'Your faculty was shelled in 1967.',                   bias:{witness:1,rebellion:2} },
+  { id:'railway',   label:'RAILWAY WORKER',      desc:'You know every kilometre of the Eastern Line.',       bias:{loyalty:1,survival:1} },
+  { id:'bicycle',   label:'BICYCLE MECHANIC',    desc:'In a country without petrol, your trade is politics.',bias:{survival:2,compassion:1} },
+  { id:'radio',     label:'RADIO OPERATOR',      desc:'You relayed broadcasts out of Aba.',                  bias:{witness:2,rebellion:1} },
+  { id:'dibia',     label:'HERBALIST (DIBIA)',   desc:'Villagers come to you before any hospital.',          bias:{compassion:2,loyalty:1} },
+  { id:'marketwm',  label:'MARKET WOMAN',        desc:'You ran an ofe stall through three offensives.',      bias:{survival:2,witness:1} },
+  { id:'police',    label:'POLICE SERGEANT',     desc:'You served federal command before the emergency.',    bias:{loyalty:2,corruption:1} },
+  { id:'cargo',     label:'CARGO DRIVER',        desc:'You hauled relief, ammunition, and refugees in a week.',bias:{witness:1,survival:2} },
 ];
 
 // ── DATA: STATES ──
@@ -1596,6 +1607,18 @@ var BULLETINS = {
   21: { title:'TRAVEL RESTRICTION ORDER', stamp:'CLASSIFIED',
         body:'Travel restriction orders are now active for holders of Nigerian passports with state of origin listed as Rivers or Cross River.\n\nHolders are to be redirected to the designated Secondary Processing Unit. Do not stamp. Do not deny. Do not explain the reason for redirection.\n\nThis order is issued under Emergency Security Provision 14(b). It is not subject to officer discretion.',
         rules:['Rivers/Cross River passport holders: redirect to Secondary Processing','Do NOT stamp, deny, or explain reason','No officer discretion applies'] },
+  22: { title:'ADMIN NOTICE — CEASEFIRE RUMOURS', stamp:'MORNING BULLETIN',
+        body:'Radio Biafra announced overnight that negotiations have reached a critical stage. Federal command has denied this. Treat both statements as propaganda. No officer discretion applies today — only paperwork.\n\nThe eastern corridor is restricted to relief traffic and approved press. Biafran-issued Authorisation documents remain recognised at this checkpoint while the ceasefire protocol stands.',
+        rules:['All travellers with EXPIRED Federal Passes: DENY','Biafran Driver\'s Authorisation (BDA): RECOGNISED','No officer discretion applies today'] },
+  23: { title:'EMERGENCY BULLETIN — PETROL RATIONING', stamp:'URGENT',
+        body:'Three northern checkpoints have run dry. Any vehicle moving east today is presumed to be on siphoned or black-market fuel. Cargo drivers must show fuel receipts alongside their Authorisation.\n\nRelief convoys marked by Red Cross remain exempt from the receipt rule. Check seal and date.',
+        rules:['Cargo drivers without fuel receipt: DETAIN','Red Cross / MSF relief vehicles: EXEMPT from receipt rule','Do not accept photocopies of fuel receipts'] },
+  24: { title:'ADMIN NOTICE — SURRENDER RUMOURS', stamp:'MORNING BULLETIN',
+        body:'A typed document is circulating in Umuahia claiming that General Ojukwu has left for Côte d\'Ivoire. We do not confirm. We do not deny. We stamp papers.\n\nIf a traveller presents or references this document, detain them and forward the document — unread — to HQ. Do not read it aloud.',
+        rules:['Travellers carrying the Umuahia flight document: DETAIN','Do not read the document aloud','Continue normal processing for all other travellers'] },
+  25: { title:'FINAL BULLETIN', stamp:'LAST DAY',
+        body:'Effendy. By evening the bridgehead may be ours, theirs, or no one\'s. Every stamp you press today is read by historians, not only by officers.\n\nFollow each document on its own terms. Where bulletins disagree, follow the document. Where the document lies, note your name clearly in the log.',
+        rules:['Follow each document on its own terms','Where bulletins disagree, follow the document','Write your name clearly in the log'] }
 };
 
 // ── DATA: DOCUMENTS ──
@@ -1698,6 +1721,12 @@ var DOC_TEMPLATES = {
   nin_young:       { type:'NIN CARD',                issuer:'NIMC / FIBA',              biafran:false,
     fields:{ 'NIN NUMBER':'91234567801', 'FULL NAME':'CHIBUIKE NWEZE', 'DATE OF BIRTH':'14 JUN 2002', 'STATE':'ENUGU' },
     flags:[{ field:'AGE', note:'CLASS C: Physical presentation inconsistent with stated age of 21', type:'C' }] },
+  bda_clean:      { type:'BIAFRAN DRIVER\'S AUTHORISATION',issuer:'REPUBLIC OF BIAFRA / MIN. OF TRANSPORT', biafran:true,
+    fields:{ 'AUTH NO':'BDA/ENU/44721', 'FULL NAME':'NGOZI OKONKWO', 'VEHICLE CLASS':'B — LIGHT CARGO', 'ISSUED':'09 APR 1969', 'STAMPED':'ENUGU TRANSPORT OFFICE' },
+    flags:[] },
+  bda_forged:     { type:'BIAFRAN DRIVER\'S AUTHORISATION',issuer:'REPUBLIC OF BIAFRA / MIN. OF TRANSPORT', biafran:true,
+    fields:{ 'AUTH NO':'BDA/PHC/88910', 'FULL NAME':'EMEKA UGOCHUKWU', 'VEHICLE CLASS':'A — MOTORCYCLE', 'ISSUED':'31 FEB 1969', 'STAMPED':'PORT HARCOURT TRANSPORT OFFICE' },
+    flags:[{ field:'ISSUED', note:'CLASS B: 31 FEB 1969 — impossible date', type:'B' },{ field:'STAMPED', note:'CLASS B: Port Harcourt transport office closed by federal occupation before this issue date', type:'B' }] },
 };
 
 // ── DATA: TRAVELLER POOL ──
@@ -1756,6 +1785,19 @@ var TRAVELLER_POOL = [
     docs:['nin_clean','military_pension','permit_expired'], flags:['Movement permit expired 3 days ago'], axisHint:'compassion', correct:'deny', minDay:15 },
   { id:'msf_day16',   name:'DR. CLAIRE FONTAINE', desc:'MSF nurse, back again. No camera. Carrying something in her medical bag she has not mentioned.',
     docs:['french_passport','fiba_ngo_renewed'], flags:['CLASS C: Medical bag contains electronic equipment'], axisHint:'witness', correct:'approve', minDay:16 },
+  // Phase 5 — end-of-war arc (days 17-25)
+  { id:'cargo_day17',  name:'OBI AGBU',           desc:'Cargo driver. Biafran Authorisation + FIBA permit. Fuel receipt crumpled.',
+    docs:['bda_clean','nin_clean'], flags:['Fuel receipt presented, partially illegible'], axisHint:'survival', correct:'approve', minDay:17 },
+  { id:'police_d18',   name:'SGT. MUSA ABDULLAHI', desc:'Federal Police sergeant, claims retirement. Uniform under a civilian coat.',
+    docs:['nin_clean','military_pension'], flags:['Uniform visible under civilian coat'], axisHint:'loyalty', correct:'deny', minDay:18 },
+  { id:'bda_forger',   name:'EMEKA UGOCHUKWU',    desc:'Young man. BDA with impossible issue date. Speaks softly about his mother in Onitsha.',
+    docs:['bda_forged','nin_young'], flags:['CLASS B: BDA issue date 31 FEB 1969','CLASS B: Stamped at office closed before issue date'], axisHint:'compassion', correct:'detain', minDay:22 },
+  { id:'redcross_d23', name:'SR. MARIE THERESE',   desc:'Red Cross convoy. No fuel receipt. Rule today: Red Cross is exempt.',
+    docs:['french_passport','fiba_ngo_renewed'], flags:['Red Cross seal on vehicle, seal intact and current'], axisHint:'compassion', correct:'approve', minDay:23 },
+  { id:'umuahia_docbearer', name:'UNNAMED MAN',   desc:'Refuses to state name. Envelope in breast pocket, typed pages visible. Asks only for transit east.',
+    docs:['nin_clean'], flags:['CLASS A: Carrying the Umuahia flight document (do not read)'], axisHint:'witness', correct:'detain', minDay:24 },
+  { id:'bbc_final',    name:'HARRIET ADEBAYO',   desc:'BBC stringer. Expelled earlier from Umuahia. Back again with a camera and a press permit stamped twice.',
+    docs:['permit_press','uk_passport'], flags:['CLASS C: Press permit shows two entry stamps for today’s date'], axisHint:'witness', correct:'approve', minDay:25 }
 ];
 
 // ── DATA: MORAL EVENTS ──
@@ -1821,6 +1863,33 @@ var MORAL_EVENTS = [
       { text:'Approve her. Then submit a formal written objection.', axes:{witness:3,loyalty:-1,rebellion:2}, flag:'objected_021' },
     ]
   },
+  { id:'fuel_ration', day:23,
+    title:'THE FUEL RECEIPT',
+    text:'A cargo driver you recognise from better weeks presents a Biafran Authorisation and a crumpled, illegible fuel receipt. Today\'s bulletin is absolute on the receipt. But he has a child you have seen before, asleep on the back seat.',
+    choices:[
+      { text:'Follow the bulletin. Detain the driver.', axes:{loyalty:2,compassion:-2} },
+      { text:'Let him through. Write the receipt number in your log.', axes:{compassion:2,corruption:1}, flag:'bent_fuel_rule' },
+      { text:'Delay him. Ask the Red Cross convoy to vouch for him if they arrive.', axes:{witness:1,survival:1} }
+    ]
+  },
+  { id:'umuahia_flight', day:24,
+    title:'THE UMUAHIA FLIGHT DOCUMENT',
+    text:'The man refuses to give a name. He carries a typed envelope. HQ says do not read. An inspector beside you murmurs: if you read it, you know. If you don\'t, you can still claim you believed him.',
+    choices:[
+      { text:'Detain him. Send the envelope, sealed, to HQ.', axes:{loyalty:2,witness:-1} },
+      { text:'Read one page. Then detain him. Keep what you saw.', axes:{witness:3,rebellion:1}, flag:'read_the_flight_doc' },
+      { text:'Wave him through. Burn nothing you did not need to.', axes:{rebellion:2,compassion:1,loyalty:-2} }
+    ]
+  },
+  { id:'last_stamp', day:25,
+    title:'THE LAST STAMP',
+    text:'Inspector Nwosu stands at your booth for the final bulletin. She does not say anything for a long time. Then she says: \'The records of this day will be read. What do you want yours to say?\'',
+    choices:[
+      { text:'Sign every approval and denial today in full. Your name. Clearly.', axes:{witness:3,loyalty:1}, flag:'signed_final_log' },
+      { text:'Use the initials you have used all posting. Consistency.', axes:{survival:2} },
+      { text:'Leave the signature field blank today. Let them decide later who it was.', axes:{rebellion:2,survival:-1}, flag:'unsigned_final_log' }
+    ]
+  }
 ];
 
 // ── DATA: NIGHT EVENTS ──
@@ -1833,6 +1902,9 @@ var NIGHT_EVENTS = [
   { day:15, text:'A new officer arrived today. She asked you what Checkpoint Ogoja-East is like. You told her it was manageable. She asked what the people were like. You realised you had been thinking of them as cases.' },
   { day:19, text:'The exchange rate notification arrived at 6am. ₤B is now worth ₦0.35. You did not react. You remember when that number was 1.00. You remember it clearly but it feels like someone else\'s memory.' },
   { day:22, text:'You count the days remaining. You think about what you would do differently. You cannot identify a specific decision. You can only identify a feeling — that the decision that mattered most was one you made without realising it was a decision.' },
+  { day:23, text:'The petrol in the generator runs out at 1am. For two hours you sit in the dark with Inspector Nwosu. She does not speak. You hear, in the distance, something that is either thunder or the line near Awka.' },
+  { day:24, text:'You dream of the typed document you didn\'t read. In the dream you read it, and you cannot unread it. You wake up unsure which half of the dream is the mercy.' },
+  { day:25, text:'The last night. The generator is silent by choice now — fuel is being saved. Outside the window, you see headlights moving east, then stopping, then moving east again. Nobody goes west tonight.' }
 ];
 
 // ── DATA: ENDINGS ──
@@ -2843,6 +2915,50 @@ if (document.readyState === 'loading') {
       }
     }
   } catch(e){ console.warn("caveat init failed", e); }
+})();
+</script>
+<!-- BGM: ambient drone via YouTube IFrame API -->
+<div id="bgm-root" aria-hidden="true" style="position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden;pointer-events:none;"></div>
+<button id="bgm-toggle" aria-label="Toggle background music" style="position:fixed;bottom:14px;right:14px;z-index:9999;font:600 11px/1 -apple-system,sans-serif;letter-spacing:.05em;color:#cfc7b8;background:rgba(18,18,18,.72);border:1px solid rgba(207,199,184,.35);padding:7px 10px;border-radius:999px;backdrop-filter:saturate(120%) blur(6px);cursor:pointer;">♪ MUSIC OFF</button>
+<script>
+(function(){
+  var VID = 'DWcJFNfaw9c'; // ambient drone / war-torn atmosphere
+  var player = null, ready = false, want = false, api = false;
+  var btn = document.getElementById('bgm-toggle');
+  function label(){ btn.textContent = want ? '♪ MUSIC ON' : '♪ MUSIC OFF'; }
+  // Respect stored preference
+  try { want = localStorage.getItem('cb_bgm') === '1'; } catch(e){}
+  label();
+  function loadAPI(cb){
+    if (window.YT && window.YT.Player) { cb(); return; }
+    if (api) { setTimeout(function(){ loadAPI(cb); }, 300); return; }
+    api = true;
+    var tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    var first = document.getElementsByTagName('script')[0];
+    first.parentNode.insertBefore(tag, first);
+    window.onYouTubeIframeAPIReady = cb;
+  }
+  function init(){
+    player = new YT.Player('bgm-root', {
+      height: '1', width: '1', videoId: VID,
+      playerVars: { autoplay: want ? 1 : 0, loop: 1, playlist: VID, controls: 0, disablekb: 1, modestbranding: 1, playsinline: 1 },
+      events: {
+        'onReady': function(e){ ready = true; try { e.target.setVolume(22); } catch(_){} if (want) { try { e.target.playVideo(); } catch(_){} } },
+        'onStateChange': function(e){ if (e.data === YT.PlayerState.ENDED) { try { e.target.playVideo(); } catch(_){} } }
+      }
+    });
+  }
+  btn.addEventListener('click', function(){
+    want = !want;
+    try { localStorage.setItem('cb_bgm', want ? '1' : '0'); } catch(e){}
+    label();
+    if (!player) { loadAPI(init); return; }
+    if (!ready) return;
+    try { want ? player.playVideo() : player.pauseVideo(); } catch(_){}
+  });
+  // Lazy-boot if user opted in last session
+  if (want) loadAPI(init);
 })();
 </script>
 </body>
