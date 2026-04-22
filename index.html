@@ -448,6 +448,7 @@ html, body {
   background: var(--olive);
   padding: 0;
   flex-direction: column;
+    align-items: stretch;
   /* iOS safe area */
   padding-bottom: env(safe-area-inset-bottom);
 }
@@ -677,6 +678,10 @@ html, body {
 
 /* Action buttons */
 .action-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
   gap: 0;
   z-index: 10;
