@@ -2027,7 +2027,7 @@ function makeCcOption(group, val, label, desc, extraClass) {
   btn.className = 'cc-option' + (extraClass ? ' ' + extraClass : '');
   btn.setAttribute('data-group', group);
   btn.setAttribute('data-val', val);
-  btn.innerHTML = '<span class="cc-option-title">' + label + '</span><span class="cc-option-desc">' + desc + '</span>';
+  btn.innerHTML = '<span class="cc-option-title">' + label + '</span>';
   btn.addEventListener('click', function() { ccSelect(group, btn, val); });
   return btn;
 }
