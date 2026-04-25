@@ -13,7 +13,7 @@
 <!-- Apple touch icon for PWA home screen -->
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=IM+Fell+English:ital@0;1&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
 :root {
   --olive: #2C3E1F;
@@ -1244,6 +1244,46 @@ html, body {
   animation: pulse 2s infinite;
   vertical-align: middle;
 }
+/* === FONTS === */
+body, .booth, .bulletin, .doc, .panel, p, li, span, td, th { font-family: "Crimson Text", "Noto Serif", Georgia, serif; }
+h1, h2, h3, .splash-title, .cc-header-title, .day-banner, .hud-day, .endgame-title { font-family: "Special Elite", "Courier Prime", monospace; letter-spacing: 0.02em; }
+.cc-option-title, .btn-primary, button.primary, .stamp, .doc-title, .bulletin-logo, .splash-subtitle, .splash-version { font-family: "Special Elite", "Courier Prime", monospace; }
+.doc-body, .doc-field, .traveller-quote { font-family: "IM Fell English", "Crimson Text", Georgia, serif; }
+.kbd, code { font-family: "Courier Prime", monospace; }
+/* === INSTALL CAVEAT === */
+.caveat-box { max-width: 480px; }
+.caveat-lead { margin: 8px 0 16px; opacity: 0.9; line-height: 1.5; }
+.caveat-platform { background: rgba(232,223,196,0.06); border: 1px solid rgba(232,223,196,0.18); border-radius: 6px; padding: 12px 14px; margin: 10px 0; text-align: left; }
+.caveat-platform-title { font-family: "Special Elite","Courier Prime",monospace; font-size: 0.95rem; letter-spacing: 0.06em; margin-bottom: 6px; opacity: 0.85; }
+.caveat-list { padding-left: 22px; margin: 0; line-height: 1.7; }
+.caveat-list li { margin: 4px 0; font-size: 0.92rem; }
+.caveat-kbd { display: inline-flex; align-items: center; gap: 6px; padding: 1px 8px; background: rgba(232,223,196,0.12); border: 1px solid rgba(232,223,196,0.25); border-radius: 4px; font-family: "Courier Prime",monospace; font-size: 0.88em; }
+.caveat-ico { width: 14px; height: 14px; vertical-align: middle; }
+.caveat-foot { margin-top: 14px; opacity: 0.8; font-size: 0.9rem; }
+/* === HINTS === */
+#hints-btn { position: fixed; top: 12px; right: 12px; z-index: 9000; width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid #E8DFC4; background: rgba(44,62,31,0.85); color: #E8DFC4; font-family: "Special Elite",monospace; font-size: 1.3rem; line-height: 1; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.4); transition: transform 0.15s; }
+#hints-btn:hover { transform: scale(1.08); }
+#hints-btn.pulse { animation: hintsPulse 1.4s ease-in-out infinite; }
+@keyframes hintsPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(232,223,196,0.6); } 50% { box-shadow: 0 0 0 10px rgba(232,223,196,0); } }
+#hints-modal { position: fixed; inset: 0; z-index: 9500; display: none; background: rgba(20,28,15,0.92); align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
+#hints-modal.open { display: flex; }
+.hints-box { background: #2C3E1F; color: #E8DFC4; border: 1px solid #5A6E3F; border-radius: 8px; max-width: 540px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 24px; position: relative; font-family: "Crimson Text",serif; line-height: 1.55; }
+.hints-box h2 { font-family: "Special Elite",monospace; margin: 0 0 14px; font-size: 1.4rem; letter-spacing: 0.05em; border-bottom: 1px solid rgba(232,223,196,0.25); padding-bottom: 10px; }
+.hints-box h3 { font-family: "Special Elite",monospace; font-size: 1rem; margin: 14px 0 6px; letter-spacing: 0.04em; color: #D4C896; }
+.hints-sec { margin-bottom: 14px; }
+.hints-sec p, .hints-sec li { font-size: 0.94rem; }
+.hints-sec ul { margin: 4px 0; padding-left: 20px; }
+.hints-sec li { margin: 4px 0; }
+#hints-close { position: absolute; top: 8px; right: 12px; background: none; border: none; color: #E8DFC4; font-size: 1.5rem; cursor: pointer; padding: 4px 10px; }
+#hints-ok { display: block; margin: 18px auto 0; padding: 10px 28px; background: #5A6E3F; color: #E8DFC4; border: 1px solid #8FA068; font-family: "Special Elite",monospace; cursor: pointer; letter-spacing: 0.05em; }
+#hints-ok:hover { background: #6F8550; }
+/* === FLASH === */
+#flash-banner { position: fixed; inset: 0; z-index: 8800; display: none; align-items: center; justify-content: center; pointer-events: none; background: rgba(20,28,15,0.55); }
+#flash-banner.show { display: flex; animation: flashFade 1.8s ease forwards; }
+.flash-inner { text-align: center; padding: 28px 44px; background: rgba(44,62,31,0.95); border: 1.5px solid #E8DFC4; border-radius: 4px; box-shadow: 0 8px 30px rgba(0,0,0,0.6); }
+.flash-title { font-family: "Special Elite",monospace; font-size: 1.8rem; letter-spacing: 0.18em; color: #F2E9CE; margin-bottom: 8px; }
+.flash-sub { font-family: "Crimson Text",serif; font-style: italic; font-size: 1.05rem; color: #D4C896; }
+@keyframes flashFade { 0%{opacity:0;transform:scale(0.94);} 18%{opacity:1;transform:scale(1);} 78%{opacity:1;transform:scale(1);} 100%{opacity:0;transform:scale(1.02);} }
 </style>
 </head>
 <body>
@@ -1257,15 +1297,15 @@ html, body {
       <div class="sun-circle"></div>
     </div>
     <div class="splash-title">CHECKPOINT<br>BIAFRA</div>
-    <div class="splash-subtitle">Federal Identity &amp; Border Authority</div>
+    <div class="splash-subtitle">Federal Ministry of Identity &amp; Border Authority · FIBA</div>
     <div class="splash-tagline">"The desk is the same desk. The country is not the same country."</div>
-    <button class="btn-primary" id="btn-begin">BEGIN POSTING</button>
+    <button class="btn-primary" id="btn-begin">START A NEW GAME</button>
     <br>
     <button class="btn-secondary" id="btn-continue" style="display:none">CONTINUE — DAY <span id="continue-day">1</span></button>
     <br>
     <button class="btn-secondary" id="btn-gallery" style="margin-top:8px">CASE FILES</button>
   </div>
-  <div class="splash-version">v1.1 · CHECKPOINT BIAFRA · ALL 28 ENDINGS</div>
+  <div class="splash-version">v1.2 · CHECKPOINT BIAFRA</div>
 </div>
 
 <!-- CHARACTER CREATION -->
@@ -1328,7 +1368,7 @@ html, body {
   <div class="bulletin-paper">
     <div class="bulletin-stamp" id="bulletin-stamp">CLASSIFIED</div>
     <div class="bulletin-header">
-      <span class="bulletin-logo">FEDERAL IDENTITY &amp; BORDER AUTHORITY</span>
+      <span class="bulletin-logo">FEDERAL MINISTRY OF IDENTITY &amp; BORDER AUTHORITY</span>
       <div class="bulletin-title" id="bulletin-title">DAILY BULLETIN</div>
       <div class="bulletin-num" id="bulletin-num">BULLETIN 001 · DAY 1</div>
     </div>
@@ -2152,7 +2192,7 @@ function showIntroPage() {
     el.innerHTML = INTRO_PAGES[introIdx].replace(/\n/g, '<br><br>');
     el.classList.add('visible');
     introIdx++;
-    introTimer = setTimeout(showIntroPage, 3500);
+    introTimer = setTimeout(showIntroPage, 6000);
   }, 400);
 }
 
@@ -2887,9 +2927,24 @@ if (document.readyState === 'loading') {
 <div id="install-caveat" role="dialog" aria-modal="true">
   <div class="caveat-box">
     <h1>ADD TO HOME SCREEN</h1>
-    <p>This checkpoint is best experienced as an installed app. On iOS Safari:</p>
-    <div class="caveat-steps">1. Tap the Share button<br>2. Scroll down and tap Add to Home Screen<br>3. Tap Add</div>
-    <p>Then launch from the home screen icon for fullscreen, offline play.</p>
+    <p class="caveat-lead">Best played as an installed app — fullscreen, offline, no browser bar.</p>
+    <div class="caveat-platform">
+      <div class="caveat-platform-title">iOS · Safari</div>
+      <ol class="caveat-list">
+        <li>Tap <span class="caveat-kbd">Share <svg class="caveat-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 12v7h14v-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span> at the bottom of Safari.</li>
+        <li>Scroll, then tap <span class="caveat-kbd">Add to Home Screen <svg class="caveat-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>.</li>
+        <li>Tap <span class="caveat-kbd">Add</span> in the top-right.</li>
+      </ol>
+    </div>
+    <div class="caveat-platform">
+      <div class="caveat-platform-title">Android · Chrome</div>
+      <ol class="caveat-list">
+        <li>Tap <span class="caveat-kbd">Menu <svg class="caveat-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="19" r="2" fill="currentColor"/></svg></span> in the top-right.</li>
+        <li>Tap <span class="caveat-kbd">Install app</span> or <span class="caveat-kbd">Add to Home screen</span>.</li>
+        <li>Confirm <span class="caveat-kbd">Install</span>.</li>
+      </ol>
+    </div>
+    <p class="caveat-foot">Then launch from the home-screen icon for the full experience.</p>
     <button type="button" class="primary" id="caveat-continue">I UNDERSTAND — CONTINUE</button>
     <button type="button" id="caveat-browser">PLAY IN BROWSER</button>
   </div>
@@ -2917,48 +2972,110 @@ if (document.readyState === 'loading') {
   } catch(e){ console.warn("caveat init failed", e); }
 })();
 </script>
-<!-- BGM: ambient drone via YouTube IFrame API -->
+<!-- BGM: ambient drone via YouTube IFrame API (auto-start, no UI) -->
 <div id="bgm-root" aria-hidden="true" style="position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden;pointer-events:none;"></div>
-<button id="bgm-toggle" aria-label="Toggle background music" style="position:fixed;bottom:14px;right:14px;z-index:9999;font:600 11px/1 -apple-system,sans-serif;letter-spacing:.05em;color:#cfc7b8;background:rgba(18,18,18,.72);border:1px solid rgba(207,199,184,.35);padding:7px 10px;border-radius:999px;backdrop-filter:saturate(120%) blur(6px);cursor:pointer;">♪ MUSIC OFF</button>
 <script>
 (function(){
-  var VID = 'DWcJFNfaw9c'; // ambient drone / war-torn atmosphere
-  var player = null, ready = false, want = false, api = false;
-  var btn = document.getElementById('bgm-toggle');
-  function label(){ btn.textContent = want ? '♪ MUSIC ON' : '♪ MUSIC OFF'; }
-  // Respect stored preference
-  try { want = localStorage.getItem('cb_bgm') === '1'; } catch(e){}
-  label();
+  var VID = "y-YcjCLU6DE"; // ambient bunker soundscape (1h, embeddable)
+  var player = null, ready = false, want = true, api = false;
   function loadAPI(cb){
-    if (window.YT && window.YT.Player) { cb(); return; }
-    if (api) { setTimeout(function(){ loadAPI(cb); }, 300); return; }
+    if (api) return cb && cb();
     api = true;
-    var tag = document.createElement('script');
-    tag.src = 'https://www.youtube.com/iframe_api';
-    var first = document.getElementsByTagName('script')[0];
+    var tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    var first = document.getElementsByTagName("script")[0];
     first.parentNode.insertBefore(tag, first);
     window.onYouTubeIframeAPIReady = cb;
   }
   function init(){
-    player = new YT.Player('bgm-root', {
-      height: '1', width: '1', videoId: VID,
-      playerVars: { autoplay: want ? 1 : 0, loop: 1, playlist: VID, controls: 0, disablekb: 1, modestbranding: 1, playsinline: 1 },
+    player = new YT.Player("bgm-root", {
+      height: "1", width: "1", videoId: VID,
+      playerVars: { autoplay: 1, loop: 1, playlist: VID, controls: 0, disablekb: 1, modestbranding: 1, playsinline: 1, rel: 0 },
       events: {
-        'onReady': function(e){ ready = true; try { e.target.setVolume(22); } catch(_){} if (want) { try { e.target.playVideo(); } catch(_){} } },
-        'onStateChange': function(e){ if (e.data === YT.PlayerState.ENDED) { try { e.target.playVideo(); } catch(_){} } }
+        onReady: function(e){ ready = true; try { e.target.setVolume(22); e.target.playVideo(); } catch(err){} },
+        onStateChange: function(e){ if (e.data === YT.PlayerState.ENDED) { try { player.playVideo(); } catch(err){} } }
       }
     });
   }
-  btn.addEventListener('click', function(){
-    want = !want;
-    try { localStorage.setItem('cb_bgm', want ? '1' : '0'); } catch(e){}
-    label();
-    if (!player) { loadAPI(init); return; }
-    if (!ready) return;
-    try { want ? player.playVideo() : player.pauseVideo(); } catch(_){}
-  });
-  // Lazy-boot if user opted in last session
-  if (want) loadAPI(init);
+  function kick(){ document.removeEventListener("pointerdown", kick); document.removeEventListener("keydown", kick); loadAPI(init); }
+  document.addEventListener("pointerdown", kick, { once: true });
+  document.addEventListener("keydown", kick, { once: true });
+})();
+</script>
+<!-- Hints help -->
+<button id="hints-btn" type="button" aria-label="Help — how to play" title="Help — how to play">?</button>
+<div id="hints-modal" role="dialog" aria-modal="true" aria-labelledby="hints-title">
+  <div class="hints-box">
+    <button id="hints-close" type="button" aria-label="Close">×</button>
+    <h2 id="hints-title">HOW TO PLAY</h2>
+    <section class="hints-sec">
+      <h3>The booth</h3>
+      <p><b>Bulletin</b> — the day’s rules from FIBA. Read it first; it tells you which papers are required and which stamps are illegal that day.</p>
+      <p><b>Documents</b> — papers each traveller hands you (passport, permit, BDA, work card…). Compare them against the bulletin and against each other. Mismatched names, expired dates, missing stamps, or impossible regions are grounds to deny.</p>
+      <p><b>Stamps</b> — your tools: APPROVE, DENY, REJECT. Each leaves a permanent mark on the traveller’s papers and on your record.</p>
+      <p><b>Day counter</b> — top bar; days run 1 → 25. The war ends on day 25 regardless of how many you process.</p>
+      <p><b>Wallet</b> — your daily shillings. Rent and food are deducted at the end of each day.</p>
+    </section>
+    <section class="hints-sec">
+      <h3>How you earn (and lose)</h3>
+      <ul>
+        <li>+1 shilling for each correct decision (approving a clean traveller; denying a clear forgery).</li>
+        <li>−2 shillings for each mistake (waving a forgery through; turning away a legal traveller).</li>
+        <li>Citations from FIBA accumulate; three in one day costs you the booth.</li>
+        <li>End-of-day costs: rent, food, sometimes medicine. Run out and the game ends in destitution.</li>
+      </ul>
+    </section>
+    <section class="hints-sec">
+      <h3>What APPROVE / DENY / REJECT mean</h3>
+      <ul>
+        <li><b>APPROVE</b> — let the traveller cross. Use only when papers match the bulletin.</li>
+        <li><b>DENY</b> — turn them back. Use for missing or expired papers; the traveller is sent home, not detained.</li>
+        <li><b>REJECT</b> — detain. Use for forgeries, smugglers, infiltrators. Triggers a security write-up.</li>
+      </ul>
+    </section>
+    <section class="hints-sec">
+      <h3>Consequences — six axes</h3>
+      <p>Every choice nudges six hidden meters: <b>loyalty</b>, <b>compassion</b>, <b>rebellion</b>, <b>survival</b>, <b>witness</b>, <b>corruption</b>. Your ending depends on which axes dominate by day 25 — play your conscience.</p>
+    </section>
+    <button id="hints-ok" type="button" class="primary">GOT IT</button>
+  </div>
+</div>
+<div id="flash-banner" aria-live="polite"><div class="flash-inner"><div class="flash-title"></div><div class="flash-sub"></div></div></div>
+<script>
+(function(){
+  var fb = document.getElementById("flash-banner");
+  var ft = fb && fb.querySelector(".flash-title");
+  var fs = fb && fb.querySelector(".flash-sub");
+  var ftimer = null;
+  window.flash = function(title, sub){
+    if (!fb) return;
+    if (ftimer) clearTimeout(ftimer);
+    ft.textContent = title || "";
+    fs.textContent = sub || "";
+    fb.classList.remove("show"); void fb.offsetWidth; fb.classList.add("show");
+    ftimer = setTimeout(function(){ fb.classList.remove("show"); }, 1800);
+  };
+  var hb = document.getElementById("hints-btn");
+  var hm = document.getElementById("hints-modal");
+  var hc = document.getElementById("hints-close");
+  var ho = document.getElementById("hints-ok");
+  function openH(){ hm && hm.classList.add("open"); }
+  function closeH(){ hm && hm.classList.remove("open"); }
+  hb && hb.addEventListener("click", openH);
+  hc && hc.addEventListener("click", closeH);
+  ho && ho.addEventListener("click", closeH);
+  hm && hm.addEventListener("click", function(e){ if (e.target === hm) closeH(); });
+  try {
+    if (!localStorage.getItem("cb_hints_seen")) {
+      hb && hb.classList.add("pulse");
+      setTimeout(function(){ hb && hb.classList.remove("pulse"); }, 6000);
+      hb && hb.addEventListener("click", function(){ try { localStorage.setItem("cb_hints_seen","1"); } catch(e){} }, { once: true });
+    }
+  } catch(e){}
+  function hookBegin(){ var btn = document.getElementById("btn-begin"); if (btn) btn.addEventListener("click", function(){ window.flash("REGISTRATION", "Federal Ministry of Identity & Border Authority"); }); }
+  function hookCC(){ document.addEventListener("click", function(e){ var t=e.target; if(!t)return; var id=t.id||""; var txt=(t.textContent||"").trim().toUpperCase(); if (id==="cc-finish"||id==="btn-cc-finish"||/REPORT FOR DUTY|TAKE THE BOOTH|CONFIRM REGISTRATION|FINISH REGISTRATION|COMPLETE REGISTRATION/.test(txt)) { window.flash("REGISTRATION COMPLETE","Reporting for duty — booth ready"); } }, true); }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function(){ hookBegin(); hookCC(); });
+  else { hookBegin(); hookCC(); }
 })();
 </script>
 </body>
