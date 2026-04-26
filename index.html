@@ -1304,6 +1304,16 @@ body:not(.phase-allow-hints) #hints-btn { display: none !important; }
 .hud-real-date { position: fixed; top: 6px; right: 8px; z-index: 8200; font-family:"Courier Prime",monospace; font-size: 10px; color: rgba(242,232,208,0.45); letter-spacing: 0.1em; pointer-events: none; user-select: none; }
 .todays-value { display:block; font-family:"Courier Prime",monospace; font-size:9.5px; color: rgba(212,160,23,0.7); margin-top:2px; letter-spacing:0.05em; font-style: italic; }
 .exchange-overlay, .fx-overlay, .rate-tip { position: fixed !important; bottom: 56px !important; right: 12px !important; top: auto !important; left: auto !important; z-index: 60 !important; max-width: 180px; }
+
+/* TOP-VIEW DESK ILLUSTRATION */
+.desk { position: relative; }
+.desk::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0.18; background-image: radial-gradient(ellipse at 50% 8%, rgba(245,225,180,0.55) 0%, rgba(245,225,180,0) 32%), linear-gradient(180deg, transparent 0%, rgba(85,55,30,0.12) 60%, rgba(40,25,12,0.28) 100%); z-index: 0; }
+.traveller-silhouette { position: absolute; top: 4px; left: 50%; transform: translateX(-50%); width: 60px; height: 70px; pointer-events: none; opacity: 0.55; z-index: 1; }
+.traveller-silhouette svg { width: 100%; height: 100%; display: block; }
+.paper-shadow { position: absolute; pointer-events: none; z-index: 0; opacity: 0.35; filter: blur(3px); background: rgba(0,0,0,0.35); border-radius: 2px; }
+.paper-shadow.p1 { top: 38%; left: 8%; width: 38%; height: 32%; transform: rotate(-3deg); }
+.paper-shadow.p2 { top: 42%; left: 48%; width: 40%; height: 30%; transform: rotate(2deg); }
+.paper-shadow.p3 { top: 65%; left: 22%; width: 56%; height: 22%; transform: rotate(-1deg); }
 </style>
 </head>
 <body>
@@ -3097,5 +3107,6 @@ setInterval(gateCrossRiver,500);
 function dateSync(){var el=document.getElementById("hud-real-date");if(!el){el=document.createElement("div");el.id="hud-real-date";el.className="hud-real-date";document.body.appendChild(el);}var d=new Date();var opts={year:"numeric",month:"short",day:"numeric"};el.textContent=d.toLocaleDateString(undefined,opts);}
 setInterval(dateSync,15000);dateSync();
 })();</script>
+<script>(function(){function setup(){var d=document.getElementById("desk");if(!d)return;if(d.querySelector(".traveller-silhouette"))return;var sil=document.createElement("div");sil.className="traveller-silhouette";sil.innerHTML='<svg viewBox="0 0 60 70" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="14" rx="11" ry="13" fill="#1a1a1a" opacity="0.85"/><path d="M 10 70 Q 10 38 30 38 Q 50 38 50 70 Z" fill="#1a1a1a" opacity="0.85"/></svg>';d.appendChild(sil);["p1","p2","p3"].forEach(function(c){var ps=document.createElement("div");ps.className="paper-shadow "+c;d.appendChild(ps);});}document.addEventListener("DOMContentLoaded",setup);setTimeout(setup,500);setInterval(setup,1500);})();</script>
 </body>
 </html>
