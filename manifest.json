@@ -1,6 +1,6 @@
 {
   "name": "Checkpoint Biafra",
-  "short_name": "Checkpoint",
+  "short_name": "Checkpoint Biafra",
   "description": "A border checkpoint game set during the Biafran secession.",
   "start_url": "./index.html",
   "display": "standalone",
