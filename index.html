@@ -1288,6 +1288,22 @@ body:not(.phase-allow-hints) #hints-btn { display: none !important; }
 .flash-title { font-family: "Special Elite",monospace; font-size: 1.8rem; letter-spacing: 0.18em; color: #F2E9CE; margin-bottom: 8px; }
 .flash-sub { font-family: "Crimson Text",serif; font-style: italic; font-size: 1.05rem; color: #D4C896; }
 @keyframes flashFade { 0%{opacity:0;transform:scale(0.94);} 18%{opacity:1;transform:scale(1);} 78%{opacity:1;transform:scale(1);} 100%{opacity:0;transform:scale(1.02);} }
+
+.susp-badge { display:inline-block; margin-left:6px; padding:2px 6px; font-family:"Special Elite",monospace; font-size:10px; background:#A33B2A; color:#F2E8D0; border-radius:2px; letter-spacing:0.05em; animation: suspPulse 1s ease-in-out infinite; }
+@keyframes suspPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } }
+.deficit-warning { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); z-index: 9500; max-width: 380px; padding: 14px 18px; background: rgba(110,30,28,0.94); color:#F8E8C8; font-family:"Crimson Text",serif; font-size:14px; line-height:1.45; border:1px solid rgba(232,223,196,0.35); border-radius:4px; box-shadow:0 6px 22px rgba(0,0,0,0.5); animation: deficitIn 0.5s ease-out, deficitOut 0.5s ease-in 8.5s both; }
+.deficit-warning .deficit-sub { display:block; margin-top:8px; font-size:11px; color:#E8DFC4; opacity:0.78; font-family:"Courier Prime",monospace; }
+@keyframes deficitIn { from { opacity:0; transform: translate(-50%, 12px); } to { opacity:1; transform: translate(-50%,0); } }
+@keyframes deficitOut { from { opacity:1; } to { opacity:0; } }
+.officer-rating-block { margin-top: 22px; padding: 14px; border-top: 1px solid rgba(232,223,196,0.2); border-bottom: 1px solid rgba(232,223,196,0.2); font-family:"Crimson Text",serif; color:#E8DFC4; }
+.officer-rating-block .or-grade { font-family:"Bebas Neue",sans-serif; font-size: 22px; letter-spacing:0.1em; }
+.officer-rating-block .or-grade b { color:#D4A017; font-size: 28px; }
+.officer-rating-block .or-pct { font-family:"Courier Prime",monospace; font-size: 11px; color: rgba(242,232,208,0.6); margin: 4px 0 12px; letter-spacing:0.1em; }
+.officer-rating-block .or-summary { font-size: 13.5px; line-height: 1.55; text-align:left; }
+.officer-rating-block .or-summary b { color:#D4A017; font-family:"Special Elite",monospace; font-size:12px; letter-spacing:0.05em; }
+.hud-real-date { position: fixed; top: 6px; right: 8px; z-index: 8200; font-family:"Courier Prime",monospace; font-size: 10px; color: rgba(242,232,208,0.45); letter-spacing: 0.1em; pointer-events: none; user-select: none; }
+.todays-value { display:block; font-family:"Courier Prime",monospace; font-size:9.5px; color: rgba(212,160,23,0.7); margin-top:2px; letter-spacing:0.05em; font-style: italic; }
+.exchange-overlay, .fx-overlay, .rate-tip { position: fixed !important; bottom: 56px !important; right: 12px !important; top: auto !important; left: auto !important; z-index: 60 !important; max-width: 180px; }
 </style>
 </head>
 <body>
@@ -1583,6 +1599,11 @@ var BACKGROUNDS = [
   { id:'marketwm',  label:'MARKET WOMAN',        desc:'You ran an ofe stall through three offensives.',      bias:{survival:2,witness:1} },
   { id:'police',    label:'POLICE SERGEANT',     desc:'You served federal command before the emergency.',    bias:{loyalty:2,corruption:1} },
   { id:'cargo',     label:'CARGO DRIVER',        desc:'You hauled relief, ammunition, and refugees in a week.',bias:{witness:1,survival:2} },
+  { id:'artist',    label:'ARTIST / CREATIVE',     desc:'Painter, musician, performer. Patrons distrust the regime.', bias:{witness:2,compassion:1} },
+  { id:'doctor',    label:'DOCTOR / NURSE',         desc:'Hospitals are your refuge. Bribes are mostly food.',         bias:{compassion:2,survival:1} },
+  { id:'journalist',label:'JOURNALIST',             desc:'You see what others edit out. Watched by FIBA.',             bias:{witness:2,rebellion:1} },
+  { id:'farmer',    label:'FARMER / TRADER',        desc:'Land claims, ration tickets, ferry passes — you know each.', bias:{survival:2} },
+  { id:'other',     label:'OTHER — SPECIFY ON FILE', desc:'A general field. FIBA notes your background as unrecorded.', bias:{} },
 ];
 
 // ── DATA: STATES ──
@@ -3052,5 +3073,29 @@ if (document.readyState === 'loading') {
 })();
 </script>
 <script>(function(){function setPhase(p){var b=document.body;b.classList.remove("phase-splash","phase-charcreate","phase-bulletin","phase-booth","phase-day-end","phase-ending","phase-allow-hints");b.classList.add("phase-"+p);if(p==="splash"||p==="bulletin"||p==="charcreate"){b.classList.add("phase-allow-hints");}}window.__setPhase=setPhase;function detect(){var ids=["splash","char-create","intro","bulletin","game","day-end","ending"];for(var i=0;i<ids.length;i++){var el=document.getElementById(ids[i]);if(el&&el.classList.contains("active")){var map={"splash":"splash","char-create":"charcreate","intro":"bulletin","bulletin":"bulletin","game":"booth","day-end":"day-end","ending":"ending"};setPhase(map[ids[i]]);return;}}}var mo=new MutationObserver(detect);document.addEventListener("DOMContentLoaded",function(){detect();document.querySelectorAll(".screen").forEach(function(s){mo.observe(s,{attributes:true,attributeFilter:["class"]});});});setInterval(detect,500);})();</script>
+<script>(function(){
+var POOL_FIRST=["Adaeze","Chinedu","Ifeoma","Obinna","Ngozi","Ekene","Chiamaka","Uzoma","Kelechi","Adaobi","Emeka","Nneka","Tobenna","Onyeka","Chima","Amaka","Chibuzo","Uchenna","Adanna","Ikenna","Chuma","Ngeri","Bassey","Etim","Eno","Imoh","Affiong","Mfon","Ubong","Edidiong","Aniefiok","Otobong","Inyang","Idongesit","Kpunyi","Joshua","Mary","Grace","Faith","Peter","Daniel","Esther","Ruth","Solomon","Comfort","Patience","Florence","Chukwudi","Chukwuma","Ezinne","Adaku","Chigozie","Tochukwu","Onyinye","Chizoba","Chinonso","Chukwuemeka","Ifeanyi","Nnamdi","Okechukwu","Chinwe","Obianuju","Anuli","Chiebuka","Chukwudera","Iheoma","Chioma","Olamma"];
+var POOL_LAST=["Achebe","Okafor","Eze","Onuoha","Nwosu","Ibekwe","Anyanwu","Okonkwo","Obi","Ndubuisi","Madu","Mbah","Nweke","Okeke","Uzor","Aniebo","Iheme","Ezeh","Akpan","Etuk","Bassey","Effiong","Ekanem","Inyang","Udo","Edet","Okon","Asuquo","Umoren","Iniobong","Akpabio","Eshiett","Nwankwo","Iwobi","Eluemunor","Onyemaechi","Chinwuba","Anyanwu","Okeke","Onyema","Egbuna","Mgbachi","Anozie","Onuoha","Onwumere","Onyemelukwe","Iheanacho","Ihegwuanya","Ihebuzor","Ekejiuba","Ekenta","Ekejimba","Eluemuno","Eluem","Onueri","Iheme","Ojukwu","Achuzia","Banjo","Madiebo","Effiong","Adekunle","Akinrinade"];
+var usedNames={};
+function pickFresh(arr){var tries=0;while(tries<25){var n=arr[Math.floor(Math.random()*arr.length)];if(!usedNames[n]){usedNames[n]=true;return n;}tries++;}return arr[Math.floor(Math.random()*arr.length)];}
+window.__pickFreshName=function(){return pickFresh(POOL_FIRST)+" "+pickFresh(POOL_LAST);};
+window.__travellerHistory=window.__travellerHistory||{};
+window.__recordTravellerDecision=function(name,decision,errors){if(!name)return;window.__travellerHistory[name]={decision:decision,errors:errors||[],day:(window.state&&window.state.day)||0};};
+window.__getReturningNote=function(name){var h=window.__travellerHistory[name];if(!h)return null;var note="Last seen Day "+h.day+": "+h.decision.toUpperCase();if(h.errors&&h.errors.length){note+=" — flagged for "+h.errors.join(", ")+".";}return note;};
+function scanSuspicious(){var papers=document.querySelectorAll(".doc, .paper, .document, .traveller-doc, [data-doc]");var keys=["EXPIRED","FORGED","MISMATCH","SUSPENDED","INVALID","UNREGISTERED","ALTERED"];papers.forEach(function(p){var t=(p.textContent||"").toUpperCase();var hit=keys.some(function(k){return t.indexOf(k)>=0;});if(hit&&!p.querySelector(".susp-badge")){var b=document.createElement("span");b.className="susp-badge";b.textContent="⚠ DOUBLE-CHECK";p.appendChild(b);}});}
+setInterval(scanSuspicious,800);
+window.__todayValue=function(shillings){var ngnPerShilling=2200;var n=Math.round(shillings*ngnPerShilling);return "≈ ₦"+n.toLocaleString()+" today";};
+function deficitWatch(){if(!window.state)return;var pay=window.state.totalPay;if(typeof pay!=="number")return;if(pay<0&&!window.__deficitWarned){window.__deficitWarned=true;var msg=document.createElement("div");msg.className="deficit-warning";msg.innerHTML="<b>YOU ARE IN DEFICIT.</b><br>If this continues, your family will lose rent and food. Children may be sent away. Your assignment may be revoked. <span class=\"deficit-sub\">Long-term deficit erodes loyalty meters and can trigger eviction endings.</span>";document.body.appendChild(msg);setTimeout(function(){if(msg.parentNode)msg.parentNode.removeChild(msg);},9000);}}
+setInterval(deficitWatch,1500);
+function fullNameUp(){var els=document.querySelectorAll(".eod-error-name, .processing-error-name, [data-error-name]");els.forEach(function(e){var n=e.textContent;if(n&&!e.dataset.expanded){e.dataset.expanded="1";if(n.split(" ").length<2){e.textContent=n+" "+(window.__pickFreshName?window.__pickFreshName().split(" ")[1]:"Onuoha");}}});}
+setInterval(fullNameUp,1000);
+window.__officerRating=function(){var s=window.state;if(!s)return null;var corr=(s.totalApproved||0)-(s.totalErrors||0);var pct=(s.totalProcessed?Math.round(((corr)/s.totalProcessed)*100):0);var grade="C";if(pct>=90)grade="A+";else if(pct>=80)grade="A";else if(pct>=70)grade="B";else if(pct>=55)grade="C";else if(pct>=40)grade="D";else grade="F";return{grade:grade,pct:pct,corr:corr,total:s.totalProcessed||0};};
+function injectEndingSummary(){var endScreen=document.getElementById("ending");if(!endScreen||!endScreen.classList.contains("active"))return;if(endScreen.querySelector(".officer-rating-block"))return;var r=window.__officerRating();if(!r)return;var s=window.state||{};var content=endScreen.querySelector(".ending-content");if(!content)return;var block=document.createElement("div");block.className="officer-rating-block";var famLine=s.familyStatus?("<b>Family:</b> "+s.familyStatus):"<b>Family:</b> survived the war on what your stamps could buy.";var warLine="<b>The war:</b> ended on Day "+(s.day||25)+". Cross River fell silent.";var studyLine=(s.player&&s.player.background==="other")?"<b>Your studies:</b> went unrecorded — a quiet life.":"<b>Your studies:</b> the war suspended every classroom. Whether you returned to them depended on what your conscience permitted.";block.innerHTML="<div class=\"or-grade\">OFFICER RATING: <b>"+r.grade+"</b></div><div class=\"or-pct\">"+r.pct+"% accuracy across "+r.total+" travellers</div><div class=\"or-summary\">"+warLine+"<br>"+famLine+"<br>"+studyLine+"</div>";content.appendChild(block);}
+setInterval(injectEndingSummary,400);
+function gateCrossRiver(){if(!window.state||!window.state.player)return;var st=window.state.player.state;document.querySelectorAll("[data-gate=\"cross-river\"]").forEach(function(el){el.style.display=(st==="Cross River")?"block":"none";});}
+setInterval(gateCrossRiver,500);
+function dateSync(){var el=document.getElementById("hud-real-date");if(!el){el=document.createElement("div");el.id="hud-real-date";el.className="hud-real-date";document.body.appendChild(el);}var d=new Date();var opts={year:"numeric",month:"short",day:"numeric"};el.textContent=d.toLocaleDateString(undefined,opts);}
+setInterval(dateSync,15000);dateSync();
+})();</script>
 </body>
 </html>
