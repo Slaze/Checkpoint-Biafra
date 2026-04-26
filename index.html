@@ -1314,20 +1314,51 @@ body:not(.phase-allow-hints) #hints-btn { display: none !important; }
 .paper-shadow.p1 { top: 38%; left: 8%; width: 38%; height: 32%; transform: rotate(-3deg); }
 .paper-shadow.p2 { top: 42%; left: 48%; width: 40%; height: 30%; transform: rotate(2deg); }
 .paper-shadow.p3 { top: 65%; left: 22%; width: 56%; height: 22%; transform: rotate(-1deg); }
+
+/* CREDITS / NWOSU / TWIST / DISCIPLINE / CONDITION CSS */
+.splash-officer-line { font-family:"IM Fell English",serif; font-size: 13px; line-height: 1.45; color: rgba(232,223,196,0.78); margin-top: 6px; margin-bottom: 18px; max-width: 320px; text-align: center; font-style: italic; letter-spacing: 0.04em; }
+.credits-line { will-change: opacity; }
+.breaking-news, .nwosu-bark, .condition-card, .disciplinary-card { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9700; max-width: 360px; padding: 18px 22px; font-family: "Crimson Text", serif; line-height: 1.5; color: #F4E8C8; border: 1px solid rgba(232,223,196,0.4); border-radius: 5px; box-shadow: 0 12px 38px rgba(0,0,0,0.7); animation: bnIn 0.5s ease, bnOut 0.6s ease 8.4s both; }
+.breaking-news { background: rgba(110, 24, 22, 0.95); }
+.breaking-news .bn-sub { font-family:"Courier Prime",monospace; font-size:11px; color: rgba(244,232,200,0.7); margin-top:10px; letter-spacing:0.06em; }
+.nwosu-bark { background: rgba(28, 38, 22, 0.96); border-color: rgba(212,160,23,0.5); }
+.nwosu-bark .nb-tag { font-family:"Special Elite",monospace; font-size:10px; letter-spacing:0.25em; color:#D4A017; margin-bottom:6px; }
+.nwosu-bark .nb-line { font-style: italic; font-size: 16px; }
+.nwosu-bark .nb-gossip { font-size: 12.5px; margin-top:10px; padding-top:8px; border-top:1px solid rgba(232,223,196,0.18); color: rgba(244,232,200,0.85); }
+.nwosu-bark .nb-gossip b { color:#D4A017; font-family:"Special Elite",monospace; font-size:10.5px; letter-spacing:0.06em; }
+.condition-card { background: rgba(40, 14, 24, 0.96); border-color: rgba(192,90,75,0.55); }
+.condition-card .cc-tag { font-family:"Special Elite",monospace; font-size:10px; letter-spacing:0.25em; color: rgba(232,223,196,0.55); margin-bottom:4px; }
+.condition-card .cc-title { font-family:"Bebas Neue",sans-serif; font-size:18px; letter-spacing:0.08em; color:#F4E8C8; margin-bottom:6px; }
+.condition-card .cc-body { font-size:14px; line-height:1.5; }
+.condition-card .cc-effect { font-family:"Courier Prime",monospace; font-size:11px; color:#E8B07A; margin-top:10px; letter-spacing:0.06em; }
+.disciplinary-card { background: rgba(20,18,12,0.96); border-color: rgba(212,160,23,0.6); }
+.disciplinary-card .dc-title { font-family:"Bebas Neue",sans-serif; font-size:18px; color:#D4A017; letter-spacing:0.1em; margin-bottom:6px; }
+.disciplinary-card .dc-body { font-size:14px; }
+.disciplinary-card .dc-cost { font-family:"Courier Prime",monospace; font-size:11px; color:#C58A3E; margin-top:10px; }
+@keyframes bnIn { from { opacity:0; transform: translate(-50%,-46%); } to { opacity:1; transform: translate(-50%,-50%); } }
+@keyframes bnOut { from { opacity:1; } to { opacity:0; } }
 </style>
 </head>
 <body>
 
 <div class="noise-overlay"></div>
 
+<!-- CREDITS PRE-SPLASH -->
+<div id="credits-splash" class="screen active" style="position:fixed;inset:0;background:#0a0d07;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:99999;color:#E8DFC4;font-family:'IM Fell English',serif;text-align:center;padding:24px;">
+  <div id="credits-line-1" class="credits-line" style="opacity:0;font-size:13px;letter-spacing:0.4em;color:rgba(232,223,196,0.6);font-family:'Courier Prime',monospace;">ICONIA GLOBAL</div>
+  <div id="credits-line-1b" class="credits-line" style="opacity:0;margin-top:6px;font-size:11px;letter-spacing:0.25em;color:rgba(232,223,196,0.4);font-family:'Courier Prime',monospace;">PRESENTS</div>
+  <div id="credits-line-2" class="credits-line" style="opacity:0;margin-top:48px;font-size:14px;letter-spacing:0.18em;color:rgba(212,160,23,0.85);font-family:'IM Fell English',serif;font-style:italic;">A game concept by</div>
+  <div id="credits-line-2b" class="credits-line" style="opacity:0;margin-top:6px;font-size:18px;letter-spacing:0.2em;color:#E8DFC4;font-family:'Bebas Neue',sans-serif;">UGOO OKOGERI</div>
+</div>
 <!-- SPLASH -->
-<div id="splash" class="screen active">
+<div id="splash" class="screen" style="display:none">
   <div class="splash-content">
     <div class="splash-sun" id="splash-sun" aria-hidden="true">
       <div class="sun-circle"></div>
     </div>
     <div class="splash-title">CHECKPOINT<br>BIAFRA</div>
     <div class="splash-subtitle">Federal Ministry of Identity &amp; Border Authority · FIBA</div>
+    <div class="splash-officer-line">You are an officer of the Federal Ministry of Identity and Border Authority.</div>
     <div class="splash-tagline">"The desk is the same desk. The country is not the same country."</div>
     <button class="btn-primary" id="btn-begin">START A NEW GAME</button>
     <br>
@@ -1377,7 +1408,7 @@ body:not(.phase-allow-hints) #hints-btn { display: none !important; }
 
     <hr class="cc-divider">
     <div class="cc-lore" style="border-color:var(--biafra-gold);background:rgba(212,160,23,0.08)">
-      Your choices determine which of the 28 endings are available to you. No path is closed entirely — but some are easier to find from where you start.
+      You are an officer of the Federal Ministry of Identity and Border Authority. Cross‑River garrison, Ogoja‑East post. Every signature you make today will be read tomorrow — by people you will never meet, and by people who already know your name.
     </div>
   </div>
   <div class="cc-proceed">
@@ -3008,7 +3039,7 @@ if (document.readyState === 'loading') {
 })();
 </script>
 <!-- BGM: ambient drone via YouTube IFrame API (auto-start, no UI) -->
-<audio id="bgm-audio" loop preload="auto" crossorigin="anonymous" style="display:none"><source src="https://cdn.pixabay.com/download/audio/2021/11/23/audio_64b2dd1bce.mp3" type="audio/mpeg"></audio><script>(function(){var a=document.getElementById("bgm-audio");if(!a)return;a.volume=0.18;var started=false;function tryPlay(){if(started)return;var p=a.play();if(p&&p.then){p.then(function(){started=true;}).catch(function(){});}else{started=true;}}function onGesture(){tryPlay();if(started){document.removeEventListener("pointerdown",onGesture);document.removeEventListener("keydown",onGesture);document.removeEventListener("touchstart",onGesture);}}document.addEventListener("pointerdown",onGesture,{passive:true});document.addEventListener("keydown",onGesture);document.addEventListener("touchstart",onGesture,{passive:true});window.__bgm={el:a,play:tryPlay,pause:function(){a.pause();started=false;}};})();</script>
+<audio id="bgm-audio" loop preload="auto" crossorigin="anonymous" style="display:none"><source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg"><source src="https://cdn.pixabay.com/download/audio/2021/11/23/audio_64b2dd1bce.mp3" type="audio/mpeg"></audio><script>(function(){var a=document.getElementById("bgm-audio");if(!a)return;a.volume=0.18;var started=false;function tryPlay(){if(started)return;var p=a.play();if(p&&p.then){p.then(function(){started=true;}).catch(function(){});}else{started=true;}}function onGesture(){tryPlay();if(started){document.removeEventListener("pointerdown",onGesture);document.removeEventListener("keydown",onGesture);document.removeEventListener("touchstart",onGesture);}}document.addEventListener("pointerdown",onGesture,{passive:true});document.addEventListener("keydown",onGesture);document.addEventListener("touchstart",onGesture,{passive:true});window.__bgm={el:a,play:tryPlay,pause:function(){a.pause();started=false;}};})();</script>
 <!-- Hints help -->
 <button id="hints-btn" type="button" aria-label="Help — how to play" title="Help — how to play">?</button>
 <div id="hints-modal" role="dialog" aria-modal="true" aria-labelledby="hints-title">
@@ -3108,5 +3139,29 @@ function dateSync(){var el=document.getElementById("hud-real-date");if(!el){el=d
 setInterval(dateSync,15000);dateSync();
 })();</script>
 <script>(function(){function setup(){var d=document.getElementById("desk");if(!d)return;if(d.querySelector(".traveller-silhouette"))return;var sil=document.createElement("div");sil.className="traveller-silhouette";sil.innerHTML='<svg viewBox="0 0 60 70" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="14" rx="11" ry="13" fill="#1a1a1a" opacity="0.85"/><path d="M 10 70 Q 10 38 30 38 Q 50 38 50 70 Z" fill="#1a1a1a" opacity="0.85"/></svg>';d.appendChild(sil);["p1","p2","p3"].forEach(function(c){var ps=document.createElement("div");ps.className="paper-shadow "+c;d.appendChild(ps);});}document.addEventListener("DOMContentLoaded",setup);setTimeout(setup,500);setInterval(setup,1500);})();</script>
+<script>(function(){
+function runCredits(){var cs=document.getElementById("credits-splash");var sp=document.getElementById("splash");if(!cs||!sp)return;var l1=document.getElementById("credits-line-1"),l1b=document.getElementById("credits-line-1b"),l2=document.getElementById("credits-line-2"),l2b=document.getElementById("credits-line-2b");function fade(el,o){if(!el)return;el.style.transition="opacity 1.2s ease";el.style.opacity=o;}setTimeout(function(){fade(l1,1);},400);setTimeout(function(){fade(l1b,1);},900);setTimeout(function(){fade(l1,0);fade(l1b,0);},2900);setTimeout(function(){fade(l2,1);},3700);setTimeout(function(){fade(l2b,1);},4200);setTimeout(function(){fade(l2,0);fade(l2b,0);},6700);setTimeout(function(){cs.style.transition="opacity 0.8s ease";cs.style.opacity="0";},7400);setTimeout(function(){cs.style.display="none";sp.style.display="";sp.classList.add("active");},8300);}
+if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",runCredits);}else{runCredits();}
+window.__nwosuLines=["You think the desk reads itself, officer? Move.","I saw three errors yesterday — keep counting and the file becomes mine.","Headquarters wants a name today. Make sure it is not yours.","Your colleague was reassigned this morning. The bench is colder.","Smile less. The travellers remember faces.","I was you, sixteen years ago. I was wrong, twice. Both names are dead now.","The radio said the war is winding. The radio is wrong.","FIBA does not pay you to be merciful, officer. They pay you to be correct.","If the next stamp is wrong, I am writing it down."];
+window.__officeGossip=["Did you hear? Adaeze from Bay 4 took a chicken from a traveller. Audit Tuesday.","They say the new directive is not coming from Lagos at all — it is from a man in Geneva.","I heard Inspector Nwosu cried in the toilet. Or maybe it was laughing. Hard to tell.","Bay 7 has stopped printing receipts. The travellers are paying anyway.","A boy from the radio came asking who approves the most. They never answer.","The ration office sent a memo. The memo was already signed by someone we do not know.","Two officers vanished from Aba post. Their wives say they took the bus. The bus is still there."];
+window.__personalConditions=[{id:"surveillance",title:"YOU ARE BEING WATCHED",body:"A clerk you have never seen sat at your bench during break. Your stamp pads are out of order.",effect:"+1 corruption suspicion",weight:1},{id:"audit",title:"FILE UNDER AUDIT",body:"FIBA Internal has flagged your last four denials for review. Be more careful with the paperwork.",effect:"−1 daily wage — audit fee",weight:1},{id:"family-summons",title:"YOUR WIFE WAS QUESTIONED",body:"A man came to the house in plainclothes. He left a number. Your wife will not say what he asked.",effect:"+2 family pressure",weight:1},{id:"demotion-threat",title:"DEMOTION ON THE BOARD",body:"A list circulated this morning. Your name was on it, in pencil.",effect:"−2 wage if errors > 2 today",weight:1},{id:"radio-warning",title:"LOOSE LIPS — TREASON WATCH",body:"State Security circular: any officer overheard discussing the war effort outside the booth will be tried under section 11.",effect:"−5 wage on rebellion choices",weight:1},{id:"food-shortage",title:"NO BREAKFAST AT THE CANTEEN",body:"The cook did not come in. The kettle is dry. You are hungry, and your hands are slower.",effect:"+1 second per traveller today",weight:1},{id:"watched-by-priest",title:"THE PRIEST IS COUNTING",body:"Father Okonkwo has been at the gate for two hours. He greets every traveller you deny by name.",effect:"+1 compassion sensitivity",weight:1}];
+window.__pickPersonalCondition=function(){var arr=window.__personalConditions;return arr[Math.floor(Math.random()*arr.length)];};
+window.__familyStatusPool=function(state){var deficit=state&&state.totalPay<0;var lines=[];if(deficit){lines.push("Adaobi wrote on the wall in chalk: \"papa we have no rice.\" You did not erase it.","Your son asked if officers eat. You said yes. He did not believe you.","The landlord came twice today. The third time he will not knock.","Your wife covered the lamp with a cloth. She said it makes the empty plate look smaller.","You traded your second pair of shoes. They are not enough.","The neighbour offered a bag of garri. You said no. You came home and regretted it.");}else{lines.push("Adaobi was reading aloud when you walked in. She did not stop.","Your wife saved a piece of fish for you. She said it was nothing. It was not nothing.","Your son drew the checkpoint. The travellers had no faces.","Someone left a cassava on the step. The note said \"officer, thank you.\" You did not eat it.","The radio worked tonight. Everyone was quiet during the names.","The lamp lasted until you finished writing. That is something.");}lines.push("You stayed at the table until the candle gave out. No one asked what you were thinking.","The dog from two doors down came to the gate. You let him sleep on the porch.","A letter came in your wife’s old handwriting. It was for someone she used to be.","You wrote one line in the margin of the bulletin. You crossed it out before bed.");return lines[Math.floor(Math.random()*lines.length)];};
+window.__cleared=window.__cleared||[];
+window.__recordCleared=function(name,bg){if(!name)return;window.__cleared.push({name:name,bg:bg||"unknown",day:(window.state&&window.state.day)||0});};
+window.__triggerSpyReveal=function(){if(!window.__cleared.length)return null;var pick=window.__cleared[Math.floor(Math.random()*window.__cleared.length)];var fates=["was tried this morning under Section 11. The verdict was read at dawn.","was identified at a roadblock outside Calabar. They are not in custody.","was named on the radio. The broadcast cut out before the sentence ended.","walked into the federal compound and did not walk out. The papers say nothing.","was found in a field with a forged BCD and three Naira notes. The field is yours."];var f=fates[Math.floor(Math.random()*fates.length)];return{name:pick.name,day:pick.day,fate:f,html:"<b>BREAKING:</b> the traveller you cleared on Day "+pick.day+" — <i>"+pick.name+"</i> — "+f};};
+window.__showBreakingNews=function(){var r=window.__triggerSpyReveal();if(!r)return;var box=document.createElement("div");box.className="breaking-news";box.innerHTML=r.html+"<div class=\"bn-sub\">Your stamp is in the file. The file is in the war.</div>";document.body.appendChild(box);setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},9500);};
+window.__lastBreakingDay=-1;function maybeBreaking(){if(!window.state||!window.state.day)return;if(window.state.day<=2)return;if(window.state.day===window.__lastBreakingDay)return;if(Math.random()<0.32){window.__lastBreakingDay=window.state.day;window.__showBreakingNews();}}setInterval(maybeBreaking,12000);
+window.__disciplinaryEvents=[{id:"ia-summons",title:"INTERNAL AFFAIRS SUMMONS",body:"You will report to Block C tomorrow at first bell. Bring your stamp log.",cost:5},{id:"pay-docked",title:"WAGE DOCKED",body:"Two days of pay are held pending investigation. Your supervisor signed without looking up.",cost:8},{id:"transfer-threat",title:"TRANSFER ORDER — PROVISIONAL",body:"You may be reassigned to Aba Junction within seventy-two hours. Aba is closer to the front.",cost:0},{id:"family-watch",title:"FAMILY UNDER OBSERVATION",body:"State Security has logged your home address. Your wife noticed the same car twice.",cost:0},{id:"treason-letter",title:"TREASON CHARGE — NOTICE",body:"A complaint was filed under section 11. Your name is on the typed sheet. There is no signature yet.",cost:0}];
+window.__triggerDisciplinary=function(){var arr=window.__disciplinaryEvents;var e=arr[Math.floor(Math.random()*arr.length)];if(window.state&&typeof window.state.totalPay==="number"&&e.cost){window.state.totalPay-=e.cost;}var box=document.createElement("div");box.className="disciplinary-card";box.innerHTML="<div class=\"dc-title\">"+e.title+"</div><div class=\"dc-body\">"+e.body+"</div>"+(e.cost?"<div class=\"dc-cost\">−₦"+e.cost+" deducted</div>":"<div class=\"dc-cost\">No fine — yet.</div>");document.body.appendChild(box);setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},10000);return e;};
+window.__targetTravellersPerDay=function(){return 20+Math.floor(Math.random()*11);};
+window.__shouldShowDecisionEvent=function(){return Math.random()<0.18;};
+window.__pickNwosu=function(){return window.__nwosuLines[Math.floor(Math.random()*window.__nwosuLines.length)];};
+window.__pickGossip=function(){return window.__officeGossip[Math.floor(Math.random()*window.__officeGossip.length)];};
+function familyStatusOverride(){var els=document.querySelectorAll(".family-status, .eod-family, [data-family-status]");els.forEach(function(e){if(e.dataset.randomized)return;e.dataset.randomized="1";var line=window.__familyStatusPool(window.state||{});e.textContent=line;});}
+setInterval(familyStatusOverride,1200);
+window.__lastNwosuDay=-1;function nwosuBark(){if(!window.state||!window.state.day)return;if(window.state.day===window.__lastNwosuDay)return;var bul=document.getElementById("bulletin");if(!bul||!bul.classList.contains("active"))return;window.__lastNwosuDay=window.state.day;var box=document.createElement("div");box.className="nwosu-bark";box.innerHTML="<div class=\"nb-tag\">INSPECTOR NWOSU</div><div class=\"nb-line\">\u201C"+window.__pickNwosu()+"\u201D</div><div class=\"nb-gossip\"><b>Booth gossip:</b> "+window.__pickGossip()+"</div>";document.body.appendChild(box);setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},9000);}setInterval(nwosuBark,1500);
+window.__lastConditionDay=-1;function conditionTick(){if(!window.state||!window.state.day||window.state.day<3)return;if(window.state.day===window.__lastConditionDay)return;var bul=document.getElementById("bulletin");if(!bul||!bul.classList.contains("active"))return;if(Math.random()>0.55)return;window.__lastConditionDay=window.state.day;var c=window.__pickPersonalCondition();var box=document.createElement("div");box.className="condition-card";box.innerHTML="<div class=\"cc-tag\">PERSONAL CONDITION</div><div class=\"cc-title\">"+c.title+"</div><div class=\"cc-body\">"+c.body+"</div><div class=\"cc-effect\">"+c.effect+"</div>";document.body.appendChild(box);setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},11000);}setInterval(conditionTick,2000);
+})();</script>
 </body>
 </html>
