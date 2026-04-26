@@ -1337,6 +1337,15 @@ body:not(.phase-allow-hints) #hints-btn { display: none !important; }
 .disciplinary-card .dc-cost { font-family:"Courier Prime",monospace; font-size:11px; color:#C58A3E; margin-top:10px; }
 @keyframes bnIn { from { opacity:0; transform: translate(-50%,-46%); } to { opacity:1; transform: translate(-50%,-50%); } }
 @keyframes bnOut { from { opacity:1; } to { opacity:0; } }
+
+.side-event-card { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 9800; max-width: 380px; padding: 22px 24px; background: rgba(20,18,12,0.97); border: 1px solid rgba(212,160,23,0.55); border-radius: 5px; color: #F4E8C8; font-family:"Crimson Text",serif; box-shadow: 0 16px 50px rgba(0,0,0,0.78); animation: bnIn 0.45s ease; }
+.side-event-card.se-fade { animation: bnOut 0.4s ease both; }
+.side-event-card .se-tag { font-family:"Special Elite",monospace; font-size:10px; letter-spacing:0.3em; color:#A33B2A; margin-bottom:8px; animation: suspPulse 1.4s ease-in-out infinite; }
+.side-event-card .se-title { font-family:"Bebas Neue",sans-serif; font-size:21px; letter-spacing:0.1em; color:#D4A017; margin-bottom:10px; }
+.side-event-card .se-body { font-size:14.5px; line-height:1.55; margin-bottom:14px; }
+.side-event-card .se-choices { display:flex; flex-direction:column; gap:8px; }
+.side-event-card .se-btn { padding: 10px 14px; background: rgba(232,223,196,0.06); color:#F4E8C8; border: 1px solid rgba(232,223,196,0.35); font-family:"Special Elite",monospace; font-size:12px; letter-spacing:0.08em; cursor:pointer; transition: background 0.15s; text-align:left; }
+.side-event-card .se-btn:hover { background: rgba(212,160,23,0.18); border-color: rgba(212,160,23,0.7); }
 </style>
 </head>
 <body>
@@ -2296,7 +2305,7 @@ function startDay() {
   state.dayApproved = 0;
   state.dayDenied = 0;
   state.dayDetained = 0;
-  state.totalTravellers = Math.min(8 + Math.floor(state.day / 4), 12);
+  state.totalTravellers = (function(){ var base = 18 + Math.floor(state.day / 3); var jitter = Math.floor(Math.random() * 8); return Math.max(20, Math.min(30, base + jitter)); })();
   state.traveller = 0;
   state.exchangeRate = getExchangeRate(state.day);
   state.dayResults = [];
@@ -2358,10 +2367,26 @@ function startProcessing() {
 }
 
 function getMoralEventForDay(day) {
-  for (var i = 0; i < MORAL_EVENTS.length; i++) {
-    if (MORAL_EVENTS[i].day === day) return MORAL_EVENTS[i];
+  // Random arc: build a per-game shuffled day map once, preserving Day 1 anchors and final-week anchors
+  if (!state.__arcMap) {
+    var anchored = {};
+    var pool = [];
+    for (var i = 0; i < MORAL_EVENTS.length; i++) {
+      var e = MORAL_EVENTS[i];
+      if (e.day <= 2 || e.day >= 22) { anchored[e.day] = e; }
+      else { pool.push(e); }
+    }
+    var openDays = [];
+    for (var d = 3; d <= 21; d++) { if (!anchored[d]) openDays.push(d); }
+    // Fisher-Yates shuffle of openDays
+    for (var k = openDays.length - 1; k > 0; k--) { var r = Math.floor(Math.random() * (k+1)); var t = openDays[k]; openDays[k] = openDays[r]; openDays[r] = t; }
+    var map = {};
+    Object.keys(anchored).forEach(function(d){ map[d] = anchored[d]; });
+    for (var p = 0; p < pool.length && p < openDays.length; p++) { map[openDays[p]] = pool[p]; }
+    state.__arcMap = map;
+    if (typeof saveState === "function") { try { saveState(); } catch(_){} }
   }
-  return null;
+  return state.__arcMap[day] || null;
 }
 
 // ── TRAVELLER LOADING ──
@@ -3162,6 +3187,26 @@ function familyStatusOverride(){var els=document.querySelectorAll(".family-statu
 setInterval(familyStatusOverride,1200);
 window.__lastNwosuDay=-1;function nwosuBark(){if(!window.state||!window.state.day)return;if(window.state.day===window.__lastNwosuDay)return;var bul=document.getElementById("bulletin");if(!bul||!bul.classList.contains("active"))return;window.__lastNwosuDay=window.state.day;var box=document.createElement("div");box.className="nwosu-bark";box.innerHTML="<div class=\"nb-tag\">INSPECTOR NWOSU</div><div class=\"nb-line\">\u201C"+window.__pickNwosu()+"\u201D</div><div class=\"nb-gossip\"><b>Booth gossip:</b> "+window.__pickGossip()+"</div>";document.body.appendChild(box);setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},9000);}setInterval(nwosuBark,1500);
 window.__lastConditionDay=-1;function conditionTick(){if(!window.state||!window.state.day||window.state.day<3)return;if(window.state.day===window.__lastConditionDay)return;var bul=document.getElementById("bulletin");if(!bul||!bul.classList.contains("active"))return;if(Math.random()>0.55)return;window.__lastConditionDay=window.state.day;var c=window.__pickPersonalCondition();var box=document.createElement("div");box.className="condition-card";box.innerHTML="<div class=\"cc-tag\">PERSONAL CONDITION</div><div class=\"cc-title\">"+c.title+"</div><div class=\"cc-body\">"+c.body+"</div><div class=\"cc-effect\">"+c.effect+"</div>";document.body.appendChild(box);setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},11000);}setInterval(conditionTick,2000);
+})();</script>
+<script>(function(){
+window.__sideEvents=[
+  {id:"bribery-1", title:"BRIBERY ATTEMPT", body:"The traveller slides three Naira notes under the BCD form. \"For the children, officer.\" The eyes are dry. The hands are not.", choices:[{label:"TAKE THE MONEY",effect:{corruption:2,survival:1}},{label:"PUSH IT BACK",effect:{loyalty:1,witness:1}},{label:"TAKE THE MONEY, STILL DENY",effect:{corruption:3,witness:-1}}]},
+  {id:"bribery-2", title:"AN ENVELOPE", body:"A folded envelope sits inside the passport, soft to the touch. The serial number is hand-written in pencil on the back.", choices:[{label:"OPEN IT NOW",effect:{corruption:2}},{label:"RETURN THE PASSPORT INTACT",effect:{loyalty:2}},{label:"POCKET IT FOR LATER",effect:{corruption:1,survival:1}}]},
+  {id:"bribery-3", title:"A COLLEAGUE WHISPERS", body:"Bay 6 leans across. \"This one paid me already. Just stamp it. We split.\" The traveller does not look at either of you.", choices:[{label:"STAMP IT",effect:{corruption:2,loyalty:-1}},{label:"REFUSE QUIETLY",effect:{loyalty:1}},{label:"REPORT TO NWOSU",effect:{loyalty:3,witness:1}}]},
+  {id:"recognise", title:"YOU RECOGNISE THIS FACE", body:"You went to school with him. Last you heard, he was teaching in Aba. The name on the BCD is not the name you remember.", choices:[{label:"APPROVE \u2014 STAY SILENT",effect:{compassion:2,corruption:1}},{label:"DENY \u2014 PROCEDURE",effect:{loyalty:2,compassion:-1}},{label:"PASS HIM TO BAY 4",effect:{survival:1}}]},
+  {id:"child-alone", title:"AN UNACCOMPANIED CHILD", body:"She is eight, maybe nine. She has a folded note from her aunt in Onitsha and no proper papers.", choices:[{label:"WAVE HER THROUGH",effect:{compassion:3,loyalty:-1}},{label:"DETAIN UNTIL SOMEONE COMES",effect:{loyalty:1}},{label:"CALL THE NUNS AT THE GATE",effect:{compassion:2,witness:1}}]},
+  {id:"radio-warning", title:"THE RADIO BREAKS", body:"State Security cuts in: a wanted man matches the description of the traveller in front of you. The signal cuts before the photo loads.", choices:[{label:"DETAIN ON SUSPICION",effect:{loyalty:2}},{label:"IGNORE THE BROADCAST",effect:{rebellion:1,witness:1}},{label:"WAIT FOR CONFIRMATION",effect:{survival:1}}]},
+  {id:"food-trade", title:"A LOAF OF BREAD", body:"She has nothing but bread and an expired permit. \"Please. My husband is on the other side.\"", choices:[{label:"ACCEPT THE BREAD, APPROVE",effect:{corruption:1,compassion:2}},{label:"APPROVE WITHOUT TAKING",effect:{compassion:3,loyalty:-1}},{label:"DENY",effect:{loyalty:1,compassion:-2}}]},
+  {id:"officer-pressure", title:"INSPECTOR NWOSU STOPS BY", body:"He leans over your shoulder. \"This one. He looks like trouble. Send him back.\" The papers are clean.", choices:[{label:"DENY \u2014 OBEY",effect:{loyalty:2,compassion:-1}},{label:"APPROVE \u2014 CLEAN PAPERS",effect:{loyalty:-1,witness:2}},{label:"DETAIN \u2014 BUY TIME",effect:{survival:1}}]},
+  {id:"gossip-decision", title:"THE GOSSIP TURNS", body:"Two clerks at Bay 3 are pretending to file. They are watching you. One of them has a notebook open.", choices:[{label:"IGNORE",effect:{}},{label:"WALK OVER, ASK",effect:{rebellion:1}},{label:"REPORT TO NWOSU",effect:{loyalty:1,corruption:1}}]},
+  {id:"family-call", title:"YOUR WIFE CALLED THE OFFICE", body:"Adaobi is sick. The fee is two days' wage. The traveller in front of you offered to cover it \u2014 if you sign. The traveller is not on the bulletin list.", choices:[{label:"SIGN AND TAKE THE MONEY",effect:{corruption:3,survival:2}},{label:"DENY \u2014 GO HOME EMPTY",effect:{loyalty:1,compassion:1}},{label:"DEFER \u2014 ASK NWOSU",effect:{loyalty:1,survival:-1}}]}
+];
+window.__sideEventChance=0.16; // ~1 in 6 travellers triggers a side-event
+window.__sideEventCooldown=0;
+window.__pickSideEvent=function(){var p=window.__sideEvents;return p[Math.floor(Math.random()*p.length)];};
+window.__showSideEvent=function(){var ev=window.__pickSideEvent();var box=document.createElement("div");box.className="side-event-card";var html="<div class=\"se-tag\">DECISION REQUIRED</div><div class=\"se-title\">"+ev.title+"</div><div class=\"se-body\">"+ev.body+"</div><div class=\"se-choices\">";ev.choices.forEach(function(c,i){html+="<button data-i=\""+i+"\" class=\"se-btn\">"+c.label+"</button>";});html+="</div>";box.innerHTML=html;document.body.appendChild(box);box.querySelectorAll(".se-btn").forEach(function(b){b.addEventListener("click",function(){var ix=parseInt(b.dataset.i,10);var eff=ev.choices[ix].effect||{};if(window.state&&window.state.axes){Object.keys(eff).forEach(function(k){window.state.axes[k]=(window.state.axes[k]||0)+eff[k];});}box.classList.add("se-fade");setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},400);});});};
+function tryHookLoad(){if(typeof window.loadNextTraveller!=="function"){setTimeout(tryHookLoad,500);return;}if(window.__loadHooked)return;window.__loadHooked=true;var orig=window.loadNextTraveller;window.loadNextTraveller=function(){var trav=(window.state&&window.state.traveller)||0;if(window.__sideEventCooldown>0){window.__sideEventCooldown--;}else if(trav>2 && Math.random()<window.__sideEventChance){window.__sideEventCooldown=2;window.__showSideEvent();}return orig.apply(this,arguments);};}
+tryHookLoad();
 })();</script>
 </body>
 </html>
