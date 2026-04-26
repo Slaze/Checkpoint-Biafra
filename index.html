@@ -13,7 +13,7 @@
 <!-- Apple touch icon for PWA home screen -->
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=IM+Fell+English:ital@0;1&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
 :root {
   --olive: #2C3E1F;
@@ -57,7 +57,7 @@ html, body {
 }
 
 /* ═══ SCREENS ═══ */
-.screen { position: fixed; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10; }
+.screen { position: fixed; inset: 0; height: 100dvh; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10; }
 .screen.active { display: flex; }
 
 /* ═══ SPLASH ═══ */
@@ -448,6 +448,7 @@ html, body {
   background: var(--olive);
   padding: 0;
   flex-direction: column;
+    align-items: stretch;
   /* iOS safe area */
   padding-bottom: env(safe-area-inset-bottom);
 }
@@ -677,6 +678,10 @@ html, body {
 
 /* Action buttons */
 .action-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
   gap: 0;
   z-index: 10;
@@ -1225,7 +1230,7 @@ html, body {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 1000;
+  z-index: 2;
   opacity: 0.03;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
@@ -1239,28 +1244,138 @@ html, body {
   animation: pulse 2s infinite;
   vertical-align: middle;
 }
+/* === FONTS === */
+body, .booth, .bulletin, .doc, .panel, p, li, span, td, th { font-family: "Crimson Text", "Noto Serif", Georgia, serif; }
+h1, h2, h3, .splash-title, .cc-header-title, .day-banner, .hud-day, .endgame-title { font-family: "Special Elite", "Courier Prime", monospace; letter-spacing: 0.02em; }
+.cc-option-title, .btn-primary, button.primary, .stamp, .doc-title, .bulletin-logo, .splash-subtitle, .splash-version { font-family: "Special Elite", "Courier Prime", monospace; }
+.doc-body, .doc-field, .traveller-quote { font-family: "IM Fell English", "Crimson Text", Georgia, serif; }
+.kbd, code { font-family: "Courier Prime", monospace; }
+/* === INSTALL CAVEAT === */
+.caveat-box { max-width: 480px; }
+.caveat-lead { margin: 8px 0 16px; opacity: 0.9; line-height: 1.5; }
+.caveat-platform { background: rgba(232,223,196,0.06); border: 1px solid rgba(232,223,196,0.18); border-radius: 6px; padding: 12px 14px; margin: 10px 0; text-align: left; }
+.caveat-platform-title { font-family: "Special Elite","Courier Prime",monospace; font-size: 0.95rem; letter-spacing: 0.06em; margin-bottom: 6px; opacity: 0.85; }
+.caveat-list { padding-left: 22px; margin: 0; line-height: 1.7; }
+.caveat-list li { margin: 4px 0; font-size: 0.92rem; }
+.caveat-kbd { display: inline-flex; align-items: center; gap: 6px; padding: 1px 8px; background: rgba(232,223,196,0.12); border: 1px solid rgba(232,223,196,0.25); border-radius: 4px; font-family: "Courier Prime",monospace; font-size: 0.88em; }
+.caveat-ico { width: 14px; height: 14px; vertical-align: middle; }
+.caveat-foot { margin-top: 14px; opacity: 0.8; font-size: 0.9rem; }
+/* === HINTS === */
+#hints-btn { position: fixed; bottom: 14px; left: 14px; z-index: 9000; width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid #E8DFC4; background: rgba(44,62,31,0.85); color: #E8DFC4; font-family: "Special Elite",monospace; font-size: 1.3rem; line-height: 1; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.4); transition: transform 0.15s; }
+#hints-btn:hover { transform: scale(1.08); }
+body:not(.phase-allow-hints) #hints-btn { display: none !important; }
+.flash-border-decision { animation: flashBorder 1.2s ease-in-out infinite; }
+@keyframes flashBorder { 0%,100% { box-shadow: inset 0 0 0 2px rgba(220,60,60,0); } 50% { box-shadow: inset 0 0 0 3px rgba(220,60,60,0.55); } }
+
+#hints-btn.pulse { animation: hintsPulse 1.4s ease-in-out infinite; }
+@keyframes hintsPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(232,223,196,0.6); } 50% { box-shadow: 0 0 0 10px rgba(232,223,196,0); } }
+#hints-modal { position: fixed; inset: 0; z-index: 9500; display: none; background: rgba(20,28,15,0.92); align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
+#hints-modal.open { display: flex; }
+.hints-box { background: #2C3E1F; color: #E8DFC4; border: 1px solid #5A6E3F; border-radius: 8px; max-width: 540px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 24px; position: relative; font-family: "Crimson Text",serif; line-height: 1.55; }
+.hints-box h2 { font-family: "Special Elite",monospace; margin: 0 0 14px; font-size: 1.4rem; letter-spacing: 0.05em; border-bottom: 1px solid rgba(232,223,196,0.25); padding-bottom: 10px; }
+.hints-box h3 { font-family: "Special Elite",monospace; font-size: 1rem; margin: 14px 0 6px; letter-spacing: 0.04em; color: #D4C896; }
+.hints-sec { margin-bottom: 14px; }
+.hints-sec p, .hints-sec li { font-size: 0.94rem; }
+.hints-sec ul { margin: 4px 0; padding-left: 20px; }
+.hints-sec li { margin: 4px 0; }
+#hints-close { position: absolute; top: 8px; right: 12px; background: none; border: none; color: #E8DFC4; font-size: 1.5rem; cursor: pointer; padding: 4px 10px; }
+#hints-ok { display: block; margin: 18px auto 0; padding: 10px 28px; background: #5A6E3F; color: #E8DFC4; border: 1px solid #8FA068; font-family: "Special Elite",monospace; cursor: pointer; letter-spacing: 0.05em; }
+#hints-ok:hover { background: #6F8550; }
+/* === FLASH === */
+#flash-banner { position: fixed; inset: 0; z-index: 8800; display: none; align-items: center; justify-content: center; pointer-events: none; background: rgba(20,28,15,0.55); }
+#flash-banner.show { display: flex; animation: flashFade 1.8s ease forwards; }
+.flash-inner { text-align: center; padding: 28px 44px; background: rgba(44,62,31,0.95); border: 1.5px solid #E8DFC4; border-radius: 4px; box-shadow: 0 8px 30px rgba(0,0,0,0.6); }
+.flash-title { font-family: "Special Elite",monospace; font-size: 1.8rem; letter-spacing: 0.18em; color: #F2E9CE; margin-bottom: 8px; }
+.flash-sub { font-family: "Crimson Text",serif; font-style: italic; font-size: 1.05rem; color: #D4C896; }
+@keyframes flashFade { 0%{opacity:0;transform:scale(0.94);} 18%{opacity:1;transform:scale(1);} 78%{opacity:1;transform:scale(1);} 100%{opacity:0;transform:scale(1.02);} }
+
+.susp-badge { display:inline-block; margin-left:6px; padding:2px 6px; font-family:"Special Elite",monospace; font-size:10px; background:#A33B2A; color:#F2E8D0; border-radius:2px; letter-spacing:0.05em; animation: suspPulse 1s ease-in-out infinite; }
+@keyframes suspPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } }
+.deficit-warning { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); z-index: 9500; max-width: 380px; padding: 14px 18px; background: rgba(110,30,28,0.94); color:#F8E8C8; font-family:"Crimson Text",serif; font-size:14px; line-height:1.45; border:1px solid rgba(232,223,196,0.35); border-radius:4px; box-shadow:0 6px 22px rgba(0,0,0,0.5); animation: deficitIn 0.5s ease-out, deficitOut 0.5s ease-in 8.5s both; }
+.deficit-warning .deficit-sub { display:block; margin-top:8px; font-size:11px; color:#E8DFC4; opacity:0.78; font-family:"Courier Prime",monospace; }
+@keyframes deficitIn { from { opacity:0; transform: translate(-50%, 12px); } to { opacity:1; transform: translate(-50%,0); } }
+@keyframes deficitOut { from { opacity:1; } to { opacity:0; } }
+.officer-rating-block { margin-top: 22px; padding: 14px; border-top: 1px solid rgba(232,223,196,0.2); border-bottom: 1px solid rgba(232,223,196,0.2); font-family:"Crimson Text",serif; color:#E8DFC4; }
+.officer-rating-block .or-grade { font-family:"Bebas Neue",sans-serif; font-size: 22px; letter-spacing:0.1em; }
+.officer-rating-block .or-grade b { color:#D4A017; font-size: 28px; }
+.officer-rating-block .or-pct { font-family:"Courier Prime",monospace; font-size: 11px; color: rgba(242,232,208,0.6); margin: 4px 0 12px; letter-spacing:0.1em; }
+.officer-rating-block .or-summary { font-size: 13.5px; line-height: 1.55; text-align:left; }
+.officer-rating-block .or-summary b { color:#D4A017; font-family:"Special Elite",monospace; font-size:12px; letter-spacing:0.05em; }
+.hud-real-date { position: fixed; top: 6px; right: 8px; z-index: 8200; font-family:"Courier Prime",monospace; font-size: 10px; color: rgba(242,232,208,0.45); letter-spacing: 0.1em; pointer-events: none; user-select: none; }
+.todays-value { display:block; font-family:"Courier Prime",monospace; font-size:9.5px; color: rgba(212,160,23,0.7); margin-top:2px; letter-spacing:0.05em; font-style: italic; }
+.exchange-overlay, .fx-overlay, .rate-tip { position: fixed !important; bottom: 56px !important; right: 12px !important; top: auto !important; left: auto !important; z-index: 60 !important; max-width: 180px; }
+
+/* TOP-VIEW DESK ILLUSTRATION */
+.desk { position: relative; }
+.desk::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0.18; background-image: radial-gradient(ellipse at 50% 8%, rgba(245,225,180,0.55) 0%, rgba(245,225,180,0) 32%), linear-gradient(180deg, transparent 0%, rgba(85,55,30,0.12) 60%, rgba(40,25,12,0.28) 100%); z-index: 0; }
+.traveller-silhouette { position: absolute; top: 4px; left: 50%; transform: translateX(-50%); width: 60px; height: 70px; pointer-events: none; opacity: 0.55; z-index: 1; }
+.traveller-silhouette svg { width: 100%; height: 100%; display: block; }
+.paper-shadow { position: absolute; pointer-events: none; z-index: 0; opacity: 0.35; filter: blur(3px); background: rgba(0,0,0,0.35); border-radius: 2px; }
+.paper-shadow.p1 { top: 38%; left: 8%; width: 38%; height: 32%; transform: rotate(-3deg); }
+.paper-shadow.p2 { top: 42%; left: 48%; width: 40%; height: 30%; transform: rotate(2deg); }
+.paper-shadow.p3 { top: 65%; left: 22%; width: 56%; height: 22%; transform: rotate(-1deg); }
+
+/* CREDITS / NWOSU / TWIST / DISCIPLINE / CONDITION CSS */
+.splash-officer-line { font-family:"IM Fell English",serif; font-size: 13px; line-height: 1.45; color: rgba(232,223,196,0.78); margin-top: 6px; margin-bottom: 18px; max-width: 320px; text-align: center; font-style: italic; letter-spacing: 0.04em; }
+.credits-line { will-change: opacity; }
+.breaking-news, .nwosu-bark, .condition-card, .disciplinary-card { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9700; max-width: 360px; padding: 18px 22px; font-family: "Crimson Text", serif; line-height: 1.5; color: #F4E8C8; border: 1px solid rgba(232,223,196,0.4); border-radius: 5px; box-shadow: 0 12px 38px rgba(0,0,0,0.7); animation: bnIn 0.5s ease, bnOut 0.6s ease 8.4s both; }
+.breaking-news { background: rgba(110, 24, 22, 0.95); }
+.breaking-news .bn-sub { font-family:"Courier Prime",monospace; font-size:11px; color: rgba(244,232,200,0.7); margin-top:10px; letter-spacing:0.06em; }
+.nwosu-bark { background: rgba(28, 38, 22, 0.96); border-color: rgba(212,160,23,0.5); }
+.nwosu-bark .nb-tag { font-family:"Special Elite",monospace; font-size:10px; letter-spacing:0.25em; color:#D4A017; margin-bottom:6px; }
+.nwosu-bark .nb-line { font-style: italic; font-size: 16px; }
+.nwosu-bark .nb-gossip { font-size: 12.5px; margin-top:10px; padding-top:8px; border-top:1px solid rgba(232,223,196,0.18); color: rgba(244,232,200,0.85); }
+.nwosu-bark .nb-gossip b { color:#D4A017; font-family:"Special Elite",monospace; font-size:10.5px; letter-spacing:0.06em; }
+.condition-card { background: rgba(40, 14, 24, 0.96); border-color: rgba(192,90,75,0.55); }
+.condition-card .cc-tag { font-family:"Special Elite",monospace; font-size:10px; letter-spacing:0.25em; color: rgba(232,223,196,0.55); margin-bottom:4px; }
+.condition-card .cc-title { font-family:"Bebas Neue",sans-serif; font-size:18px; letter-spacing:0.08em; color:#F4E8C8; margin-bottom:6px; }
+.condition-card .cc-body { font-size:14px; line-height:1.5; }
+.condition-card .cc-effect { font-family:"Courier Prime",monospace; font-size:11px; color:#E8B07A; margin-top:10px; letter-spacing:0.06em; }
+.disciplinary-card { background: rgba(20,18,12,0.96); border-color: rgba(212,160,23,0.6); }
+.disciplinary-card .dc-title { font-family:"Bebas Neue",sans-serif; font-size:18px; color:#D4A017; letter-spacing:0.1em; margin-bottom:6px; }
+.disciplinary-card .dc-body { font-size:14px; }
+.disciplinary-card .dc-cost { font-family:"Courier Prime",monospace; font-size:11px; color:#C58A3E; margin-top:10px; }
+@keyframes bnIn { from { opacity:0; transform: translate(-50%,-46%); } to { opacity:1; transform: translate(-50%,-50%); } }
+@keyframes bnOut { from { opacity:1; } to { opacity:0; } }
+
+.side-event-card { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 9800; max-width: 380px; padding: 22px 24px; background: rgba(20,18,12,0.97); border: 1px solid rgba(212,160,23,0.55); border-radius: 5px; color: #F4E8C8; font-family:"Crimson Text",serif; box-shadow: 0 16px 50px rgba(0,0,0,0.78); animation: bnIn 0.45s ease; }
+.side-event-card.se-fade { animation: bnOut 0.4s ease both; }
+.side-event-card .se-tag { font-family:"Special Elite",monospace; font-size:10px; letter-spacing:0.3em; color:#A33B2A; margin-bottom:8px; animation: suspPulse 1.4s ease-in-out infinite; }
+.side-event-card .se-title { font-family:"Bebas Neue",sans-serif; font-size:21px; letter-spacing:0.1em; color:#D4A017; margin-bottom:10px; }
+.side-event-card .se-body { font-size:14.5px; line-height:1.55; margin-bottom:14px; }
+.side-event-card .se-choices { display:flex; flex-direction:column; gap:8px; }
+.side-event-card .se-btn { padding: 10px 14px; background: rgba(232,223,196,0.06); color:#F4E8C8; border: 1px solid rgba(232,223,196,0.35); font-family:"Special Elite",monospace; font-size:12px; letter-spacing:0.08em; cursor:pointer; transition: background 0.15s; text-align:left; }
+.side-event-card .se-btn:hover { background: rgba(212,160,23,0.18); border-color: rgba(212,160,23,0.7); }
 </style>
 </head>
 <body>
 
 <div class="noise-overlay"></div>
 
+<!-- CREDITS PRE-SPLASH -->
+<div id="credits-splash" class="screen active" style="position:fixed;inset:0;background:#0a0d07;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:99999;color:#E8DFC4;font-family:'IM Fell English',serif;text-align:center;padding:24px;">
+  <div id="credits-line-1" class="credits-line" style="opacity:0;font-size:13px;letter-spacing:0.4em;color:rgba(232,223,196,0.6);font-family:'Courier Prime',monospace;">ICONIA GLOBAL</div>
+  <div id="credits-line-1b" class="credits-line" style="opacity:0;margin-top:6px;font-size:11px;letter-spacing:0.25em;color:rgba(232,223,196,0.4);font-family:'Courier Prime',monospace;">PRESENTS</div>
+  <div id="credits-line-2" class="credits-line" style="opacity:0;margin-top:48px;font-size:14px;letter-spacing:0.18em;color:rgba(212,160,23,0.85);font-family:'IM Fell English',serif;font-style:italic;">A game concept by</div>
+  <div id="credits-line-2b" class="credits-line" style="opacity:0;margin-top:6px;font-size:18px;letter-spacing:0.2em;color:#E8DFC4;font-family:'Bebas Neue',sans-serif;">UGOO OKOGERI</div>
+</div>
 <!-- SPLASH -->
-<div id="splash" class="screen active">
+<div id="splash" class="screen" style="display:none">
   <div class="splash-content">
     <div class="splash-sun" id="splash-sun" aria-hidden="true">
       <div class="sun-circle"></div>
     </div>
     <div class="splash-title">CHECKPOINT<br>BIAFRA</div>
-    <div class="splash-subtitle">Federal Identity &amp; Border Authority</div>
+    <div class="splash-subtitle">Federal Ministry of Identity &amp; Border Authority · FIBA</div>
+    <div class="splash-officer-line">You are an officer of the Federal Ministry of Identity and Border Authority.</div>
     <div class="splash-tagline">"The desk is the same desk. The country is not the same country."</div>
-    <button class="btn-primary" id="btn-begin">BEGIN POSTING</button>
+    <button class="btn-primary" id="btn-begin">START A NEW GAME</button>
     <br>
     <button class="btn-secondary" id="btn-continue" style="display:none">CONTINUE — DAY <span id="continue-day">1</span></button>
     <br>
     <button class="btn-secondary" id="btn-gallery" style="margin-top:8px">CASE FILES</button>
   </div>
-  <div class="splash-version">v1.1 · CHECKPOINT BIAFRA · ALL 28 ENDINGS</div>
+  <div class="splash-version">v1.2 · CHECKPOINT BIAFRA</div>
 </div>
 
 <!-- CHARACTER CREATION -->
@@ -1302,7 +1417,7 @@ html, body {
 
     <hr class="cc-divider">
     <div class="cc-lore" style="border-color:var(--biafra-gold);background:rgba(212,160,23,0.08)">
-      Your choices determine which of the 28 endings are available to you. No path is closed entirely — but some are easier to find from where you start.
+      You are an officer of the Federal Ministry of Identity and Border Authority. Cross‑River garrison, Ogoja‑East post. Every signature you make today will be read tomorrow — by people you will never meet, and by people who already know your name.
     </div>
   </div>
   <div class="cc-proceed">
@@ -1323,7 +1438,7 @@ html, body {
   <div class="bulletin-paper">
     <div class="bulletin-stamp" id="bulletin-stamp">CLASSIFIED</div>
     <div class="bulletin-header">
-      <span class="bulletin-logo">FEDERAL IDENTITY &amp; BORDER AUTHORITY</span>
+      <span class="bulletin-logo">FEDERAL MINISTRY OF IDENTITY &amp; BORDER AUTHORITY</span>
       <div class="bulletin-title" id="bulletin-title">DAILY BULLETIN</div>
       <div class="bulletin-num" id="bulletin-num">BULLETIN 001 · DAY 1</div>
     </div>
@@ -1422,12 +1537,12 @@ html, body {
 <!-- ENDING SCREEN -->
 <div id="ending" class="screen">
   <div class="ending-content">
-    <span class="ending-number" id="ending-number">ENDING 1 OF 28</span>
+    <span class="ending-number" id="ending-number" style="display:none"></span>
     <div class="ending-title" id="ending-title">ENDING TITLE</div>
     <div class="ending-text" id="ending-text"></div>
     <div class="ending-axes" id="ending-axes"></div>
-    <div class="endings-unlocked" id="endings-unlocked">1 OF 28 ENDINGS DISCOVERED</div>
-    <button class="btn-primary" id="btn-return-splash" style="margin-top:8px">RETURN TO CHECKPOINT</button>
+    <div class="endings-unlocked" id="endings-unlocked" style="display:none"></div>
+    <button class="btn-primary" id="btn-return-splash" style="margin-top:8px">RETURN TO CHECKPOINT BIAFRA</button>
   </div>
 </div>
 
@@ -1523,6 +1638,22 @@ var BACKGROUNDS = [
   { id:'trader',   label:'MARKET TRADER',         desc:'Reads people well. Flagged as corruption risk.', bias:{survival:2} },
   { id:'journalist','label':'JOURNALIST',          desc:'Build case files. Sources approach you.', bias:{witness:3} },
   { id:'pastor',   label:'PASTOR/MINISTER',       desc:'Community brings information.', bias:{compassion:2,loyalty:1} },
+  { id:'palmoil',   label:'PALM OIL TRADER',     desc:'You know every backroad market.',                     bias:{survival:1,corruption:1} },
+  { id:'redcross',  label:'RED CROSS NURSE',     desc:'You have triaged the wounded from both sides.',       bias:{compassion:3} },
+  { id:'bbc',       label:'BBC CORRESPONDENT',   desc:'You filed dispatches from Umuahia until they expelled you.', bias:{witness:3} },
+  { id:'lecturer',  label:'NSUKKA LECTURER',     desc:'Your faculty was shelled in 1967.',                   bias:{witness:1,rebellion:2} },
+  { id:'railway',   label:'RAILWAY WORKER',      desc:'You know every kilometre of the Eastern Line.',       bias:{loyalty:1,survival:1} },
+  { id:'bicycle',   label:'BICYCLE MECHANIC',    desc:'In a country without petrol, your trade is politics.',bias:{survival:2,compassion:1} },
+  { id:'radio',     label:'RADIO OPERATOR',      desc:'You relayed broadcasts out of Aba.',                  bias:{witness:2,rebellion:1} },
+  { id:'dibia',     label:'HERBALIST (DIBIA)',   desc:'Villagers come to you before any hospital.',          bias:{compassion:2,loyalty:1} },
+  { id:'marketwm',  label:'MARKET WOMAN',        desc:'You ran an ofe stall through three offensives.',      bias:{survival:2,witness:1} },
+  { id:'police',    label:'POLICE SERGEANT',     desc:'You served federal command before the emergency.',    bias:{loyalty:2,corruption:1} },
+  { id:'cargo',     label:'CARGO DRIVER',        desc:'You hauled relief, ammunition, and refugees in a week.',bias:{witness:1,survival:2} },
+  { id:'artist',    label:'ARTIST / CREATIVE',     desc:'Painter, musician, performer. Patrons distrust the regime.', bias:{witness:2,compassion:1} },
+  { id:'doctor',    label:'DOCTOR / NURSE',         desc:'Hospitals are your refuge. Bribes are mostly food.',         bias:{compassion:2,survival:1} },
+  { id:'journalist',label:'JOURNALIST',             desc:'You see what others edit out. Watched by FIBA.',             bias:{witness:2,rebellion:1} },
+  { id:'farmer',    label:'FARMER / TRADER',        desc:'Land claims, ration tickets, ferry passes — you know each.', bias:{survival:2} },
+  { id:'other',     label:'OTHER — SPECIFY ON FILE', desc:'A general field. FIBA notes your background as unrecorded.', bias:{} },
 ];
 
 // ── DATA: STATES ──
@@ -1591,6 +1722,18 @@ var BULLETINS = {
   21: { title:'TRAVEL RESTRICTION ORDER', stamp:'CLASSIFIED',
         body:'Travel restriction orders are now active for holders of Nigerian passports with state of origin listed as Rivers or Cross River.\n\nHolders are to be redirected to the designated Secondary Processing Unit. Do not stamp. Do not deny. Do not explain the reason for redirection.\n\nThis order is issued under Emergency Security Provision 14(b). It is not subject to officer discretion.',
         rules:['Rivers/Cross River passport holders: redirect to Secondary Processing','Do NOT stamp, deny, or explain reason','No officer discretion applies'] },
+  22: { title:'ADMIN NOTICE — CEASEFIRE RUMOURS', stamp:'MORNING BULLETIN',
+        body:'Radio Biafra announced overnight that negotiations have reached a critical stage. Federal command has denied this. Treat both statements as propaganda. No officer discretion applies today — only paperwork.\n\nThe eastern corridor is restricted to relief traffic and approved press. Biafran-issued Authorisation documents remain recognised at this checkpoint while the ceasefire protocol stands.',
+        rules:['All travellers with EXPIRED Federal Passes: DENY','Biafran Driver\'s Authorisation (BDA): RECOGNISED','No officer discretion applies today'] },
+  23: { title:'EMERGENCY BULLETIN — PETROL RATIONING', stamp:'URGENT',
+        body:'Three northern checkpoints have run dry. Any vehicle moving east today is presumed to be on siphoned or black-market fuel. Cargo drivers must show fuel receipts alongside their Authorisation.\n\nRelief convoys marked by Red Cross remain exempt from the receipt rule. Check seal and date.',
+        rules:['Cargo drivers without fuel receipt: DETAIN','Red Cross / MSF relief vehicles: EXEMPT from receipt rule','Do not accept photocopies of fuel receipts'] },
+  24: { title:'ADMIN NOTICE — SURRENDER RUMOURS', stamp:'MORNING BULLETIN',
+        body:'A typed document is circulating in Umuahia claiming that General Ojukwu has left for Côte d\'Ivoire. We do not confirm. We do not deny. We stamp papers.\n\nIf a traveller presents or references this document, detain them and forward the document — unread — to HQ. Do not read it aloud.',
+        rules:['Travellers carrying the Umuahia flight document: DETAIN','Do not read the document aloud','Continue normal processing for all other travellers'] },
+  25: { title:'FINAL BULLETIN', stamp:'LAST DAY',
+        body:'Effendy. By evening the bridgehead may be ours, theirs, or no one\'s. Every stamp you press today is read by historians, not only by officers.\n\nFollow each document on its own terms. Where bulletins disagree, follow the document. Where the document lies, note your name clearly in the log.',
+        rules:['Follow each document on its own terms','Where bulletins disagree, follow the document','Write your name clearly in the log'] }
 };
 
 // ── DATA: DOCUMENTS ──
@@ -1693,6 +1836,12 @@ var DOC_TEMPLATES = {
   nin_young:       { type:'NIN CARD',                issuer:'NIMC / FIBA',              biafran:false,
     fields:{ 'NIN NUMBER':'91234567801', 'FULL NAME':'CHIBUIKE NWEZE', 'DATE OF BIRTH':'14 JUN 2002', 'STATE':'ENUGU' },
     flags:[{ field:'AGE', note:'CLASS C: Physical presentation inconsistent with stated age of 21', type:'C' }] },
+  bda_clean:      { type:'BIAFRAN DRIVER\'S AUTHORISATION',issuer:'REPUBLIC OF BIAFRA / MIN. OF TRANSPORT', biafran:true,
+    fields:{ 'AUTH NO':'BDA/ENU/44721', 'FULL NAME':'NGOZI OKONKWO', 'VEHICLE CLASS':'B — LIGHT CARGO', 'ISSUED':'09 APR 1969', 'STAMPED':'ENUGU TRANSPORT OFFICE' },
+    flags:[] },
+  bda_forged:     { type:'BIAFRAN DRIVER\'S AUTHORISATION',issuer:'REPUBLIC OF BIAFRA / MIN. OF TRANSPORT', biafran:true,
+    fields:{ 'AUTH NO':'BDA/PHC/88910', 'FULL NAME':'EMEKA UGOCHUKWU', 'VEHICLE CLASS':'A — MOTORCYCLE', 'ISSUED':'31 FEB 1969', 'STAMPED':'PORT HARCOURT TRANSPORT OFFICE' },
+    flags:[{ field:'ISSUED', note:'CLASS B: 31 FEB 1969 — impossible date', type:'B' },{ field:'STAMPED', note:'CLASS B: Port Harcourt transport office closed by federal occupation before this issue date', type:'B' }] },
 };
 
 // ── DATA: TRAVELLER POOL ──
@@ -1751,6 +1900,19 @@ var TRAVELLER_POOL = [
     docs:['nin_clean','military_pension','permit_expired'], flags:['Movement permit expired 3 days ago'], axisHint:'compassion', correct:'deny', minDay:15 },
   { id:'msf_day16',   name:'DR. CLAIRE FONTAINE', desc:'MSF nurse, back again. No camera. Carrying something in her medical bag she has not mentioned.',
     docs:['french_passport','fiba_ngo_renewed'], flags:['CLASS C: Medical bag contains electronic equipment'], axisHint:'witness', correct:'approve', minDay:16 },
+  // Phase 5 — end-of-war arc (days 17-25)
+  { id:'cargo_day17',  name:'OBI AGBU',           desc:'Cargo driver. Biafran Authorisation + FIBA permit. Fuel receipt crumpled.',
+    docs:['bda_clean','nin_clean'], flags:['Fuel receipt presented, partially illegible'], axisHint:'survival', correct:'approve', minDay:17 },
+  { id:'police_d18',   name:'SGT. MUSA ABDULLAHI', desc:'Federal Police sergeant, claims retirement. Uniform under a civilian coat.',
+    docs:['nin_clean','military_pension'], flags:['Uniform visible under civilian coat'], axisHint:'loyalty', correct:'deny', minDay:18 },
+  { id:'bda_forger',   name:'EMEKA UGOCHUKWU',    desc:'Young man. BDA with impossible issue date. Speaks softly about his mother in Onitsha.',
+    docs:['bda_forged','nin_young'], flags:['CLASS B: BDA issue date 31 FEB 1969','CLASS B: Stamped at office closed before issue date'], axisHint:'compassion', correct:'detain', minDay:22 },
+  { id:'redcross_d23', name:'SR. MARIE THERESE',   desc:'Red Cross convoy. No fuel receipt. Rule today: Red Cross is exempt.',
+    docs:['french_passport','fiba_ngo_renewed'], flags:['Red Cross seal on vehicle, seal intact and current'], axisHint:'compassion', correct:'approve', minDay:23 },
+  { id:'umuahia_docbearer', name:'UNNAMED MAN',   desc:'Refuses to state name. Envelope in breast pocket, typed pages visible. Asks only for transit east.',
+    docs:['nin_clean'], flags:['CLASS A: Carrying the Umuahia flight document (do not read)'], axisHint:'witness', correct:'detain', minDay:24 },
+  { id:'bbc_final',    name:'HARRIET ADEBAYO',   desc:'BBC stringer. Expelled earlier from Umuahia. Back again with a camera and a press permit stamped twice.',
+    docs:['permit_press','uk_passport'], flags:['CLASS C: Press permit shows two entry stamps for today’s date'], axisHint:'witness', correct:'approve', minDay:25 }
 ];
 
 // ── DATA: MORAL EVENTS ──
@@ -1816,6 +1978,33 @@ var MORAL_EVENTS = [
       { text:'Approve her. Then submit a formal written objection.', axes:{witness:3,loyalty:-1,rebellion:2}, flag:'objected_021' },
     ]
   },
+  { id:'fuel_ration', day:23,
+    title:'THE FUEL RECEIPT',
+    text:'A cargo driver you recognise from better weeks presents a Biafran Authorisation and a crumpled, illegible fuel receipt. Today\'s bulletin is absolute on the receipt. But he has a child you have seen before, asleep on the back seat.',
+    choices:[
+      { text:'Follow the bulletin. Detain the driver.', axes:{loyalty:2,compassion:-2} },
+      { text:'Let him through. Write the receipt number in your log.', axes:{compassion:2,corruption:1}, flag:'bent_fuel_rule' },
+      { text:'Delay him. Ask the Red Cross convoy to vouch for him if they arrive.', axes:{witness:1,survival:1} }
+    ]
+  },
+  { id:'umuahia_flight', day:24,
+    title:'THE UMUAHIA FLIGHT DOCUMENT',
+    text:'The man refuses to give a name. He carries a typed envelope. HQ says do not read. An inspector beside you murmurs: if you read it, you know. If you don\'t, you can still claim you believed him.',
+    choices:[
+      { text:'Detain him. Send the envelope, sealed, to HQ.', axes:{loyalty:2,witness:-1} },
+      { text:'Read one page. Then detain him. Keep what you saw.', axes:{witness:3,rebellion:1}, flag:'read_the_flight_doc' },
+      { text:'Wave him through. Burn nothing you did not need to.', axes:{rebellion:2,compassion:1,loyalty:-2} }
+    ]
+  },
+  { id:'last_stamp', day:25,
+    title:'THE LAST STAMP',
+    text:'Inspector Nwosu stands at your booth for the final bulletin. She does not say anything for a long time. Then she says: \'The records of this day will be read. What do you want yours to say?\'',
+    choices:[
+      { text:'Sign every approval and denial today in full. Your name. Clearly.', axes:{witness:3,loyalty:1}, flag:'signed_final_log' },
+      { text:'Use the initials you have used all posting. Consistency.', axes:{survival:2} },
+      { text:'Leave the signature field blank today. Let them decide later who it was.', axes:{rebellion:2,survival:-1}, flag:'unsigned_final_log' }
+    ]
+  }
 ];
 
 // ── DATA: NIGHT EVENTS ──
@@ -1828,6 +2017,9 @@ var NIGHT_EVENTS = [
   { day:15, text:'A new officer arrived today. She asked you what Checkpoint Ogoja-East is like. You told her it was manageable. She asked what the people were like. You realised you had been thinking of them as cases.' },
   { day:19, text:'The exchange rate notification arrived at 6am. ₤B is now worth ₦0.35. You did not react. You remember when that number was 1.00. You remember it clearly but it feels like someone else\'s memory.' },
   { day:22, text:'You count the days remaining. You think about what you would do differently. You cannot identify a specific decision. You can only identify a feeling — that the decision that mattered most was one you made without realising it was a decision.' },
+  { day:23, text:'The petrol in the generator runs out at 1am. For two hours you sit in the dark with Inspector Nwosu. She does not speak. You hear, in the distance, something that is either thunder or the line near Awka.' },
+  { day:24, text:'You dream of the typed document you didn\'t read. In the dream you read it, and you cannot unread it. You wake up unsure which half of the dream is the mercy.' },
+  { day:25, text:'The last night. The generator is silent by choice now — fuel is being saved. Outside the window, you see headlights moving east, then stopping, then moving east again. Nobody goes west tonight.' }
 ];
 
 // ── DATA: ENDINGS ──
@@ -1950,7 +2142,7 @@ function makeCcOption(group, val, label, desc, extraClass) {
   btn.className = 'cc-option' + (extraClass ? ' ' + extraClass : '');
   btn.setAttribute('data-group', group);
   btn.setAttribute('data-val', val);
-  btn.innerHTML = '<span class="cc-option-title">' + label + '</span><span class="cc-option-desc">' + desc + '</span>';
+  btn.innerHTML = '<span class="cc-option-title">' + label + '</span>';
   btn.addEventListener('click', function() { ccSelect(group, btn, val); });
   return btn;
 }
@@ -2075,7 +2267,7 @@ function showIntroPage() {
     el.innerHTML = INTRO_PAGES[introIdx].replace(/\n/g, '<br><br>');
     el.classList.add('visible');
     introIdx++;
-    introTimer = setTimeout(showIntroPage, 3500);
+    introTimer = setTimeout(showIntroPage, 9500);
   }, 400);
 }
 
@@ -2113,7 +2305,7 @@ function startDay() {
   state.dayApproved = 0;
   state.dayDenied = 0;
   state.dayDetained = 0;
-  state.totalTravellers = Math.min(8 + Math.floor(state.day / 4), 12);
+  state.totalTravellers = (function(){ var base = 18 + Math.floor(state.day / 3); var jitter = Math.floor(Math.random() * 8); return Math.max(20, Math.min(30, base + jitter)); })();
   state.traveller = 0;
   state.exchangeRate = getExchangeRate(state.day);
   state.dayResults = [];
@@ -2175,10 +2367,26 @@ function startProcessing() {
 }
 
 function getMoralEventForDay(day) {
-  for (var i = 0; i < MORAL_EVENTS.length; i++) {
-    if (MORAL_EVENTS[i].day === day) return MORAL_EVENTS[i];
+  // Random arc: build a per-game shuffled day map once, preserving Day 1 anchors and final-week anchors
+  if (!state.__arcMap) {
+    var anchored = {};
+    var pool = [];
+    for (var i = 0; i < MORAL_EVENTS.length; i++) {
+      var e = MORAL_EVENTS[i];
+      if (e.day <= 2 || e.day >= 22) { anchored[e.day] = e; }
+      else { pool.push(e); }
+    }
+    var openDays = [];
+    for (var d = 3; d <= 21; d++) { if (!anchored[d]) openDays.push(d); }
+    // Fisher-Yates shuffle of openDays
+    for (var k = openDays.length - 1; k > 0; k--) { var r = Math.floor(Math.random() * (k+1)); var t = openDays[k]; openDays[k] = openDays[r]; openDays[r] = t; }
+    var map = {};
+    Object.keys(anchored).forEach(function(d){ map[d] = anchored[d]; });
+    for (var p = 0; p < pool.length && p < openDays.length; p++) { map[openDays[p]] = pool[p]; }
+    state.__arcMap = map;
+    if (typeof saveState === "function") { try { saveState(); } catch(_){} }
   }
-  return null;
+  return state.__arcMap[day] || null;
 }
 
 // ── TRAVELLER LOADING ──
@@ -2543,7 +2751,7 @@ function calculateEnding() {
 }
 
 function showEndingScreen(ending) {
-  document.getElementById('ending-number').textContent = 'ENDING ' + ending.num + ' OF 28';
+  var enEl=document.getElementById('ending-number');if(enEl){enEl.style.display='none';enEl.textContent='';}
   document.getElementById('ending-title').textContent  = ending.title;
   document.getElementById('ending-text').innerHTML     = ending.text;
 
@@ -2797,5 +3005,208 @@ if (document.readyState === 'loading') {
 
 })();
 </script>
+<style>
+#install-caveat { position: fixed; inset: 0; z-index: 9999; display: none; background: #2C3E1F; color: #E8DFC4; font-family: "Courier Prime", monospace; align-items: center; justify-content: center; padding: 24px; text-align: center; }
+#install-caveat.active { display: flex; }
+#install-caveat .caveat-box { max-width: 480px; width: 100%; }
+#install-caveat h1 { font-family: "Bebas Neue", sans-serif; font-size: 32px; letter-spacing: 2px; margin: 0 0 16px 0; color: #D4B84A; }
+#install-caveat p { margin: 0 0 12px 0; line-height: 1.5; font-size: 14px; }
+#install-caveat .caveat-steps { text-align: left; margin: 16px 0; padding: 12px; border: 1px dashed #E8DFC4; font-size: 13px; line-height: 1.7; }
+#install-caveat button { display: block; width: 100%; margin: 8px 0; padding: 14px; background: transparent; color: #E8DFC4; border: 2px solid #E8DFC4; font-family: "Bebas Neue", sans-serif; font-size: 16px; letter-spacing: 2px; cursor: pointer; }
+#install-caveat button.primary { background: #D4B84A; color: #2C3E1F; border-color: #D4B84A; }
+</style>
+<div id="install-caveat" role="dialog" aria-modal="true">
+  <div class="caveat-box">
+    <h1>ADD TO HOME SCREEN</h1>
+    <p class="caveat-lead">Best played as an installed app — fullscreen, offline, no browser bar.</p>
+    <div class="caveat-platform">
+      <div class="caveat-platform-title">iOS · Safari</div>
+      <ol class="caveat-list">
+        <li>Tap <span class="caveat-kbd">Share <svg class="caveat-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 12v7h14v-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span> at the bottom of Safari.</li>
+        <li>Scroll, then tap <span class="caveat-kbd">Add to Home Screen <svg class="caveat-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>.</li>
+        <li>Tap <span class="caveat-kbd">Add</span> in the top-right.</li>
+      </ol>
+    </div>
+    <div class="caveat-platform">
+      <div class="caveat-platform-title">Android · Chrome</div>
+      <ol class="caveat-list">
+        <li>Tap <span class="caveat-kbd">Menu <svg class="caveat-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="19" r="2" fill="currentColor"/></svg></span> in the top-right.</li>
+        <li>Tap <span class="caveat-kbd">Install app</span> or <span class="caveat-kbd">Add to Home screen</span>.</li>
+        <li>Confirm <span class="caveat-kbd">Install</span>.</li>
+      </ol>
+    </div>
+    <p class="caveat-foot">Then launch from the home-screen icon for the full experience.</p>
+    <button type="button" class="primary" id="caveat-continue">I UNDERSTAND — CONTINUE</button>
+    <button type="button" id="caveat-browser">PLAY IN BROWSER</button>
+  </div>
+</div>
+<script>
+(function(){
+  try {
+    var isStandalone = (window.navigator.standalone === true) || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
+    var caveatSeen = false;
+    try { caveatSeen = localStorage.getItem("caveatSeen") === "1"; } catch(e){}
+    if (!isStandalone && !caveatSeen) {
+      var el = document.getElementById("install-caveat");
+      if (el) {
+        el.classList.add("active");
+        var markSeen = function(){
+          try { localStorage.setItem("caveatSeen","1"); } catch(e){}
+          el.classList.remove("active");
+        };
+        var c1 = document.getElementById("caveat-continue");
+        var c2 = document.getElementById("caveat-browser");
+        if (c1) c1.addEventListener("click", markSeen);
+        if (c2) c2.addEventListener("click", markSeen);
+      }
+    }
+  } catch(e){ console.warn("caveat init failed", e); }
+})();
+</script>
+<!-- BGM: ambient drone via YouTube IFrame API (auto-start, no UI) -->
+<audio id="bgm-audio" loop preload="auto" crossorigin="anonymous" style="display:none"><source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg"><source src="https://cdn.pixabay.com/download/audio/2021/11/23/audio_64b2dd1bce.mp3" type="audio/mpeg"></audio><script>(function(){var a=document.getElementById("bgm-audio");if(!a)return;a.volume=0.18;var started=false;function tryPlay(){if(started)return;var p=a.play();if(p&&p.then){p.then(function(){started=true;}).catch(function(){});}else{started=true;}}function onGesture(){tryPlay();if(started){document.removeEventListener("pointerdown",onGesture);document.removeEventListener("keydown",onGesture);document.removeEventListener("touchstart",onGesture);}}document.addEventListener("pointerdown",onGesture,{passive:true});document.addEventListener("keydown",onGesture);document.addEventListener("touchstart",onGesture,{passive:true});window.__bgm={el:a,play:tryPlay,pause:function(){a.pause();started=false;}};})();</script>
+<!-- Hints help -->
+<button id="hints-btn" type="button" aria-label="Help — how to play" title="Help — how to play">?</button>
+<div id="hints-modal" role="dialog" aria-modal="true" aria-labelledby="hints-title">
+  <div class="hints-box">
+    <button id="hints-close" type="button" aria-label="Close">×</button>
+    <h2 id="hints-title">HOW TO PLAY</h2>
+    <section class="hints-sec">
+      <h3>The booth</h3>
+      <p><b>Bulletin</b> — the day’s rules from FIBA. Read it first; it tells you which papers are required and which stamps are illegal that day.</p>
+      <p><b>Documents</b> — papers each traveller hands you (passport, permit, BDA, work card…). Compare them against the bulletin and against each other. Mismatched names, expired dates, missing stamps, or impossible regions are grounds to deny.</p>
+      <p><b>Stamps</b> — your tools: APPROVE, DENY, REJECT. Each leaves a permanent mark on the traveller’s papers and on your record.</p>
+      <p><b>Day counter</b> — top bar; days run 1 → 25. The war ends on day 25 regardless of how many you process.</p>
+      <p><b>Wallet</b> — your daily Biafran notes. Rent and food are deducted at the end of each day.</p>
+    </section>
+    <section class="hints-sec">
+      <h3>How you earn (and lose)</h3>
+      <ul>
+        <li>+1 Biafran note for each correct decision (approving a clean traveller; denying a clear forgery).</li>
+        <li>−2 Biafran notes for each mistake (waving a forgery through; turning away a legal traveller).</li>
+        <li>Citations from FIBA accumulate; three in one day costs you the booth.</li>
+        <li>End-of-day costs: rent, food, sometimes medicine. Run out and the game ends in destitution.</li>
+      </ul>
+    </section>
+    <section class="hints-sec">
+      <h3>What APPROVE / DENY / REJECT mean</h3>
+      <ul>
+        <li><b>APPROVE</b> — let the traveller cross. Use only when papers match the bulletin.</li>
+        <li><b>DENY</b> — turn them back. Use for missing or expired papers; the traveller is sent home, not detained.</li>
+        <li><b>REJECT</b> — detain. Use for forgeries, smugglers, infiltrators. Triggers a security write-up.</li>
+      </ul>
+    </section>
+    
+    <button id="hints-ok" type="button" class="primary">GOT IT</button>
+  </div>
+</div>
+<div id="flash-banner" aria-live="polite"><div class="flash-inner"><div class="flash-title"></div><div class="flash-sub"></div></div></div>
+<script>
+(function(){
+  var fb = document.getElementById("flash-banner");
+  var ft = fb && fb.querySelector(".flash-title");
+  var fs = fb && fb.querySelector(".flash-sub");
+  var ftimer = null;
+  window.flash = function(title, sub){
+    if (!fb) return;
+    if (ftimer) clearTimeout(ftimer);
+    ft.textContent = title || "";
+    fs.textContent = sub || "";
+    fb.classList.remove("show"); void fb.offsetWidth; fb.classList.add("show");
+    ftimer = setTimeout(function(){ fb.classList.remove("show"); }, 1800);
+  };
+  var hb = document.getElementById("hints-btn");
+  var hm = document.getElementById("hints-modal");
+  var hc = document.getElementById("hints-close");
+  var ho = document.getElementById("hints-ok");
+  function openH(){ hm && hm.classList.add("open"); }
+  function closeH(){ hm && hm.classList.remove("open"); }
+  hb && hb.addEventListener("click", openH);
+  hc && hc.addEventListener("click", closeH);
+  ho && ho.addEventListener("click", closeH);
+  hm && hm.addEventListener("click", function(e){ if (e.target === hm) closeH(); });
+  try {
+    if (!localStorage.getItem("cb_hints_seen")) {
+      hb && hb.classList.add("pulse");
+      setTimeout(function(){ hb && hb.classList.remove("pulse"); }, 6000);
+      hb && hb.addEventListener("click", function(){ try { localStorage.setItem("cb_hints_seen","1"); } catch(e){} }, { once: true });
+    }
+  } catch(e){}
+  function hookBegin(){ var btn = document.getElementById("btn-begin"); if (btn) btn.addEventListener("click", function(){ window.flash("REGISTRATION", "Federal Ministry of Identity & Border Authority"); }); }
+  function hookCC(){ document.addEventListener("click", function(e){ var t=e.target; if(!t)return; var id=t.id||""; var txt=(t.textContent||"").trim().toUpperCase(); if (id==="cc-finish"||id==="btn-cc-finish"||/REPORT FOR DUTY|TAKE THE BOOTH|CONFIRM REGISTRATION|FINISH REGISTRATION|COMPLETE REGISTRATION/.test(txt)) { window.flash("REGISTRATION COMPLETE","Reporting for duty — booth ready"); } }, true); }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function(){ hookBegin(); hookCC(); });
+  else { hookBegin(); hookCC(); }
+})();
+</script>
+<script>(function(){function setPhase(p){var b=document.body;b.classList.remove("phase-splash","phase-charcreate","phase-bulletin","phase-booth","phase-day-end","phase-ending","phase-allow-hints");b.classList.add("phase-"+p);if(p==="splash"||p==="bulletin"||p==="charcreate"){b.classList.add("phase-allow-hints");}}window.__setPhase=setPhase;function detect(){var ids=["splash","char-create","intro","bulletin","game","day-end","ending"];for(var i=0;i<ids.length;i++){var el=document.getElementById(ids[i]);if(el&&el.classList.contains("active")){var map={"splash":"splash","char-create":"charcreate","intro":"bulletin","bulletin":"bulletin","game":"booth","day-end":"day-end","ending":"ending"};setPhase(map[ids[i]]);return;}}}var mo=new MutationObserver(detect);document.addEventListener("DOMContentLoaded",function(){detect();document.querySelectorAll(".screen").forEach(function(s){mo.observe(s,{attributes:true,attributeFilter:["class"]});});});setInterval(detect,500);})();</script>
+<script>(function(){
+var POOL_FIRST=["Adaeze","Chinedu","Ifeoma","Obinna","Ngozi","Ekene","Chiamaka","Uzoma","Kelechi","Adaobi","Emeka","Nneka","Tobenna","Onyeka","Chima","Amaka","Chibuzo","Uchenna","Adanna","Ikenna","Chuma","Ngeri","Bassey","Etim","Eno","Imoh","Affiong","Mfon","Ubong","Edidiong","Aniefiok","Otobong","Inyang","Idongesit","Kpunyi","Joshua","Mary","Grace","Faith","Peter","Daniel","Esther","Ruth","Solomon","Comfort","Patience","Florence","Chukwudi","Chukwuma","Ezinne","Adaku","Chigozie","Tochukwu","Onyinye","Chizoba","Chinonso","Chukwuemeka","Ifeanyi","Nnamdi","Okechukwu","Chinwe","Obianuju","Anuli","Chiebuka","Chukwudera","Iheoma","Chioma","Olamma"];
+var POOL_LAST=["Achebe","Okafor","Eze","Onuoha","Nwosu","Ibekwe","Anyanwu","Okonkwo","Obi","Ndubuisi","Madu","Mbah","Nweke","Okeke","Uzor","Aniebo","Iheme","Ezeh","Akpan","Etuk","Bassey","Effiong","Ekanem","Inyang","Udo","Edet","Okon","Asuquo","Umoren","Iniobong","Akpabio","Eshiett","Nwankwo","Iwobi","Eluemunor","Onyemaechi","Chinwuba","Anyanwu","Okeke","Onyema","Egbuna","Mgbachi","Anozie","Onuoha","Onwumere","Onyemelukwe","Iheanacho","Ihegwuanya","Ihebuzor","Ekejiuba","Ekenta","Ekejimba","Eluemuno","Eluem","Onueri","Iheme","Ojukwu","Achuzia","Banjo","Madiebo","Effiong","Adekunle","Akinrinade"];
+var usedNames={};
+function pickFresh(arr){var tries=0;while(tries<25){var n=arr[Math.floor(Math.random()*arr.length)];if(!usedNames[n]){usedNames[n]=true;return n;}tries++;}return arr[Math.floor(Math.random()*arr.length)];}
+window.__pickFreshName=function(){return pickFresh(POOL_FIRST)+" "+pickFresh(POOL_LAST);};
+window.__travellerHistory=window.__travellerHistory||{};
+window.__recordTravellerDecision=function(name,decision,errors){if(!name)return;window.__travellerHistory[name]={decision:decision,errors:errors||[],day:(window.state&&window.state.day)||0};};
+window.__getReturningNote=function(name){var h=window.__travellerHistory[name];if(!h)return null;var note="Last seen Day "+h.day+": "+h.decision.toUpperCase();if(h.errors&&h.errors.length){note+=" — flagged for "+h.errors.join(", ")+".";}return note;};
+function scanSuspicious(){var papers=document.querySelectorAll(".doc, .paper, .document, .traveller-doc, [data-doc]");var keys=["EXPIRED","FORGED","MISMATCH","SUSPENDED","INVALID","UNREGISTERED","ALTERED"];papers.forEach(function(p){var t=(p.textContent||"").toUpperCase();var hit=keys.some(function(k){return t.indexOf(k)>=0;});if(hit&&!p.querySelector(".susp-badge")){var b=document.createElement("span");b.className="susp-badge";b.textContent="⚠ DOUBLE-CHECK";p.appendChild(b);}});}
+setInterval(scanSuspicious,800);
+window.__todayValue=function(shillings){var ngnPerShilling=2200;var n=Math.round(shillings*ngnPerShilling);return "≈ ₦"+n.toLocaleString()+" today";};
+function deficitWatch(){if(!window.state)return;var pay=window.state.totalPay;if(typeof pay!=="number")return;if(pay<0&&!window.__deficitWarned){window.__deficitWarned=true;var msg=document.createElement("div");msg.className="deficit-warning";msg.innerHTML="<b>YOU ARE IN DEFICIT.</b><br>If this continues, your family will lose rent and food. Children may be sent away. Your assignment may be revoked. <span class=\"deficit-sub\">Long-term deficit erodes loyalty meters and can trigger eviction endings.</span>";document.body.appendChild(msg);setTimeout(function(){if(msg.parentNode)msg.parentNode.removeChild(msg);},9000);}}
+setInterval(deficitWatch,1500);
+function fullNameUp(){var els=document.querySelectorAll(".eod-error-name, .processing-error-name, [data-error-name]");els.forEach(function(e){var n=e.textContent;if(n&&!e.dataset.expanded){e.dataset.expanded="1";if(n.split(" ").length<2){e.textContent=n+" "+(window.__pickFreshName?window.__pickFreshName().split(" ")[1]:"Onuoha");}}});}
+setInterval(fullNameUp,1000);
+window.__officerRating=function(){var s=window.state;if(!s)return null;var corr=(s.totalApproved||0)-(s.totalErrors||0);var pct=(s.totalProcessed?Math.round(((corr)/s.totalProcessed)*100):0);var grade="C";if(pct>=90)grade="A+";else if(pct>=80)grade="A";else if(pct>=70)grade="B";else if(pct>=55)grade="C";else if(pct>=40)grade="D";else grade="F";return{grade:grade,pct:pct,corr:corr,total:s.totalProcessed||0};};
+function injectEndingSummary(){var endScreen=document.getElementById("ending");if(!endScreen||!endScreen.classList.contains("active"))return;if(endScreen.querySelector(".officer-rating-block"))return;var r=window.__officerRating();if(!r)return;var s=window.state||{};var content=endScreen.querySelector(".ending-content");if(!content)return;var block=document.createElement("div");block.className="officer-rating-block";var famLine=s.familyStatus?("<b>Family:</b> "+s.familyStatus):"<b>Family:</b> survived the war on what your stamps could buy.";var warLine="<b>The war:</b> ended on Day "+(s.day||25)+". Cross River fell silent.";var studyLine=(s.player&&s.player.background==="other")?"<b>Your studies:</b> went unrecorded — a quiet life.":"<b>Your studies:</b> the war suspended every classroom. Whether you returned to them depended on what your conscience permitted.";block.innerHTML="<div class=\"or-grade\">OFFICER RATING: <b>"+r.grade+"</b></div><div class=\"or-pct\">"+r.pct+"% accuracy across "+r.total+" travellers</div><div class=\"or-summary\">"+warLine+"<br>"+famLine+"<br>"+studyLine+"</div>";content.appendChild(block);}
+setInterval(injectEndingSummary,400);
+function gateCrossRiver(){if(!window.state||!window.state.player)return;var st=window.state.player.state;document.querySelectorAll("[data-gate=\"cross-river\"]").forEach(function(el){el.style.display=(st==="Cross River")?"block":"none";});}
+setInterval(gateCrossRiver,500);
+function dateSync(){var el=document.getElementById("hud-real-date");if(!el){el=document.createElement("div");el.id="hud-real-date";el.className="hud-real-date";document.body.appendChild(el);}var d=new Date();var opts={year:"numeric",month:"short",day:"numeric"};el.textContent=d.toLocaleDateString(undefined,opts);}
+setInterval(dateSync,15000);dateSync();
+})();</script>
+<script>(function(){function setup(){var d=document.getElementById("desk");if(!d)return;if(d.querySelector(".traveller-silhouette"))return;var sil=document.createElement("div");sil.className="traveller-silhouette";sil.innerHTML='<svg viewBox="0 0 60 70" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="14" rx="11" ry="13" fill="#1a1a1a" opacity="0.85"/><path d="M 10 70 Q 10 38 30 38 Q 50 38 50 70 Z" fill="#1a1a1a" opacity="0.85"/></svg>';d.appendChild(sil);["p1","p2","p3"].forEach(function(c){var ps=document.createElement("div");ps.className="paper-shadow "+c;d.appendChild(ps);});}document.addEventListener("DOMContentLoaded",setup);setTimeout(setup,500);setInterval(setup,1500);})();</script>
+<script>(function(){
+function runCredits(){var cs=document.getElementById("credits-splash");var sp=document.getElementById("splash");if(!cs||!sp)return;var l1=document.getElementById("credits-line-1"),l1b=document.getElementById("credits-line-1b"),l2=document.getElementById("credits-line-2"),l2b=document.getElementById("credits-line-2b");function fade(el,o){if(!el)return;el.style.transition="opacity 1.2s ease";el.style.opacity=o;}setTimeout(function(){fade(l1,1);},400);setTimeout(function(){fade(l1b,1);},900);setTimeout(function(){fade(l1,0);fade(l1b,0);},2900);setTimeout(function(){fade(l2,1);},3700);setTimeout(function(){fade(l2b,1);},4200);setTimeout(function(){fade(l2,0);fade(l2b,0);},6700);setTimeout(function(){cs.style.transition="opacity 0.8s ease";cs.style.opacity="0";},7400);setTimeout(function(){cs.style.display="none";sp.style.display="";sp.classList.add("active");},8300);}
+if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",runCredits);}else{runCredits();}
+window.__nwosuLines=["You think the desk reads itself, officer? Move.","I saw three errors yesterday — keep counting and the file becomes mine.","Headquarters wants a name today. Make sure it is not yours.","Your colleague was reassigned this morning. The bench is colder.","Smile less. The travellers remember faces.","I was you, sixteen years ago. I was wrong, twice. Both names are dead now.","The radio said the war is winding. The radio is wrong.","FIBA does not pay you to be merciful, officer. They pay you to be correct.","If the next stamp is wrong, I am writing it down."];
+window.__officeGossip=["Did you hear? Adaeze from Bay 4 took a chicken from a traveller. Audit Tuesday.","They say the new directive is not coming from Lagos at all — it is from a man in Geneva.","I heard Inspector Nwosu cried in the toilet. Or maybe it was laughing. Hard to tell.","Bay 7 has stopped printing receipts. The travellers are paying anyway.","A boy from the radio came asking who approves the most. They never answer.","The ration office sent a memo. The memo was already signed by someone we do not know.","Two officers vanished from Aba post. Their wives say they took the bus. The bus is still there."];
+window.__personalConditions=[{id:"surveillance",title:"YOU ARE BEING WATCHED",body:"A clerk you have never seen sat at your bench during break. Your stamp pads are out of order.",effect:"+1 corruption suspicion",weight:1},{id:"audit",title:"FILE UNDER AUDIT",body:"FIBA Internal has flagged your last four denials for review. Be more careful with the paperwork.",effect:"−1 daily wage — audit fee",weight:1},{id:"family-summons",title:"YOUR WIFE WAS QUESTIONED",body:"A man came to the house in plainclothes. He left a number. Your wife will not say what he asked.",effect:"+2 family pressure",weight:1},{id:"demotion-threat",title:"DEMOTION ON THE BOARD",body:"A list circulated this morning. Your name was on it, in pencil.",effect:"−2 wage if errors > 2 today",weight:1},{id:"radio-warning",title:"LOOSE LIPS — TREASON WATCH",body:"State Security circular: any officer overheard discussing the war effort outside the booth will be tried under section 11.",effect:"−5 wage on rebellion choices",weight:1},{id:"food-shortage",title:"NO BREAKFAST AT THE CANTEEN",body:"The cook did not come in. The kettle is dry. You are hungry, and your hands are slower.",effect:"+1 second per traveller today",weight:1},{id:"watched-by-priest",title:"THE PRIEST IS COUNTING",body:"Father Okonkwo has been at the gate for two hours. He greets every traveller you deny by name.",effect:"+1 compassion sensitivity",weight:1}];
+window.__pickPersonalCondition=function(){var arr=window.__personalConditions;return arr[Math.floor(Math.random()*arr.length)];};
+window.__familyStatusPool=function(state){var deficit=state&&state.totalPay<0;var lines=[];if(deficit){lines.push("Adaobi wrote on the wall in chalk: \"papa we have no rice.\" You did not erase it.","Your son asked if officers eat. You said yes. He did not believe you.","The landlord came twice today. The third time he will not knock.","Your wife covered the lamp with a cloth. She said it makes the empty plate look smaller.","You traded your second pair of shoes. They are not enough.","The neighbour offered a bag of garri. You said no. You came home and regretted it.");}else{lines.push("Adaobi was reading aloud when you walked in. She did not stop.","Your wife saved a piece of fish for you. She said it was nothing. It was not nothing.","Your son drew the checkpoint. The travellers had no faces.","Someone left a cassava on the step. The note said \"officer, thank you.\" You did not eat it.","The radio worked tonight. Everyone was quiet during the names.","The lamp lasted until you finished writing. That is something.");}lines.push("You stayed at the table until the candle gave out. No one asked what you were thinking.","The dog from two doors down came to the gate. You let him sleep on the porch.","A letter came in your wife’s old handwriting. It was for someone she used to be.","You wrote one line in the margin of the bulletin. You crossed it out before bed.");return lines[Math.floor(Math.random()*lines.length)];};
+window.__cleared=window.__cleared||[];
+window.__recordCleared=function(name,bg){if(!name)return;window.__cleared.push({name:name,bg:bg||"unknown",day:(window.state&&window.state.day)||0});};
+window.__triggerSpyReveal=function(){if(!window.__cleared.length)return null;var pick=window.__cleared[Math.floor(Math.random()*window.__cleared.length)];var fates=["was tried this morning under Section 11. The verdict was read at dawn.","was identified at a roadblock outside Calabar. They are not in custody.","was named on the radio. The broadcast cut out before the sentence ended.","walked into the federal compound and did not walk out. The papers say nothing.","was found in a field with a forged BCD and three Naira notes. The field is yours."];var f=fates[Math.floor(Math.random()*fates.length)];return{name:pick.name,day:pick.day,fate:f,html:"<b>BREAKING:</b> the traveller you cleared on Day "+pick.day+" — <i>"+pick.name+"</i> — "+f};};
+window.__showBreakingNews=function(){var r=window.__triggerSpyReveal();if(!r)return;var box=document.createElement("div");box.className="breaking-news";box.innerHTML=r.html+"<div class=\"bn-sub\">Your stamp is in the file. The file is in the war.</div>";document.body.appendChild(box);setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},9500);};
+window.__lastBreakingDay=-1;function maybeBreaking(){if(!window.state||!window.state.day)return;if(window.state.day<=2)return;if(window.state.day===window.__lastBreakingDay)return;if(Math.random()<0.32){window.__lastBreakingDay=window.state.day;window.__showBreakingNews();}}setInterval(maybeBreaking,12000);
+window.__disciplinaryEvents=[{id:"ia-summons",title:"INTERNAL AFFAIRS SUMMONS",body:"You will report to Block C tomorrow at first bell. Bring your stamp log.",cost:5},{id:"pay-docked",title:"WAGE DOCKED",body:"Two days of pay are held pending investigation. Your supervisor signed without looking up.",cost:8},{id:"transfer-threat",title:"TRANSFER ORDER — PROVISIONAL",body:"You may be reassigned to Aba Junction within seventy-two hours. Aba is closer to the front.",cost:0},{id:"family-watch",title:"FAMILY UNDER OBSERVATION",body:"State Security has logged your home address. Your wife noticed the same car twice.",cost:0},{id:"treason-letter",title:"TREASON CHARGE — NOTICE",body:"A complaint was filed under section 11. Your name is on the typed sheet. There is no signature yet.",cost:0}];
+window.__triggerDisciplinary=function(){var arr=window.__disciplinaryEvents;var e=arr[Math.floor(Math.random()*arr.length)];if(window.state&&typeof window.state.totalPay==="number"&&e.cost){window.state.totalPay-=e.cost;}var box=document.createElement("div");box.className="disciplinary-card";box.innerHTML="<div class=\"dc-title\">"+e.title+"</div><div class=\"dc-body\">"+e.body+"</div>"+(e.cost?"<div class=\"dc-cost\">−₦"+e.cost+" deducted</div>":"<div class=\"dc-cost\">No fine — yet.</div>");document.body.appendChild(box);setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},10000);return e;};
+window.__targetTravellersPerDay=function(){return 20+Math.floor(Math.random()*11);};
+window.__shouldShowDecisionEvent=function(){return Math.random()<0.18;};
+window.__pickNwosu=function(){return window.__nwosuLines[Math.floor(Math.random()*window.__nwosuLines.length)];};
+window.__pickGossip=function(){return window.__officeGossip[Math.floor(Math.random()*window.__officeGossip.length)];};
+function familyStatusOverride(){var els=document.querySelectorAll(".family-status, .eod-family, [data-family-status]");els.forEach(function(e){if(e.dataset.randomized)return;e.dataset.randomized="1";var line=window.__familyStatusPool(window.state||{});e.textContent=line;});}
+setInterval(familyStatusOverride,1200);
+window.__lastNwosuDay=-1;function nwosuBark(){if(!window.state||!window.state.day)return;if(window.state.day===window.__lastNwosuDay)return;var bul=document.getElementById("bulletin");if(!bul||!bul.classList.contains("active"))return;window.__lastNwosuDay=window.state.day;var box=document.createElement("div");box.className="nwosu-bark";box.innerHTML="<div class=\"nb-tag\">INSPECTOR NWOSU</div><div class=\"nb-line\">\u201C"+window.__pickNwosu()+"\u201D</div><div class=\"nb-gossip\"><b>Booth gossip:</b> "+window.__pickGossip()+"</div>";document.body.appendChild(box);setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},9000);}setInterval(nwosuBark,1500);
+window.__lastConditionDay=-1;function conditionTick(){if(!window.state||!window.state.day||window.state.day<3)return;if(window.state.day===window.__lastConditionDay)return;var bul=document.getElementById("bulletin");if(!bul||!bul.classList.contains("active"))return;if(Math.random()>0.55)return;window.__lastConditionDay=window.state.day;var c=window.__pickPersonalCondition();var box=document.createElement("div");box.className="condition-card";box.innerHTML="<div class=\"cc-tag\">PERSONAL CONDITION</div><div class=\"cc-title\">"+c.title+"</div><div class=\"cc-body\">"+c.body+"</div><div class=\"cc-effect\">"+c.effect+"</div>";document.body.appendChild(box);setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},11000);}setInterval(conditionTick,2000);
+})();</script>
+<script>(function(){
+window.__sideEvents=[
+  {id:"bribery-1", title:"BRIBERY ATTEMPT", body:"The traveller slides three Naira notes under the BCD form. \"For the children, officer.\" The eyes are dry. The hands are not.", choices:[{label:"TAKE THE MONEY",effect:{corruption:2,survival:1}},{label:"PUSH IT BACK",effect:{loyalty:1,witness:1}},{label:"TAKE THE MONEY, STILL DENY",effect:{corruption:3,witness:-1}}]},
+  {id:"bribery-2", title:"AN ENVELOPE", body:"A folded envelope sits inside the passport, soft to the touch. The serial number is hand-written in pencil on the back.", choices:[{label:"OPEN IT NOW",effect:{corruption:2}},{label:"RETURN THE PASSPORT INTACT",effect:{loyalty:2}},{label:"POCKET IT FOR LATER",effect:{corruption:1,survival:1}}]},
+  {id:"bribery-3", title:"A COLLEAGUE WHISPERS", body:"Bay 6 leans across. \"This one paid me already. Just stamp it. We split.\" The traveller does not look at either of you.", choices:[{label:"STAMP IT",effect:{corruption:2,loyalty:-1}},{label:"REFUSE QUIETLY",effect:{loyalty:1}},{label:"REPORT TO NWOSU",effect:{loyalty:3,witness:1}}]},
+  {id:"recognise", title:"YOU RECOGNISE THIS FACE", body:"You went to school with him. Last you heard, he was teaching in Aba. The name on the BCD is not the name you remember.", choices:[{label:"APPROVE \u2014 STAY SILENT",effect:{compassion:2,corruption:1}},{label:"DENY \u2014 PROCEDURE",effect:{loyalty:2,compassion:-1}},{label:"PASS HIM TO BAY 4",effect:{survival:1}}]},
+  {id:"child-alone", title:"AN UNACCOMPANIED CHILD", body:"She is eight, maybe nine. She has a folded note from her aunt in Onitsha and no proper papers.", choices:[{label:"WAVE HER THROUGH",effect:{compassion:3,loyalty:-1}},{label:"DETAIN UNTIL SOMEONE COMES",effect:{loyalty:1}},{label:"CALL THE NUNS AT THE GATE",effect:{compassion:2,witness:1}}]},
+  {id:"radio-warning", title:"THE RADIO BREAKS", body:"State Security cuts in: a wanted man matches the description of the traveller in front of you. The signal cuts before the photo loads.", choices:[{label:"DETAIN ON SUSPICION",effect:{loyalty:2}},{label:"IGNORE THE BROADCAST",effect:{rebellion:1,witness:1}},{label:"WAIT FOR CONFIRMATION",effect:{survival:1}}]},
+  {id:"food-trade", title:"A LOAF OF BREAD", body:"She has nothing but bread and an expired permit. \"Please. My husband is on the other side.\"", choices:[{label:"ACCEPT THE BREAD, APPROVE",effect:{corruption:1,compassion:2}},{label:"APPROVE WITHOUT TAKING",effect:{compassion:3,loyalty:-1}},{label:"DENY",effect:{loyalty:1,compassion:-2}}]},
+  {id:"officer-pressure", title:"INSPECTOR NWOSU STOPS BY", body:"He leans over your shoulder. \"This one. He looks like trouble. Send him back.\" The papers are clean.", choices:[{label:"DENY \u2014 OBEY",effect:{loyalty:2,compassion:-1}},{label:"APPROVE \u2014 CLEAN PAPERS",effect:{loyalty:-1,witness:2}},{label:"DETAIN \u2014 BUY TIME",effect:{survival:1}}]},
+  {id:"gossip-decision", title:"THE GOSSIP TURNS", body:"Two clerks at Bay 3 are pretending to file. They are watching you. One of them has a notebook open.", choices:[{label:"IGNORE",effect:{}},{label:"WALK OVER, ASK",effect:{rebellion:1}},{label:"REPORT TO NWOSU",effect:{loyalty:1,corruption:1}}]},
+  {id:"family-call", title:"YOUR WIFE CALLED THE OFFICE", body:"Adaobi is sick. The fee is two days' wage. The traveller in front of you offered to cover it \u2014 if you sign. The traveller is not on the bulletin list.", choices:[{label:"SIGN AND TAKE THE MONEY",effect:{corruption:3,survival:2}},{label:"DENY \u2014 GO HOME EMPTY",effect:{loyalty:1,compassion:1}},{label:"DEFER \u2014 ASK NWOSU",effect:{loyalty:1,survival:-1}}]}
+];
+window.__sideEventChance=0.16; // ~1 in 6 travellers triggers a side-event
+window.__sideEventCooldown=0;
+window.__pickSideEvent=function(){var p=window.__sideEvents;return p[Math.floor(Math.random()*p.length)];};
+window.__showSideEvent=function(){var ev=window.__pickSideEvent();var box=document.createElement("div");box.className="side-event-card";var html="<div class=\"se-tag\">DECISION REQUIRED</div><div class=\"se-title\">"+ev.title+"</div><div class=\"se-body\">"+ev.body+"</div><div class=\"se-choices\">";ev.choices.forEach(function(c,i){html+="<button data-i=\""+i+"\" class=\"se-btn\">"+c.label+"</button>";});html+="</div>";box.innerHTML=html;document.body.appendChild(box);box.querySelectorAll(".se-btn").forEach(function(b){b.addEventListener("click",function(){var ix=parseInt(b.dataset.i,10);var eff=ev.choices[ix].effect||{};if(window.state&&window.state.axes){Object.keys(eff).forEach(function(k){window.state.axes[k]=(window.state.axes[k]||0)+eff[k];});}box.classList.add("se-fade");setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},400);});});};
+function tryHookLoad(){if(typeof window.loadNextTraveller!=="function"){setTimeout(tryHookLoad,500);return;}if(window.__loadHooked)return;window.__loadHooked=true;var orig=window.loadNextTraveller;window.loadNextTraveller=function(){var trav=(window.state&&window.state.traveller)||0;if(window.__sideEventCooldown>0){window.__sideEventCooldown--;}else if(trav>2 && Math.random()<window.__sideEventChance){window.__sideEventCooldown=2;window.__showSideEvent();}return orig.apply(this,arguments);};}
+tryHookLoad();
+})();</script>
 </body>
 </html>
