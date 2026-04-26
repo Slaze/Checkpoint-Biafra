@@ -1261,8 +1261,12 @@ h1, h2, h3, .splash-title, .cc-header-title, .day-banner, .hud-day, .endgame-tit
 .caveat-ico { width: 14px; height: 14px; vertical-align: middle; }
 .caveat-foot { margin-top: 14px; opacity: 0.8; font-size: 0.9rem; }
 /* === HINTS === */
-#hints-btn { position: fixed; top: 12px; right: 12px; z-index: 9000; width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid #E8DFC4; background: rgba(44,62,31,0.85); color: #E8DFC4; font-family: "Special Elite",monospace; font-size: 1.3rem; line-height: 1; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.4); transition: transform 0.15s; }
+#hints-btn { position: fixed; bottom: 14px; left: 14px; z-index: 9000; width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid #E8DFC4; background: rgba(44,62,31,0.85); color: #E8DFC4; font-family: "Special Elite",monospace; font-size: 1.3rem; line-height: 1; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.4); transition: transform 0.15s; }
 #hints-btn:hover { transform: scale(1.08); }
+body:not(.phase-allow-hints) #hints-btn { display: none !important; }
+.flash-border-decision { animation: flashBorder 1.2s ease-in-out infinite; }
+@keyframes flashBorder { 0%,100% { box-shadow: inset 0 0 0 2px rgba(220,60,60,0); } 50% { box-shadow: inset 0 0 0 3px rgba(220,60,60,0.55); } }
+
 #hints-btn.pulse { animation: hintsPulse 1.4s ease-in-out infinite; }
 @keyframes hintsPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(232,223,196,0.6); } 50% { box-shadow: 0 0 0 10px rgba(232,223,196,0); } }
 #hints-modal { position: fixed; inset: 0; z-index: 9500; display: none; background: rgba(20,28,15,0.92); align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
@@ -1467,12 +1471,12 @@ h1, h2, h3, .splash-title, .cc-header-title, .day-banner, .hud-day, .endgame-tit
 <!-- ENDING SCREEN -->
 <div id="ending" class="screen">
   <div class="ending-content">
-    <span class="ending-number" id="ending-number">ENDING 1 OF 28</span>
+    <span class="ending-number" id="ending-number" style="display:none"></span>
     <div class="ending-title" id="ending-title">ENDING TITLE</div>
     <div class="ending-text" id="ending-text"></div>
     <div class="ending-axes" id="ending-axes"></div>
-    <div class="endings-unlocked" id="endings-unlocked">1 OF 28 ENDINGS DISCOVERED</div>
-    <button class="btn-primary" id="btn-return-splash" style="margin-top:8px">RETURN TO CHECKPOINT</button>
+    <div class="endings-unlocked" id="endings-unlocked" style="display:none"></div>
+    <button class="btn-primary" id="btn-return-splash" style="margin-top:8px">RETURN TO CHECKPOINT BIAFRA</button>
   </div>
 </div>
 
@@ -2192,7 +2196,7 @@ function showIntroPage() {
     el.innerHTML = INTRO_PAGES[introIdx].replace(/\n/g, '<br><br>');
     el.classList.add('visible');
     introIdx++;
-    introTimer = setTimeout(showIntroPage, 6000);
+    introTimer = setTimeout(showIntroPage, 9500);
   }, 400);
 }
 
@@ -2660,7 +2664,7 @@ function calculateEnding() {
 }
 
 function showEndingScreen(ending) {
-  document.getElementById('ending-number').textContent = 'ENDING ' + ending.num + ' OF 28';
+  var enEl=document.getElementById('ending-number');if(enEl){enEl.style.display='none';enEl.textContent='';}
   document.getElementById('ending-title').textContent  = ending.title;
   document.getElementById('ending-text').innerHTML     = ending.text;
 
@@ -2973,35 +2977,7 @@ if (document.readyState === 'loading') {
 })();
 </script>
 <!-- BGM: ambient drone via YouTube IFrame API (auto-start, no UI) -->
-<div id="bgm-root" aria-hidden="true" style="position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden;pointer-events:none;"></div>
-<script>
-(function(){
-  var VID = "y-YcjCLU6DE"; // ambient bunker soundscape (1h, embeddable)
-  var player = null, ready = false, want = true, api = false;
-  function loadAPI(cb){
-    if (api) return cb && cb();
-    api = true;
-    var tag = document.createElement("script");
-    tag.src = "https://www.youtube.com/iframe_api";
-    var first = document.getElementsByTagName("script")[0];
-    first.parentNode.insertBefore(tag, first);
-    window.onYouTubeIframeAPIReady = cb;
-  }
-  function init(){
-    player = new YT.Player("bgm-root", {
-      height: "1", width: "1", videoId: VID,
-      playerVars: { autoplay: 1, loop: 1, playlist: VID, controls: 0, disablekb: 1, modestbranding: 1, playsinline: 1, rel: 0 },
-      events: {
-        onReady: function(e){ ready = true; try { e.target.setVolume(22); e.target.playVideo(); } catch(err){} },
-        onStateChange: function(e){ if (e.data === YT.PlayerState.ENDED) { try { player.playVideo(); } catch(err){} } }
-      }
-    });
-  }
-  function kick(){ document.removeEventListener("pointerdown", kick); document.removeEventListener("keydown", kick); loadAPI(init); }
-  document.addEventListener("pointerdown", kick, { once: true });
-  document.addEventListener("keydown", kick, { once: true });
-})();
-</script>
+<audio id="bgm-audio" loop preload="auto" crossorigin="anonymous" style="display:none"><source src="https://cdn.pixabay.com/download/audio/2021/11/23/audio_64b2dd1bce.mp3" type="audio/mpeg"></audio><script>(function(){var a=document.getElementById("bgm-audio");if(!a)return;a.volume=0.18;var started=false;function tryPlay(){if(started)return;var p=a.play();if(p&&p.then){p.then(function(){started=true;}).catch(function(){});}else{started=true;}}function onGesture(){tryPlay();if(started){document.removeEventListener("pointerdown",onGesture);document.removeEventListener("keydown",onGesture);document.removeEventListener("touchstart",onGesture);}}document.addEventListener("pointerdown",onGesture,{passive:true});document.addEventListener("keydown",onGesture);document.addEventListener("touchstart",onGesture,{passive:true});window.__bgm={el:a,play:tryPlay,pause:function(){a.pause();started=false;}};})();</script>
 <!-- Hints help -->
 <button id="hints-btn" type="button" aria-label="Help — how to play" title="Help — how to play">?</button>
 <div id="hints-modal" role="dialog" aria-modal="true" aria-labelledby="hints-title">
@@ -3014,13 +2990,13 @@ if (document.readyState === 'loading') {
       <p><b>Documents</b> — papers each traveller hands you (passport, permit, BDA, work card…). Compare them against the bulletin and against each other. Mismatched names, expired dates, missing stamps, or impossible regions are grounds to deny.</p>
       <p><b>Stamps</b> — your tools: APPROVE, DENY, REJECT. Each leaves a permanent mark on the traveller’s papers and on your record.</p>
       <p><b>Day counter</b> — top bar; days run 1 → 25. The war ends on day 25 regardless of how many you process.</p>
-      <p><b>Wallet</b> — your daily shillings. Rent and food are deducted at the end of each day.</p>
+      <p><b>Wallet</b> — your daily Biafran notes. Rent and food are deducted at the end of each day.</p>
     </section>
     <section class="hints-sec">
       <h3>How you earn (and lose)</h3>
       <ul>
-        <li>+1 shilling for each correct decision (approving a clean traveller; denying a clear forgery).</li>
-        <li>−2 shillings for each mistake (waving a forgery through; turning away a legal traveller).</li>
+        <li>+1 Biafran note for each correct decision (approving a clean traveller; denying a clear forgery).</li>
+        <li>−2 Biafran notes for each mistake (waving a forgery through; turning away a legal traveller).</li>
         <li>Citations from FIBA accumulate; three in one day costs you the booth.</li>
         <li>End-of-day costs: rent, food, sometimes medicine. Run out and the game ends in destitution.</li>
       </ul>
@@ -3033,10 +3009,7 @@ if (document.readyState === 'loading') {
         <li><b>REJECT</b> — detain. Use for forgeries, smugglers, infiltrators. Triggers a security write-up.</li>
       </ul>
     </section>
-    <section class="hints-sec">
-      <h3>Consequences — six axes</h3>
-      <p>Every choice nudges six hidden meters: <b>loyalty</b>, <b>compassion</b>, <b>rebellion</b>, <b>survival</b>, <b>witness</b>, <b>corruption</b>. Your ending depends on which axes dominate by day 25 — play your conscience.</p>
-    </section>
+    
     <button id="hints-ok" type="button" class="primary">GOT IT</button>
   </div>
 </div>
@@ -3078,5 +3051,6 @@ if (document.readyState === 'loading') {
   else { hookBegin(); hookCC(); }
 })();
 </script>
+<script>(function(){function setPhase(p){var b=document.body;b.classList.remove("phase-splash","phase-charcreate","phase-bulletin","phase-booth","phase-day-end","phase-ending","phase-allow-hints");b.classList.add("phase-"+p);if(p==="splash"||p==="bulletin"||p==="charcreate"){b.classList.add("phase-allow-hints");}}window.__setPhase=setPhase;function detect(){var ids=["splash","char-create","intro","bulletin","game","day-end","ending"];for(var i=0;i<ids.length;i++){var el=document.getElementById(ids[i]);if(el&&el.classList.contains("active")){var map={"splash":"splash","char-create":"charcreate","intro":"bulletin","bulletin":"bulletin","game":"booth","day-end":"day-end","ending":"ending"};setPhase(map[ids[i]]);return;}}}var mo=new MutationObserver(detect);document.addEventListener("DOMContentLoaded",function(){detect();document.querySelectorAll(".screen").forEach(function(s){mo.observe(s,{attributes:true,attributeFilter:["class"]});});});setInterval(detect,500);})();</script>
 </body>
 </html>
