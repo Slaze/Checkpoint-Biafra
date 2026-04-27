@@ -2404,6 +2404,20 @@ function loadNextTraveller() {
   }
 
   var t = list[state.traveller % list.length];
+  // Fresh-name override so the same template-traveller never re-uses its hardcoded name
+  try {
+    if (window.__pickFreshName) {
+      var fresh = window.__pickFreshName();
+      // Clone so we do not mutate the pool entry permanently
+      t = Object.assign({}, t);
+      t._origName = t.name;
+      t.name = fresh;
+      // Sync any embedded name fields on documents
+      if (t.docs && Array.isArray(t.docs)) {
+        t.docs = t.docs.map(function(d){ if(!d || !d.fields) return d; var nd=Object.assign({},d); nd.fields=Object.assign({},d.fields); Object.keys(nd.fields).forEach(function(k){ if(typeof nd.fields[k]==="string" && nd.fields[k]===t._origName){ nd.fields[k]=fresh; } }); return nd; });
+      }
+    }
+  } catch(_){}
   state.currentTraveller = t;
   renderTraveller(t);
   renderDocs(t);
@@ -2565,8 +2579,8 @@ function decide(action) {
   else if (action === 'deny') state.dayDenied++;
   else if (action === 'detain') state.dayDetained++;
 
-  if (correct && action === 'detain') payChange = 1500;
-  else if (!correct) payChange = -500;
+  if (correct && action === 'detain') payChange = 600;
+  else if (!correct) payChange = -1200;
 
   state.totalPay += payChange;
 
@@ -2667,10 +2681,10 @@ function endOfDay() {
   }
 
   var familySize = state.family.length;
-  var foodCost = familySize * 800;
-  var rentCost = 1200;
+  var foodCost = familySize * 1500;
+  var rentCost = 2800;
   var totalExpenses = foodCost + rentCost;
-  var baseDaily = 3400;
+  var baseDaily = 5500;
 
   // Add base pay
   state.totalPay += baseDaily;
@@ -3064,7 +3078,7 @@ if (document.readyState === 'loading') {
 })();
 </script>
 <!-- BGM: ambient drone via YouTube IFrame API (auto-start, no UI) -->
-<audio id="bgm-audio" loop preload="auto" crossorigin="anonymous" style="display:none"><source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg"><source src="https://cdn.pixabay.com/download/audio/2021/11/23/audio_64b2dd1bce.mp3" type="audio/mpeg"></audio><script>(function(){var a=document.getElementById("bgm-audio");if(!a)return;a.volume=0.18;var started=false;function tryPlay(){if(started)return;var p=a.play();if(p&&p.then){p.then(function(){started=true;}).catch(function(){});}else{started=true;}}function onGesture(){tryPlay();if(started){document.removeEventListener("pointerdown",onGesture);document.removeEventListener("keydown",onGesture);document.removeEventListener("touchstart",onGesture);}}document.addEventListener("pointerdown",onGesture,{passive:true});document.addEventListener("keydown",onGesture);document.addEventListener("touchstart",onGesture,{passive:true});window.__bgm={el:a,play:tryPlay,pause:function(){a.pause();started=false;}};})();</script>
+<audio id="bgm-audio" loop preload="auto" crossorigin="anonymous" style="display:none"><source src="https://cdn.pixabay.com/download/audio/2022/03/09/audio_c3b71727e1.mp3" type="audio/mpeg"><source src="https://cdn.pixabay.com/download/audio/2022/10/30/audio_38aa64ba3a.mp3" type="audio/mpeg"><source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg"><source src="https://cdn.pixabay.com/download/audio/2021/11/23/audio_64b2dd1bce.mp3" type="audio/mpeg"></audio><script>(function(){var a=document.getElementById("bgm-audio");if(!a)return;a.volume=0.18;var started=false;function tryPlay(){if(started)return;var p=a.play();if(p&&p.then){p.then(function(){started=true;}).catch(function(){});}else{started=true;}}function onGesture(){tryPlay();if(started){document.removeEventListener("pointerdown",onGesture);document.removeEventListener("keydown",onGesture);document.removeEventListener("touchstart",onGesture);}}document.addEventListener("pointerdown",onGesture,{passive:true});document.addEventListener("keydown",onGesture);document.addEventListener("touchstart",onGesture,{passive:true});window.__bgm={el:a,play:tryPlay,pause:function(){a.pause();started=false;}};})();</script>
 <!-- Hints help -->
 <button id="hints-btn" type="button" aria-label="Help — how to play" title="Help — how to play">?</button>
 <div id="hints-modal" role="dialog" aria-modal="true" aria-labelledby="hints-title">
