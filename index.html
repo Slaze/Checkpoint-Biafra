@@ -1346,6 +1346,21 @@ body:not(.phase-allow-hints) #hints-btn { display: none !important; }
 .side-event-card .se-choices { display:flex; flex-direction:column; gap:8px; }
 .side-event-card .se-btn { padding: 10px 14px; background: rgba(232,223,196,0.06); color:#F4E8C8; border: 1px solid rgba(232,223,196,0.35); font-family:"Special Elite",monospace; font-size:12px; letter-spacing:0.08em; cursor:pointer; transition: background 0.15s; text-align:left; }
 .side-event-card .se-btn:hover { background: rgba(212,160,23,0.18); border-color: rgba(212,160,23,0.7); }
+
+.query-card, .rumor-card { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9750; max-width: 380px; padding: 18px 22px; font-family:"Crimson Text", serif; line-height: 1.5; color: #F4E8C8; border: 1px solid rgba(232,223,196,0.45); border-radius: 5px; box-shadow: 0 14px 42px rgba(0,0,0,0.78); animation: bnIn 0.45s ease, bnOut 0.55s ease 9.5s both; }
+.query-card { background: rgba(40, 14, 12, 0.96); border-color: rgba(192,90,75,0.6); }
+.query-card .q-tag { font-family:"Special Elite",monospace; font-size:10px; letter-spacing:0.3em; color:#C58A3E; margin-bottom:6px; }
+.query-card .q-title { font-family:"Bebas Neue",sans-serif; font-size:19px; letter-spacing:0.1em; color:#E8DFC4; margin-bottom:8px; }
+.query-card .q-body { font-size:14px; line-height:1.55; }
+.query-card .q-cost { font-family:"Courier Prime",monospace; font-size:12px; color:#E8B07A; margin-top:10px; letter-spacing:0.06em; }
+.rumor-card { background: rgba(14, 18, 14, 0.96); border-color: rgba(140,120,80,0.55); }
+.rumor-card .r-tag { font-family:"Special Elite",monospace; font-size:10px; letter-spacing:0.3em; color:rgba(232,223,196,0.5); margin-bottom:6px; }
+.rumor-card .r-title { font-family:"Bebas Neue",sans-serif; font-size:19px; letter-spacing:0.1em; color:#D4A017; margin-bottom:8px; }
+.rumor-card .r-body { font-size:14px; font-style:italic; }
+.rumor-card .r-foot { font-family:"Courier Prime",monospace; font-size:11px; color: rgba(232,223,196,0.45); margin-top:10px; letter-spacing:0.05em; }
+.tension-toast { position: fixed; bottom: 84px; right: 14px; max-width: 320px; padding: 10px 14px; background: rgba(15,18,12,0.94); border-left: 3px solid rgba(212,160,23,0.65); color: rgba(244,232,200,0.92); font-family:"Crimson Text",serif; font-size:13px; line-height:1.45; z-index: 9600; box-shadow: 0 6px 20px rgba(0,0,0,0.55); animation: tensionIn 0.35s ease, tensionOut 0.4s ease 8s both; }
+@keyframes tensionIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes tensionOut { from { opacity: 1; } to { opacity: 0; } }
 </style>
 </head>
 <body>
@@ -2407,14 +2422,14 @@ function loadNextTraveller() {
   // Fresh-name override so the same template-traveller never re-uses its hardcoded name
   try {
     if (window.__pickFreshName) {
-      var fresh = window.__pickFreshName();
+      var fresh = window.__pickFreshName((t && (t.desc || t.region || t.state)) || "");
       // Clone so we do not mutate the pool entry permanently
       t = Object.assign({}, t);
       t._origName = t.name;
       t.name = fresh;
       // Sync any embedded name fields on documents
       if (t.docs && Array.isArray(t.docs)) {
-        t.docs = t.docs.map(function(d){ if(!d || !d.fields) return d; var nd=Object.assign({},d); nd.fields=Object.assign({},d.fields); Object.keys(nd.fields).forEach(function(k){ if(typeof nd.fields[k]==="string" && nd.fields[k]===t._origName){ nd.fields[k]=fresh; } }); return nd; });
+        t.docs = t.docs.map(function(d){ if(!d || !d.fields) return d; var nd=Object.assign({},d); nd.fields=Object.assign({},d.fields); Object.keys(nd.fields).forEach(function(k){ if(typeof nd.fields[k]==="string" && (nd.fields[k]===t._origName || nd.fields[k].toUpperCase()===String(t._origName||"").toUpperCase())){ nd.fields[k]=fresh; } }); return nd; });
       }
     }
   } catch(_){}
@@ -3154,11 +3169,47 @@ if (document.readyState === 'loading') {
 </script>
 <script>(function(){function setPhase(p){var b=document.body;b.classList.remove("phase-splash","phase-charcreate","phase-bulletin","phase-booth","phase-day-end","phase-ending","phase-allow-hints");b.classList.add("phase-"+p);if(p==="splash"||p==="bulletin"||p==="charcreate"){b.classList.add("phase-allow-hints");}}window.__setPhase=setPhase;function detect(){var ids=["splash","char-create","intro","bulletin","game","day-end","ending"];for(var i=0;i<ids.length;i++){var el=document.getElementById(ids[i]);if(el&&el.classList.contains("active")){var map={"splash":"splash","char-create":"charcreate","intro":"bulletin","bulletin":"bulletin","game":"booth","day-end":"day-end","ending":"ending"};setPhase(map[ids[i]]);return;}}}var mo=new MutationObserver(detect);document.addEventListener("DOMContentLoaded",function(){detect();document.querySelectorAll(".screen").forEach(function(s){mo.observe(s,{attributes:true,attributeFilter:["class"]});});});setInterval(detect,500);})();</script>
 <script>(function(){
-var POOL_FIRST=["Adaeze","Chinedu","Ifeoma","Obinna","Ngozi","Ekene","Chiamaka","Uzoma","Kelechi","Adaobi","Emeka","Nneka","Tobenna","Onyeka","Chima","Amaka","Chibuzo","Uchenna","Adanna","Ikenna","Chuma","Ngeri","Bassey","Etim","Eno","Imoh","Affiong","Mfon","Ubong","Edidiong","Aniefiok","Otobong","Inyang","Idongesit","Kpunyi","Joshua","Mary","Grace","Faith","Peter","Daniel","Esther","Ruth","Solomon","Comfort","Patience","Florence","Chukwudi","Chukwuma","Ezinne","Adaku","Chigozie","Tochukwu","Onyinye","Chizoba","Chinonso","Chukwuemeka","Ifeanyi","Nnamdi","Okechukwu","Chinwe","Obianuju","Anuli","Chiebuka","Chukwudera","Iheoma","Chioma","Olamma"];
-var POOL_LAST=["Achebe","Okafor","Eze","Onuoha","Nwosu","Ibekwe","Anyanwu","Okonkwo","Obi","Ndubuisi","Madu","Mbah","Nweke","Okeke","Uzor","Aniebo","Iheme","Ezeh","Akpan","Etuk","Bassey","Effiong","Ekanem","Inyang","Udo","Edet","Okon","Asuquo","Umoren","Iniobong","Akpabio","Eshiett","Nwankwo","Iwobi","Eluemunor","Onyemaechi","Chinwuba","Anyanwu","Okeke","Onyema","Egbuna","Mgbachi","Anozie","Onuoha","Onwumere","Onyemelukwe","Iheanacho","Ihegwuanya","Ihebuzor","Ekejiuba","Ekenta","Ekejimba","Eluemuno","Eluem","Onueri","Iheme","Ojukwu","Achuzia","Banjo","Madiebo","Effiong","Adekunle","Akinrinade"];
-var usedNames={};
-function pickFresh(arr){var tries=0;while(tries<25){var n=arr[Math.floor(Math.random()*arr.length)];if(!usedNames[n]){usedNames[n]=true;return n;}tries++;}return arr[Math.floor(Math.random()*arr.length)];}
-window.__pickFreshName=function(){return pickFresh(POOL_FIRST)+" "+pickFresh(POOL_LAST);};
+var POOLS_FIRST = {
+  igbo: ["Adaeze","Chinedu","Ifeoma","Obinna","Ngozi","Ekene","Chiamaka","Uzoma","Kelechi","Adaobi","Emeka","Nneka","Tobenna","Onyeka","Chima","Amaka","Chibuzo","Uchenna","Adanna","Ikenna","Chuma","Chukwudi","Chukwuma","Ezinne","Adaku","Chigozie","Tochukwu","Onyinye","Chizoba","Chinonso","Chukwuemeka","Ifeanyi","Nnamdi","Okechukwu","Chinwe","Obianuju","Anuli","Chiebuka","Iheoma","Chioma","Olamma","Nkechi","Uchechi","Chidinma","Nnenna","Ikechukwu","Ngozichi","Chibueze","Onyekachi","Munachi"],
+  yoruba: ["Adebola","Adeola","Babatunde","Folashade","Funmilayo","Olumide","Olusegun","Ayodele","Bukola","Olawale","Yetunde","Wale","Tope","Tunde","Kemi","Bisi","Lekan","Femi","Sade","Tola","Bayo","Kunle","Bolaji","Damilola","Oluwaseun","Olabisi","Ayotunde","Mojisola","Folake","Idowu","Akin","Tayo","Ronke","Bimbo","Tobi","Toyin","Banji","Yemisi","Niyi","Tinuke"],
+  hausa: ["Ibrahim","Aisha","Musa","Aminu","Hassan","Hussein","Bello","Yusuf","Sani","Lawal","Suleiman","Habiba","Maryam","Zainab","Garba","Kabiru","Salisu","Aliyu","Umar","Hauwa","Fatima","Halima","Idris","Tijjani","Nuhu","Auwal","Mustapha","Murtala","Shehu","Ahmadu","Nasir","Bashir","Adamu","Buhari","Saminu","Jamilu","Rabiu","Sadiq","Mubarak"],
+  efik: ["Bassey","Etim","Eno","Imoh","Affiong","Mfon","Ubong","Edidiong","Aniefiok","Otobong","Inyang","Idongesit","Edet","Okon","Asuquo","Umoren","Iniobong","Akpabio","Eshiett","Ekaette","Nseobong","Anietie","Ekpenyong","Eka","Itoro","Ime","Ekong","Ekemini","Iboro"],
+  ijaw: ["Boma","Ebiere","Tonye","Ipalibo","Ebiye","Diepiriye","Tamuno","Kemepade","Sotonye","Pereye","Bekes","Daubo","Ebimobowei","Tubonimi","Ibim","Iniye","Ebipade","Tariere","Ebimokumo","Pere","Belema"],
+  urhobo: ["Oghenekaro","Tega","Onome","Ejiro","Oghenetega","Erhirhie","Voke","Akpevwe","Oghenefejiro","Avwerosuoghene","Ovie","Mudia","Edesiri","Akpos","Eyitemi","Erhinyoja"],
+  tiv: ["Terhemen","Aondoaver","Sewuese","Iorlumun","Mngutyo","Doosuur","Mtema","Wantor","Iember","Hembafan","Vendimwa","Mwuese","Anenger","Hemen","Saanyol"],
+  generic: ["Joshua","Mary","Grace","Faith","Peter","Daniel","Esther","Ruth","Solomon","Comfort","Patience","Florence","David","Sarah","John","Rachel","Stephen","Joy","Mark","Paul","Rebecca","Samuel","Hope"]
+};
+var POOLS_LAST = {
+  igbo: ["Achebe","Okafor","Eze","Onuoha","Nwosu","Ibekwe","Anyanwu","Okonkwo","Obi","Ndubuisi","Madu","Mbah","Nweke","Okeke","Uzor","Aniebo","Iheme","Ezeh","Ojukwu","Achuzia","Madiebo","Nwankwo","Iwobi","Eluemunor","Onyemaechi","Chinwuba","Anozie","Onwumere","Onyemelukwe","Iheanacho","Ekejiuba","Ekenta","Onyema","Egbuna","Mgbachi","Okoye","Nnaji","Udeze","Mbanefo","Nwadike","Okorie","Igwe","Nnabuife"],
+  yoruba: ["Adekunle","Akinrinade","Banjo","Adeyemi","Ogunyemi","Olanrewaju","Adekoya","Bamidele","Soyinka","Awolowo","Obasanjo","Tinubu","Ojo","Alabi","Akinwale","Olatunji","Adebanjo","Ogundipe","Olusola","Akinyemi","Fagbemi","Aderibigbe","Awoyemi","Olufemi","Ogungbe","Sodimu","Owoseni","Ladipo","Akanbi"],
+  hausa: ["Abubakar","Mohammed","Maitama","Sule","Bello","Bauchi","Sani","Yero","Wushishi","Zazzau","Lawal","Tijani","Wakili","Goje","Aliyu","Garba","Gaya","Kwankwaso","Galadima","Madaki","Wamakko","Dan-Asabe"],
+  efik: ["Akpan","Etuk","Bassey","Effiong","Ekanem","Inyang","Udo","Edet","Okon","Asuquo","Umoren","Akpabio","Eshiett","Anwana","Ekong","Ndon","Ekpenyong","Atakpa","Ita","Edemekong","Udofia"],
+  ijaw: ["Diete-Spiff","Pepple","Briggs","Wilcox","Owonaro","Sambo","Tariah","Abere","Belema","Wokoma","Beredugo","Oki","Asari-Dokubo"],
+  urhobo: ["Ibori","Akpobari","Mukoro","Otiti","Ighedosa","Egbune","Esanubi","Edhere","Akpomudje","Egbarevba","Otokito"],
+  tiv: ["Akume","Tarka","Akaagerger","Suswam","Ortom","Akase","Adasu","Iorpenda","Gemade","Hyacinth"],
+  generic: ["Effiong","Banjo","Madiebo","Achuzia","Akpabio","Adekunle","Akinrinade"]
+};
+var usedNames = {};
+function pickFresh(arr){ if(!arr||!arr.length) return null; var tries=0; while(tries<25){ var n=arr[Math.floor(Math.random()*arr.length)]; if(!usedNames[n]){ usedNames[n]=true; return n; } tries++; } return arr[Math.floor(Math.random()*arr.length)]; }
+function inferEthnicity(hint){
+  if(!hint) return "generic";
+  var s = String(hint).toLowerCase();
+  if(/\b(hausa|fulani|kano|sokoto|kaduna|borno|katsina|zamfara|jigawa|maiduguri|gombe|yobe|bauchi|kebbi|adamawa)\b/.test(s)) return "hausa";
+  if(/\b(yoruba|lagos|ibadan|oyo|ogun|osun|ekiti|kwara|abeokuta|ondo|ilorin)\b/.test(s)) return "yoruba";
+  if(/\b(igbo|ibo|anambra|imo|abia|ebonyi|enugu|onitsha|aba|owerri|umuahia|nnewi|awka|nsukka)\b/.test(s)) return "igbo";
+  if(/\b(efik|ibibio|annang|calabar|cross river|akwa ibom|uyo|eket|oron)\b/.test(s)) return "efik";
+  if(/\b(ijaw|izon|kalabari|bayelsa|rivers|port harcourt|yenagoa|opobo|bonny)\b/.test(s)) return "ijaw";
+  if(/\b(urhobo|itsekiri|isoko|delta|warri|sapele|ughelli)\b/.test(s)) return "urhobo";
+  if(/\b(tiv|idoma|igede|benue|makurdi|gboko)\b/.test(s)) return "tiv";
+  if(/\b(edo|bini|esan|benin city)\b/.test(s)) return "yoruba";
+  return "generic";
+}
+window.__pickFreshName = function(hint){
+  var eth = inferEthnicity(hint);
+  var first = pickFresh(POOLS_FIRST[eth]) || pickFresh(POOLS_FIRST.generic);
+  var last  = pickFresh(POOLS_LAST[eth])  || pickFresh(POOLS_LAST.generic);
+  return (first + " " + last).toUpperCase();
+};
 window.__travellerHistory=window.__travellerHistory||{};
 window.__recordTravellerDecision=function(name,decision,errors){if(!name)return;window.__travellerHistory[name]={decision:decision,errors:errors||[],day:(window.state&&window.state.day)||0};};
 window.__getReturningNote=function(name){var h=window.__travellerHistory[name];if(!h)return null;var note="Last seen Day "+h.day+": "+h.decision.toUpperCase();if(h.errors&&h.errors.length){note+=" — flagged for "+h.errors.join(", ")+".";}return note;};
@@ -3221,6 +3272,102 @@ window.__pickSideEvent=function(){var p=window.__sideEvents;return p[Math.floor(
 window.__showSideEvent=function(){var ev=window.__pickSideEvent();var box=document.createElement("div");box.className="side-event-card";var html="<div class=\"se-tag\">DECISION REQUIRED</div><div class=\"se-title\">"+ev.title+"</div><div class=\"se-body\">"+ev.body+"</div><div class=\"se-choices\">";ev.choices.forEach(function(c,i){html+="<button data-i=\""+i+"\" class=\"se-btn\">"+c.label+"</button>";});html+="</div>";box.innerHTML=html;document.body.appendChild(box);box.querySelectorAll(".se-btn").forEach(function(b){b.addEventListener("click",function(){var ix=parseInt(b.dataset.i,10);var eff=ev.choices[ix].effect||{};if(window.state&&window.state.axes){Object.keys(eff).forEach(function(k){window.state.axes[k]=(window.state.axes[k]||0)+eff[k];});}box.classList.add("se-fade");setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},400);});});};
 function tryHookLoad(){if(typeof window.loadNextTraveller!=="function"){setTimeout(tryHookLoad,500);return;}if(window.__loadHooked)return;window.__loadHooked=true;var orig=window.loadNextTraveller;window.loadNextTraveller=function(){var trav=(window.state&&window.state.traveller)||0;if(window.__sideEventCooldown>0){window.__sideEventCooldown--;}else if(trav>2 && Math.random()<window.__sideEventChance){window.__sideEventCooldown=2;window.__showSideEvent();}return orig.apply(this,arguments);};}
 tryHookLoad();
+})();</script>
+<script>(function(){
+window.__recentRiskyApprovals = window.__recentRiskyApprovals || [];
+window.__recordApproval = function(t, action){
+  if(!t || action!=="approve") return;
+  var hasFlag = (t.flags && t.flags.length>0) || (t.correct && t.correct!=="approve");
+  if(!hasFlag) return;
+  var isFemale = /\b(woman|female|wife|mother|nurse|widow|girl|daughter|sister|nun|market.*woman)\b/i.test((t.desc||"")+" "+(t.name||""));
+  var hasMissingDoc = (t.flags||[]).some(function(f){ return /MISSING|EXPIRED|FORGED|MISMATCH|UNREGISTERED|INVALID|INCOMPLETE/i.test(String(f)); });
+  window.__recentRiskyApprovals.push({ name: t.name||"Unknown", desc: t.desc||"", flags:(t.flags||[]).slice(), isFemale:isFemale, incomplete:hasMissingDoc, day:(window.state&&window.state.day)||0 });
+  if(window.__recentRiskyApprovals.length>20) window.__recentRiskyApprovals.shift();
+};
+window.__queryEvents = [
+  {tag:"INTERNAL QUERY", title:"YOU ARE BEING ASKED A QUESTION", body:"A clerk arrived with a one-page memo. \"Officer, on Day {day} you cleared {name}. Movement permit was missing. Explain.\"", cost:1500},
+  {tag:"INTERNAL QUERY", title:"INCOMPLETE BCD APPROVAL", body:"Internal Affairs flagged your stamp on {name}. The BCD ward signature was blank. Two days\u2019 wage held pending review.", cost:2400},
+  {tag:"INTERNAL QUERY", title:"WHO PROCESSED THIS?", body:"A typed slip lands on the desk. \"This file (subject: {name}) was approved without a valid permit. Initials {initials}. Confirm.\"", cost:1800},
+  {tag:"FORMAL WARNING", title:"A FORMAL WARNING", body:"Your supervisor stops at your bench. He does not sit. \"You let a {descShort} pass with a forged passport. The bench is watching you now.\"", cost:1200},
+  {tag:"WAGE DOCK", title:"WAGE DOCKED \u2014 IMPROPER ID (FEMALE TRAVELLER)", body:"Internal note: Day {day}. Officer cleared female subject ({name}) without proper identification. Three days wage held pending.", cost:3300, femaleOnly:true},
+  {tag:"WAGE DOCK", title:"WAGE DOCKED \u2014 INCOMPLETE DOCUMENTS", body:"Audit found {name} was cleared on incomplete papers. Compensation dock applied to today\u2019s wage. The supervisor signed without looking up.", cost:2200, incompleteOnly:true},
+  {tag:"WAGE DOCK", title:"GARNISHMENT NOTICE", body:"Treasury slip stapled to your kit: GARNISHMENT \u2014 \u20A6{cost}. Reason: improper clearance, file {name}.", cost:1800},
+  {tag:"PROBATION", title:"OFFICER ON PROBATION", body:"You have been placed on internal probation. One more error and the bench becomes someone else\u2019s.", cost:0},
+  {tag:"INTERROGATION", title:"BEHIND THE GLASS", body:"They take you to the back office. The chair faces the lamp. They ask: \"Why did you stamp {name}?\" You say: \"The papers seemed in order.\" They write that down.", cost:0}
+];
+window.__triggerQuery = function(){
+  var pool = window.__recentRiskyApprovals;
+  if(!pool.length) return null;
+  var subject = pool[Math.floor(Math.random()*pool.length)];
+  var candidates = window.__queryEvents.filter(function(e){
+    if(e.femaleOnly && !subject.isFemale) return false;
+    if(e.incompleteOnly && !subject.incomplete) return false;
+    return true;
+  });
+  var ev = candidates[Math.floor(Math.random()*candidates.length)];
+  var dShort = (subject.desc||"").split(",")[0].trim() || "subject";
+  var bodyText = ev.body
+    .replace(/\{name\}/g, subject.name)
+    .replace(/\{day\}/g, String(subject.day))
+    .replace(/\{descShort\}/g, dShort)
+    .replace(/\{initials\}/g, ((window.state && window.state.player && window.state.player.firstname) ? window.state.player.firstname[0] : "U") + ".O.")
+    .replace(/\{cost\}/g, String(ev.cost||0));
+  if(window.state && typeof window.state.totalPay === "number" && ev.cost){ window.state.totalPay -= ev.cost; }
+  var box = document.createElement("div");
+  box.className = "query-card";
+  box.innerHTML = "<div class=\"q-tag\">"+ev.tag+"</div>"+
+    "<div class=\"q-title\">"+ev.title+"</div>"+
+    "<div class=\"q-body\">"+bodyText+"</div>"+
+    (ev.cost?"<div class=\"q-cost\">\u2212\u20A6"+ev.cost.toLocaleString()+" deducted from wage</div>":"<div class=\"q-cost\">No fine \u2014 yet.</div>");
+  document.body.appendChild(box);
+  setTimeout(function(){ if(box.parentNode) box.parentNode.removeChild(box); }, 11000);
+  return ev;
+};
+window.__rumorEvents = [
+  {title:"OFFICER MISSING", body:"Officer Bassey from the night shift never came back. His radio was found in a ditch. His wife called the office twice. Nobody answers."},
+  {title:"CONVOY AMBUSH \u2014 AYANGBA ROAD", body:"A federal convoy was ambushed near Ayangba. Two officers in plainclothes are unaccounted for. Headquarters has not commented."},
+  {title:"BAY 5 IS EMPTY", body:"Bay 5 has been empty for two days. The chair is pushed in. The stamp pad is dry. No one says his name."},
+  {title:"THE OYO POST", body:"The Oyo border post burned down on Tuesday. Two officers are confirmed dead. The directive is to keep stamping."},
+  {title:"YOUR OWN TRANSFER PAPERS", body:"A clerk hands you a sealed envelope. The corner says \u201CRE: TRANSFER \u2014 PROVISIONAL.\u201D You do not open it. Not yet."},
+  {title:"THEY ARE WATCHING THE GATE", body:"Three men in identical jackets sat outside the gate from 9 to 4. They did not eat. They did not leave. They were not stopped."},
+  {title:"THE CALABAR INCIDENT", body:"Whisper at the canteen: an officer in Calabar was found in his own boot. State Security has classified the file. Do not ask questions."},
+  {title:"THE HORN THAT WOULD NOT STOP", body:"At dawn a horn sounded for an hour from somewhere east. Headquarters issued a memo telling everyone to stay at their desks. Nobody moved for nine minutes."},
+  {title:"OFFICERS DISAPPEARED \u2014 ABA POST", body:"Three officers from Aba Junction did not report on Monday. The post was found locked. The keys were missing. So were the records."},
+  {title:"LIST CIRCULATING", body:"A handwritten list passed through the bays this morning. Six names. Yours was not on it. Yet."}
+];
+window.__pickRumor = function(){ return window.__rumorEvents[Math.floor(Math.random()*window.__rumorEvents.length)]; };
+window.__showRumor = function(){
+  var r = window.__pickRumor();
+  var box = document.createElement("div");
+  box.className = "rumor-card";
+  box.innerHTML = "<div class=\"r-tag\">RUMOUR</div><div class=\"r-title\">"+r.title+"</div><div class=\"r-body\">"+r.body+"</div><div class=\"r-foot\">No one wrote this down.</div>";
+  document.body.appendChild(box);
+  setTimeout(function(){ if(box.parentNode) box.parentNode.removeChild(box); }, 11000);
+};
+window.__tensionEvents = [
+  "Adaeze from Bay 4 took her name plate off her desk before lunch.",
+  "Bay 7 has not opened today. The chair faces the wall.",
+  "The supervisor closed his door at 11 and did not open it again.",
+  "Two clerks went for tea and did not return.",
+  "A child was crying in the waiting hall for forty minutes. Nobody moved.",
+  "Someone wrote a name on the toilet wall in pencil. By the afternoon it was gone, and so was the pencil.",
+  "The radio cut out at 14:00. It cut out yesterday at 14:00 also.",
+  "The cleaner refused to enter Bay 6 this morning and would not say why.",
+  "Officer Inyang has been wearing his coat indoors for three days.",
+  "Three of the lights have been off since Tuesday. Nobody has called maintenance.",
+  "The new clerk has been crying quietly since lunch. Nobody has asked."
+];
+window.__lastTensionT = 0;
+function tensionTick(){ if(!window.state || !window.state.day) return; if(window.state.day<2) return; var bul=document.getElementById("bulletin"); var booth=document.getElementById("game"); var visible = (bul && bul.classList.contains("active")) || (booth && booth.classList.contains("active")); if(!visible) return; if(Date.now() - window.__lastTensionT < 70000) return; if(Math.random() > 0.22) return; window.__lastTensionT = Date.now(); var line = window.__tensionEvents[Math.floor(Math.random()*window.__tensionEvents.length)]; var t = document.createElement("div"); t.className = "tension-toast"; t.textContent = line; document.body.appendChild(t); setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); }, 8500); }
+setInterval(tensionTick, 4000);
+window.__lastQueryDay = -1;
+function queryTick(){ if(!window.state || !window.state.day || window.state.day<3) return; if(window.state.day === window.__lastQueryDay) return; var bul=document.getElementById("bulletin"); if(!bul || !bul.classList.contains("active")) return; if((window.__recentRiskyApprovals||[]).length < 1) return; if(Math.random() > 0.42) return; window.__lastQueryDay = window.state.day; window.__triggerQuery(); }
+setInterval(queryTick, 1800);
+window.__lastRumorT = 0;
+function rumorTick(){ if(!window.state || !window.state.day || window.state.day<4) return; if(Date.now() - window.__lastRumorT < 60000) return; var bul=document.getElementById("bulletin"); var booth=document.getElementById("game"); var visible = (bul && bul.classList.contains("active")) || (booth && booth.classList.contains("active")); if(!visible) return; if(Math.random() > 0.18) return; window.__lastRumorT = Date.now(); window.__showRumor(); }
+setInterval(rumorTick, 8000);
+function tryHookDecide(){ if(typeof window.decide !== "function"){ setTimeout(tryHookDecide, 500); return; } if(window.__decideHooked) return; window.__decideHooked = true; var orig = window.decide; window.decide = function(action){ try { var t = window.state && window.state.currentTraveller; window.__recordApproval(t, action); } catch(_){} return orig.apply(this, arguments); }; }
+tryHookDecide();
 })();</script>
 </body>
 </html>
