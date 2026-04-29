@@ -1361,6 +1361,9 @@ body:not(.phase-allow-hints) #hints-btn { display: none !important; }
 .tension-toast { position: fixed; bottom: 84px; right: 14px; max-width: 320px; padding: 10px 14px; background: rgba(15,18,12,0.94); border-left: 3px solid rgba(212,160,23,0.65); color: rgba(244,232,200,0.92); font-family:"Crimson Text",serif; font-size:13px; line-height:1.45; z-index: 9600; box-shadow: 0 6px 20px rgba(0,0,0,0.55); animation: tensionIn 0.35s ease, tensionOut 0.4s ease 8s both; }
 @keyframes tensionIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
 @keyframes tensionOut { from { opacity: 1; } to { opacity: 0; } }
+
+.pay-flash { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9900; font-family:"Bebas Neue",sans-serif; font-size: 56px; letter-spacing: 0.06em; color: #D4A017; text-shadow: 0 4px 18px rgba(0,0,0,0.85), 0 0 24px rgba(212,160,23,0.55); pointer-events: none; animation: payFlash 2s ease-out both; }
+@keyframes payFlash { 0% { opacity: 0; transform: translate(-50%, -30%) scale(0.9); } 18% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); } 60% { opacity: 1; transform: translate(-50%, -55%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -80%) scale(0.95); } }
 </style>
 </head>
 <body>
@@ -3278,14 +3281,38 @@ if (document.readyState === 'loading') {
 <script>(function(){function setPhase(p){var b=document.body;b.classList.remove("phase-splash","phase-charcreate","phase-bulletin","phase-booth","phase-day-end","phase-ending","phase-allow-hints");b.classList.add("phase-"+p);if(p==="splash"||p==="bulletin"||p==="charcreate"){b.classList.add("phase-allow-hints");}}window.__setPhase=setPhase;function detect(){var ids=["splash","char-create","intro","bulletin","game","day-end","ending"];for(var i=0;i<ids.length;i++){var el=document.getElementById(ids[i]);if(el&&el.classList.contains("active")){var map={"splash":"splash","char-create":"charcreate","intro":"bulletin","bulletin":"bulletin","game":"booth","day-end":"day-end","ending":"ending"};setPhase(map[ids[i]]);return;}}}var mo=new MutationObserver(detect);document.addEventListener("DOMContentLoaded",function(){detect();document.querySelectorAll(".screen").forEach(function(s){mo.observe(s,{attributes:true,attributeFilter:["class"]});});});setInterval(detect,500);})();</script>
 <script>(function(){
 var POOLS_FIRST = {
-  igbo: ["Adaeze","Chinedu","Ifeoma","Obinna","Ngozi","Ekene","Chiamaka","Uzoma","Kelechi","Adaobi","Emeka","Nneka","Tobenna","Onyeka","Chima","Amaka","Chibuzo","Uchenna","Adanna","Ikenna","Chuma","Chukwudi","Chukwuma","Ezinne","Adaku","Chigozie","Tochukwu","Onyinye","Chizoba","Chinonso","Chukwuemeka","Ifeanyi","Nnamdi","Okechukwu","Chinwe","Obianuju","Anuli","Chiebuka","Iheoma","Chioma","Olamma","Nkechi","Uchechi","Chidinma","Nnenna","Ikechukwu","Ngozichi","Chibueze","Onyekachi","Munachi"],
-  yoruba: ["Adebola","Adeola","Babatunde","Folashade","Funmilayo","Olumide","Olusegun","Ayodele","Bukola","Olawale","Yetunde","Wale","Tope","Tunde","Kemi","Bisi","Lekan","Femi","Sade","Tola","Bayo","Kunle","Bolaji","Damilola","Oluwaseun","Olabisi","Ayotunde","Mojisola","Folake","Idowu","Akin","Tayo","Ronke","Bimbo","Tobi","Toyin","Banji","Yemisi","Niyi","Tinuke"],
-  hausa: ["Ibrahim","Aisha","Musa","Aminu","Hassan","Hussein","Bello","Yusuf","Sani","Lawal","Suleiman","Habiba","Maryam","Zainab","Garba","Kabiru","Salisu","Aliyu","Umar","Hauwa","Fatima","Halima","Idris","Tijjani","Nuhu","Auwal","Mustapha","Murtala","Shehu","Ahmadu","Nasir","Bashir","Adamu","Buhari","Saminu","Jamilu","Rabiu","Sadiq","Mubarak"],
-  efik: ["Bassey","Etim","Eno","Imoh","Affiong","Mfon","Ubong","Edidiong","Aniefiok","Otobong","Inyang","Idongesit","Edet","Okon","Asuquo","Umoren","Iniobong","Akpabio","Eshiett","Ekaette","Nseobong","Anietie","Ekpenyong","Eka","Itoro","Ime","Ekong","Ekemini","Iboro"],
-  ijaw: ["Boma","Ebiere","Tonye","Ipalibo","Ebiye","Diepiriye","Tamuno","Kemepade","Sotonye","Pereye","Bekes","Daubo","Ebimobowei","Tubonimi","Ibim","Iniye","Ebipade","Tariere","Ebimokumo","Pere","Belema"],
-  urhobo: ["Oghenekaro","Tega","Onome","Ejiro","Oghenetega","Erhirhie","Voke","Akpevwe","Oghenefejiro","Avwerosuoghene","Ovie","Mudia","Edesiri","Akpos","Eyitemi","Erhinyoja"],
-  tiv: ["Terhemen","Aondoaver","Sewuese","Iorlumun","Mngutyo","Doosuur","Mtema","Wantor","Iember","Hembafan","Vendimwa","Mwuese","Anenger","Hemen","Saanyol"],
-  generic: ["Joshua","Mary","Grace","Faith","Peter","Daniel","Esther","Ruth","Solomon","Comfort","Patience","Florence","David","Sarah","John","Rachel","Stephen","Joy","Mark","Paul","Rebecca","Samuel","Hope"]
+  igbo: {
+    male:   ["Chinedu","Obinna","Ekene","Uzoma","Kelechi","Emeka","Tobenna","Onyeka","Chima","Chibuzo","Uchenna","Ikenna","Chuma","Chukwudi","Chukwuma","Chigozie","Tochukwu","Chinonso","Chukwuemeka","Ifeanyi","Nnamdi","Okechukwu","Chiebuka","Ikechukwu","Chibueze","Onyekachi","Munachi"],
+    female: ["Adaeze","Ifeoma","Ngozi","Chiamaka","Adaobi","Nneka","Amaka","Adanna","Ezinne","Adaku","Onyinye","Chizoba","Chinwe","Obianuju","Anuli","Iheoma","Chioma","Olamma","Nkechi","Uchechi","Chidinma","Nnenna"]
+  },
+  yoruba: {
+    male:   ["Babatunde","Olumide","Olusegun","Ayodele","Olawale","Wale","Tunde","Lekan","Femi","Bayo","Kunle","Ayotunde","Akin","Banji","Niyi","Tobi","Tope","Tayo","Idowu"],
+    female: ["Adebola","Adeola","Folashade","Funmilayo","Bukola","Yetunde","Kemi","Bisi","Sade","Tola","Bolaji","Damilola","Oluwaseun","Olabisi","Mojisola","Folake","Ronke","Bimbo","Toyin","Yemisi","Tinuke"]
+  },
+  hausa: {
+    male:   ["Ibrahim","Musa","Aminu","Hassan","Hussein","Bello","Yusuf","Sani","Lawal","Suleiman","Garba","Kabiru","Salisu","Aliyu","Umar","Idris","Tijjani","Nuhu","Auwal","Mustapha","Murtala","Shehu","Ahmadu","Nasir","Bashir","Adamu","Buhari","Saminu","Jamilu","Rabiu","Sadiq","Mubarak"],
+    female: ["Aisha","Habiba","Maryam","Zainab","Hauwa","Fatima","Halima","Bilkisu","Sadiya","Rakiya","Asabe","Hadiza"]
+  },
+  efik: {
+    male:   ["Bassey","Etim","Imoh","Ubong","Aniefiok","Otobong","Idongesit","Edet","Okon","Asuquo","Umoren","Akpabio","Eshiett","Nseobong","Anietie","Ekpenyong","Iboro","Ekong","Ime"],
+    female: ["Eno","Affiong","Mfon","Edidiong","Iniobong","Ekaette","Itoro","Ekemini","Inyang","Eka","Arit","Imaobong"]
+  },
+  ijaw: {
+    male:   ["Tonye","Ebiye","Diepiriye","Sotonye","Bekes","Daubo","Ebimobowei","Tubonimi","Ibim","Ebimokumo","Pere","Boma"],
+    female: ["Ebiere","Ipalibo","Pereye","Iniye","Belema","Tariere","Ebipade","Tamuno","Kemepade"]
+  },
+  urhobo: {
+    male:   ["Oghenekaro","Tega","Erhirhie","Oghenefejiro","Avwerosuoghene","Ovie","Mudia","Akpos","Erhinyoja","Ejiro","Oghenetega"],
+    female: ["Onome","Akpevwe","Edesiri","Eyitemi","Voke","Tega","Tega"]
+  },
+  tiv: {
+    male:   ["Terhemen","Aondoaver","Iorlumun","Hembafan","Vendimwa","Hemen","Saanyol","Mngutyo","Anenger"],
+    female: ["Sewuese","Doosuur","Mtema","Iember","Mwuese","Wantor"]
+  },
+  generic: {
+    male:   ["Joshua","Peter","Daniel","Solomon","David","John","Stephen","Mark","Paul","Samuel"],
+    female: ["Mary","Grace","Faith","Esther","Ruth","Comfort","Patience","Florence","Sarah","Rachel","Joy","Hope","Rebecca"]
+  }
 };
 var POOLS_LAST = {
   igbo: ["Achebe","Okafor","Eze","Onuoha","Nwosu","Ibekwe","Anyanwu","Okonkwo","Obi","Ndubuisi","Madu","Mbah","Nweke","Okeke","Uzor","Aniebo","Iheme","Ezeh","Ojukwu","Achuzia","Madiebo","Nwankwo","Iwobi","Eluemunor","Onyemaechi","Chinwuba","Anozie","Onwumere","Onyemelukwe","Iheanacho","Ekejiuba","Ekenta","Onyema","Egbuna","Mgbachi","Okoye","Nnaji","Udeze","Mbanefo","Nwadike","Okorie","Igwe","Nnabuife"],
@@ -3312,10 +3339,23 @@ function inferEthnicity(hint){
   if(/\b(edo|bini|esan|benin city)\b/.test(s)) return "yoruba";
   return "generic";
 }
+function inferGender(hint){
+  if(!hint) return null;
+  var s = String(hint).toLowerCase();
+  // Female cues
+  if(/\b(woman|female|wife|mother|widow|girl|daughter|sister|nun|aunt|grandmother|nurse|maid|seamstress|matron|she|her)\b/.test(s)) return "female";
+  // Male cues — be careful; default many job titles to male in 1967 setting only when other hints absent
+  if(/\b(man\b|male|husband|father|son|brother|uncle|grandfather|boy|priest|imam|reverend|chief|emir|elder|he\b|him\b)\b/.test(s)) return "male";
+  return null;
+}
 window.__pickFreshName = function(hint){
   var eth = inferEthnicity(hint);
-  var first = pickFresh(POOLS_FIRST[eth]) || pickFresh(POOLS_FIRST.generic);
-  var last  = pickFresh(POOLS_LAST[eth])  || pickFresh(POOLS_LAST.generic);
+  var bucket = POOLS_FIRST[eth] || POOLS_FIRST.generic;
+  var gender = inferGender(hint);
+  if(!gender){ gender = (Math.random() < 0.5) ? "male" : "female"; }
+  var firstList = (bucket && bucket[gender]) || (bucket && bucket.male) || POOLS_FIRST.generic.male;
+  var first = pickFresh(firstList) || pickFresh(POOLS_FIRST.generic[gender] || POOLS_FIRST.generic.male);
+  var last  = pickFresh(POOLS_LAST[eth]) || pickFresh(POOLS_LAST.generic);
   return (first + " " + last).toUpperCase();
 };
 window.__travellerHistory=window.__travellerHistory||{};
@@ -3363,21 +3403,71 @@ window.__lastConditionDay=-1;function conditionTick(){if(!window.state||!window.
 })();</script>
 <script>(function(){
 window.__sideEvents=[
-  {id:"bribery-1", title:"BRIBERY ATTEMPT", body:"The traveller slides three Naira notes under the BCD form. \"For the children, officer.\" The eyes are dry. The hands are not.", choices:[{label:"TAKE THE MONEY",effect:{corruption:2,survival:1}},{label:"PUSH IT BACK",effect:{loyalty:1,witness:1}},{label:"TAKE THE MONEY, STILL DENY",effect:{corruption:3,witness:-1}}]},
-  {id:"bribery-2", title:"AN ENVELOPE", body:"A folded envelope sits inside the passport, soft to the touch. The serial number is hand-written in pencil on the back.", choices:[{label:"OPEN IT NOW",effect:{corruption:2}},{label:"RETURN THE PASSPORT INTACT",effect:{loyalty:2}},{label:"POCKET IT FOR LATER",effect:{corruption:1,survival:1}}]},
-  {id:"bribery-3", title:"A COLLEAGUE WHISPERS", body:"Bay 6 leans across. \"This one paid me already. Just stamp it. We split.\" The traveller does not look at either of you.", choices:[{label:"STAMP IT",effect:{corruption:2,loyalty:-1}},{label:"REFUSE QUIETLY",effect:{loyalty:1}},{label:"REPORT TO NWOSU",effect:{loyalty:3,witness:1}}]},
-  {id:"recognise", title:"YOU RECOGNISE THIS FACE", body:"You went to school with him. Last you heard, he was teaching in Aba. The name on the BCD is not the name you remember.", choices:[{label:"APPROVE \u2014 STAY SILENT",effect:{compassion:2,corruption:1}},{label:"DENY \u2014 PROCEDURE",effect:{loyalty:2,compassion:-1}},{label:"PASS HIM TO BAY 4",effect:{survival:1}}]},
-  {id:"child-alone", title:"AN UNACCOMPANIED CHILD", body:"She is eight, maybe nine. She has a folded note from her aunt in Onitsha and no proper papers.", choices:[{label:"WAVE HER THROUGH",effect:{compassion:3,loyalty:-1}},{label:"DETAIN UNTIL SOMEONE COMES",effect:{loyalty:1}},{label:"CALL THE NUNS AT THE GATE",effect:{compassion:2,witness:1}}]},
-  {id:"radio-warning", title:"THE RADIO BREAKS", body:"State Security cuts in: a wanted man matches the description of the traveller in front of you. The signal cuts before the photo loads.", choices:[{label:"DETAIN ON SUSPICION",effect:{loyalty:2}},{label:"IGNORE THE BROADCAST",effect:{rebellion:1,witness:1}},{label:"WAIT FOR CONFIRMATION",effect:{survival:1}}]},
-  {id:"food-trade", title:"A LOAF OF BREAD", body:"She has nothing but bread and an expired permit. \"Please. My husband is on the other side.\"", choices:[{label:"ACCEPT THE BREAD, APPROVE",effect:{corruption:1,compassion:2}},{label:"APPROVE WITHOUT TAKING",effect:{compassion:3,loyalty:-1}},{label:"DENY",effect:{loyalty:1,compassion:-2}}]},
-  {id:"officer-pressure", title:"INSPECTOR NWOSU STOPS BY", body:"He leans over your shoulder. \"This one. He looks like trouble. Send him back.\" The papers are clean.", choices:[{label:"DENY \u2014 OBEY",effect:{loyalty:2,compassion:-1}},{label:"APPROVE \u2014 CLEAN PAPERS",effect:{loyalty:-1,witness:2}},{label:"DETAIN \u2014 BUY TIME",effect:{survival:1}}]},
-  {id:"gossip-decision", title:"THE GOSSIP TURNS", body:"Two clerks at Bay 3 are pretending to file. They are watching you. One of them has a notebook open.", choices:[{label:"IGNORE",effect:{}},{label:"WALK OVER, ASK",effect:{rebellion:1}},{label:"REPORT TO NWOSU",effect:{loyalty:1,corruption:1}}]},
-  {id:"family-call", title:"YOUR WIFE CALLED THE OFFICE", body:"Adaobi is sick. The fee is two days' wage. The traveller in front of you offered to cover it \u2014 if you sign. The traveller is not on the bulletin list.", choices:[{label:"SIGN AND TAKE THE MONEY",effect:{corruption:3,survival:2}},{label:"DENY \u2014 GO HOME EMPTY",effect:{loyalty:1,compassion:1}},{label:"DEFER \u2014 ASK NWOSU",effect:{loyalty:1,survival:-1}}]}
+  {id:"bribery-1", title:"BRIBERY ATTEMPT", body:"The traveller in agbada slides three Naira notes under the BCD form. \"For the children, officer.\" The eyes are dry. The hands are not.",
+    choices:[
+      {label:"TAKE THE MONEY", effect:{corruption:2,survival:1}, pay:1500},
+      {label:"PUSH IT BACK", effect:{loyalty:1,witness:1}, pay:0},
+      {label:"TAKE THE MONEY, STILL DENY", effect:{corruption:3,witness:-1}, pay:1500}
+    ]},
+  {id:"bribery-2", title:"AN ENVELOPE", body:"A folded envelope sits inside the passport, soft to the touch. The serial number is hand-written in pencil on the back.",
+    choices:[
+      {label:"OPEN IT NOW", effect:{corruption:2}, pay:2200},
+      {label:"RETURN THE PASSPORT INTACT", effect:{loyalty:2}, pay:0},
+      {label:"POCKET IT FOR LATER", effect:{corruption:1,survival:1}, pay:2200}
+    ]},
+  {id:"bribery-3", title:"A COLLEAGUE WHISPERS", body:"Bay 6 leans across. \"This one paid me already. Just stamp it. We split.\" The traveller does not look at either of you.",
+    choices:[
+      {label:"STAMP IT \u2014 SPLIT THE BRIBE", effect:{corruption:2,loyalty:-1}, pay:1200},
+      {label:"REFUSE QUIETLY", effect:{loyalty:1}, pay:0},
+      {label:"REPORT TO NWOSU", effect:{loyalty:3,witness:1}, pay:0}
+    ]},
+  {id:"recognise", title:"YOU RECOGNISE THIS FACE", body:"You went to school with him. Last you heard, he was teaching in Aba. The name on the BCD is not the name you remember.",
+    choices:[
+      {label:"APPROVE \u2014 STAY SILENT", effect:{compassion:2,corruption:1}, pay:0},
+      {label:"DENY \u2014 PROCEDURE", effect:{loyalty:2,compassion:-1}, pay:0},
+      {label:"PASS HIM TO BAY 4", effect:{survival:1}, pay:0}
+    ]},
+  {id:"child-alone", title:"AN UNACCOMPANIED CHILD", body:"She is eight, maybe nine. She has a folded note from her aunt in Onitsha and no proper papers.",
+    choices:[
+      {label:"WAVE HER THROUGH", effect:{compassion:3,loyalty:-1}, pay:0},
+      {label:"DETAIN UNTIL SOMEONE COMES", effect:{loyalty:1}, pay:0},
+      {label:"CALL THE NUNS AT THE GATE", effect:{compassion:2,witness:1}, pay:0}
+    ]},
+  {id:"radio-warning", title:"THE RADIO BREAKS", body:"State Security cuts in: a wanted man matches the description of the traveller in front of you. The signal cuts before the photo loads.",
+    choices:[
+      {label:"DETAIN ON SUSPICION", effect:{loyalty:2}, pay:600},
+      {label:"IGNORE THE BROADCAST", effect:{rebellion:1,witness:1}, pay:0},
+      {label:"WAIT FOR CONFIRMATION", effect:{survival:1}, pay:0}
+    ]},
+  {id:"food-trade", title:"A LOAF OF BREAD", body:"She has nothing but bread and an expired permit. \"Please. My husband is on the other side.\"",
+    choices:[
+      {label:"ACCEPT THE BREAD, APPROVE", effect:{corruption:1,compassion:2}, pay:400},
+      {label:"APPROVE WITHOUT TAKING", effect:{compassion:3,loyalty:-1}, pay:0},
+      {label:"DENY", effect:{loyalty:1,compassion:-2}, pay:0}
+    ]},
+  {id:"officer-pressure", title:"INSPECTOR NWOSU STOPS BY", body:"He leans over your shoulder. \"This one. He looks like trouble. Send him back.\" The papers are clean.",
+    choices:[
+      {label:"DENY \u2014 OBEY", effect:{loyalty:2,compassion:-1}, pay:0},
+      {label:"APPROVE \u2014 CLEAN PAPERS", effect:{loyalty:-1,witness:2}, pay:0},
+      {label:"DETAIN \u2014 BUY TIME", effect:{survival:1}, pay:0}
+    ]},
+  {id:"gossip-decision", title:"THE GOSSIP TURNS", body:"Two clerks at Bay 3 are pretending to file. They are watching you. One of them has a notebook open.",
+    choices:[
+      {label:"IGNORE", effect:{}, pay:0},
+      {label:"WALK OVER, ASK", effect:{rebellion:1}, pay:0},
+      {label:"REPORT TO NWOSU", effect:{loyalty:1,corruption:1}, pay:0}
+    ]},
+  {id:"family-call", title:"YOUR WIFE CALLED THE OFFICE", body:"Adaobi is sick. The fee is two days\u2019 wage. The traveller in front of you offered to cover it \u2014 if you sign. The traveller is not on the bulletin list.",
+    choices:[
+      {label:"SIGN AND TAKE THE MONEY", effect:{corruption:3,survival:2}, pay:3000},
+      {label:"DENY \u2014 GO HOME EMPTY", effect:{loyalty:1,compassion:1}, pay:0},
+      {label:"DEFER \u2014 ASK NWOSU", effect:{loyalty:1,survival:-1}, pay:0}
+    ]}
 ];
 window.__sideEventChance=0.16; // ~1 in 6 travellers triggers a side-event
 window.__sideEventCooldown=0;
 window.__pickSideEvent=function(){var p=window.__sideEvents;return p[Math.floor(Math.random()*p.length)];};
-window.__showSideEvent=function(){var ev=window.__pickSideEvent();var box=document.createElement("div");box.className="side-event-card";var html="<div class=\"se-tag\">DECISION REQUIRED</div><div class=\"se-title\">"+ev.title+"</div><div class=\"se-body\">"+ev.body+"</div><div class=\"se-choices\">";ev.choices.forEach(function(c,i){html+="<button data-i=\""+i+"\" class=\"se-btn\">"+c.label+"</button>";});html+="</div>";box.innerHTML=html;document.body.appendChild(box);box.querySelectorAll(".se-btn").forEach(function(b){b.addEventListener("click",function(){var ix=parseInt(b.dataset.i,10);var eff=ev.choices[ix].effect||{};if(window.state&&window.state.axes){Object.keys(eff).forEach(function(k){window.state.axes[k]=(window.state.axes[k]||0)+eff[k];});}box.classList.add("se-fade");setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},400);});});};
+window.__showSideEvent=function(){var ev=window.__pickSideEvent();var box=document.createElement("div");box.className="side-event-card";var html="<div class=\"se-tag\">DECISION REQUIRED</div><div class=\"se-title\">"+ev.title+"</div><div class=\"se-body\">"+ev.body+"</div><div class=\"se-choices\">";ev.choices.forEach(function(c,i){html+="<button data-i=\""+i+"\" class=\"se-btn\">"+c.label+"</button>";});html+="</div>";box.innerHTML=html;document.body.appendChild(box);box.querySelectorAll(".se-btn").forEach(function(b){b.addEventListener("click",function(){var ix=parseInt(b.dataset.i,10);var eff=ev.choices[ix].effect||{};var pay=ev.choices[ix].pay||0;if(window.state&&window.state.axes){Object.keys(eff).forEach(function(k){window.state.axes[k]=(window.state.axes[k]||0)+eff[k];});}if(window.state&&typeof window.state.totalPay==="number"&&pay){window.state.totalPay+=pay;if(typeof window.updateHUD==="function")try{window.updateHUD();}catch(_){}var t=document.createElement("div");t.className="pay-flash";t.textContent=(pay>0?"+":"")+"₦"+pay.toLocaleString();document.body.appendChild(t);setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},2000);}box.classList.add("se-fade");setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},400);});});};if(window.state&&window.state.axes){Object.keys(eff).forEach(function(k){window.state.axes[k]=(window.state.axes[k]||0)+eff[k];});}box.classList.add("se-fade");setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},400);});});};
 function tryHookLoad(){if(typeof window.loadNextTraveller!=="function"){setTimeout(tryHookLoad,500);return;}if(window.__loadHooked)return;window.__loadHooked=true;var orig=window.loadNextTraveller;window.loadNextTraveller=function(){var trav=(window.state&&window.state.traveller)||0;if(window.__sideEventCooldown>0){window.__sideEventCooldown--;}else if(trav>2 && Math.random()<window.__sideEventChance){window.__sideEventCooldown=2;window.__showSideEvent();}return orig.apply(this,arguments);};}
 tryHookLoad();
 })();</script>
