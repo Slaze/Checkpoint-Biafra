@@ -3062,6 +3062,16 @@ if (document.readyState === 'loading') {
   init();
 }
 
+// expose engine to window for runtime animation hooks
+try {
+  if (typeof decide === "function") window.decide = decide;
+  if (typeof updateHUD === "function") window.updateHUD = updateHUD;
+  if (typeof renderDocs === "function") window.renderDocs = renderDocs;
+  if (typeof renderTraveller === "function") window.renderTraveller = renderTraveller;
+  if (typeof state !== "undefined") window.state = state;
+  if (typeof loadNextTraveller === "function") window.loadNextTraveller = loadNextTraveller;
+} catch(_){}
+
 })();
 </script>
 <style>
