@@ -1346,6 +1346,51 @@ body:not(.phase-allow-hints) #hints-btn { display: none !important; }
 .side-event-card .se-choices { display:flex; flex-direction:column; gap:8px; }
 .side-event-card .se-btn { padding: 10px 14px; background: rgba(232,223,196,0.06); color:#F4E8C8; border: 1px solid rgba(232,223,196,0.35); font-family:"Special Elite",monospace; font-size:12px; letter-spacing:0.08em; cursor:pointer; transition: background 0.15s; text-align:left; }
 .side-event-card .se-btn:hover { background: rgba(212,160,23,0.18); border-color: rgba(212,160,23,0.7); }
+
+.query-card, .rumor-card { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9750; max-width: 380px; padding: 18px 22px; font-family:"Crimson Text", serif; line-height: 1.5; color: #F4E8C8; border: 1px solid rgba(232,223,196,0.45); border-radius: 5px; box-shadow: 0 14px 42px rgba(0,0,0,0.78); animation: bnIn 0.45s ease, bnOut 0.55s ease 9.5s both; }
+.query-card { background: rgba(40, 14, 12, 0.96); border-color: rgba(192,90,75,0.6); }
+.query-card .q-tag { font-family:"Special Elite",monospace; font-size:10px; letter-spacing:0.3em; color:#C58A3E; margin-bottom:6px; }
+.query-card .q-title { font-family:"Bebas Neue",sans-serif; font-size:19px; letter-spacing:0.1em; color:#E8DFC4; margin-bottom:8px; }
+.query-card .q-body { font-size:14px; line-height:1.55; }
+.query-card .q-cost { font-family:"Courier Prime",monospace; font-size:12px; color:#E8B07A; margin-top:10px; letter-spacing:0.06em; }
+.rumor-card { background: rgba(14, 18, 14, 0.96); border-color: rgba(140,120,80,0.55); }
+.rumor-card .r-tag { font-family:"Special Elite",monospace; font-size:10px; letter-spacing:0.3em; color:rgba(232,223,196,0.5); margin-bottom:6px; }
+.rumor-card .r-title { font-family:"Bebas Neue",sans-serif; font-size:19px; letter-spacing:0.1em; color:#D4A017; margin-bottom:8px; }
+.rumor-card .r-body { font-size:14px; font-style:italic; }
+.rumor-card .r-foot { font-family:"Courier Prime",monospace; font-size:11px; color: rgba(232,223,196,0.45); margin-top:10px; letter-spacing:0.05em; }
+.tension-toast { position: fixed; bottom: 84px; right: 14px; max-width: 320px; padding: 10px 14px; background: rgba(15,18,12,0.94); border-left: 3px solid rgba(212,160,23,0.65); color: rgba(244,232,200,0.92); font-family:"Crimson Text",serif; font-size:13px; line-height:1.45; z-index: 9600; box-shadow: 0 6px 20px rgba(0,0,0,0.55); animation: tensionIn 0.35s ease, tensionOut 0.4s ease 8s both; }
+@keyframes tensionIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes tensionOut { from { opacity: 1; } to { opacity: 0; } }
+
+.pay-flash { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9900; font-family:"Bebas Neue",sans-serif; font-size: 56px; letter-spacing: 0.06em; color: #D4A017; text-shadow: 0 4px 18px rgba(0,0,0,0.85), 0 0 24px rgba(212,160,23,0.55); pointer-events: none; animation: payFlash 2s ease-out both; }
+@keyframes payFlash { 0% { opacity: 0; transform: translate(-50%, -30%) scale(0.9); } 18% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); } 60% { opacity: 1; transform: translate(-50%, -55%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -80%) scale(0.95); } }
+
+/* TIER-1 ANIMATIONS */
+@keyframes stampSlam { 0%{transform:translate(-50%,-220%) rotate(-18deg) scale(2.6); opacity:0;} 55%{transform:translate(-50%,-50%) rotate(-3deg) scale(1.18); opacity:1;} 70%{transform:translate(-50%,-50%) rotate(-3deg) scale(0.94);} 85%{transform:translate(-50%,-50%) rotate(-3deg) scale(1.04);} 100%{transform:translate(-50%,-50%) rotate(-3deg) scale(1); opacity:1;} }
+@keyframes inkBleed { 0%{transform:translate(-50%,-50%) scale(0); opacity:0.95;} 60%{transform:translate(-50%,-50%) scale(1.6); opacity:0.45;} 100%{transform:translate(-50%,-50%) scale(2.4); opacity:0;} }
+@keyframes paperEnter { 0%{transform:translateX(-30px) rotate(-2.4deg); opacity:0;} 60%{transform:translateX(4px) rotate(0.6deg); opacity:1;} 100%{transform:translateX(0) rotate(0); opacity:1;} }
+@keyframes paperExit { 0%{transform:translateX(0) rotate(0); opacity:1;} 100%{transform:translateX(420px) rotate(8deg); opacity:0;} }
+@keyframes hudTick { 0%{transform:scale(1);color:inherit;} 30%{transform:scale(1.18);color:#D4A017;} 100%{transform:scale(1);color:inherit;} }
+@keyframes hudTickDown { 0%{transform:scale(1);} 30%{transform:scale(1.16);color:#C44;} 100%{transform:scale(1);} }
+@keyframes dayFlip { 0%{transform:rotateX(0);} 50%{transform:rotateX(90deg); color:#D4A017;} 100%{transform:rotateX(0);} }
+@keyframes silhouetteBreath { 0%,100%{transform:translate(-50%,0) scaleY(1);} 50%{transform:translate(-50%,1px) scaleY(0.985);} }
+@keyframes lampFlicker { 0%,18%,22%,40%,42%,80%,100%{opacity:0.18;} 19%{opacity:0.30;} 21%{opacity:0.10;} 41%{opacity:0.32;} 82%{opacity:0.08;} }
+@keyframes vignettePulse { 0%,100%{box-shadow:inset 0 0 220px rgba(0,0,0,0.55);} 50%{box-shadow:inset 0 0 280px rgba(0,0,0,0.72);} }
+@keyframes sideShake { 0%,100%{transform:translate(-50%,-50%);} 20%{transform:translate(-51%,-50%);} 40%{transform:translate(-49%,-50%);} 60%{transform:translate(-50%,-49%);} 80%{transform:translate(-50%,-51%);} }
+
+.stamp-slam { animation: stampSlam 0.55s cubic-bezier(.22,1.4,.36,1) both !important; }
+.ink-splat { position:absolute; top:50%; left:50%; width:160px; height:160px; pointer-events:none; z-index:8; background: radial-gradient(circle, rgba(170,30,30,0.85) 0%, rgba(170,30,30,0.55) 25%, rgba(170,30,30,0) 65%); border-radius:50%; transform:translate(-50%,-50%) scale(0); animation: inkBleed 0.85s ease-out both; mix-blend-mode:multiply; }
+.ink-splat.approve { background: radial-gradient(circle, rgba(36,110,42,0.85) 0%, rgba(36,110,42,0.5) 25%, rgba(36,110,42,0) 65%); }
+.ink-splat.detain { background: radial-gradient(circle, rgba(212,160,23,0.85) 0%, rgba(212,160,23,0.5) 25%, rgba(212,160,23,0) 65%); }
+.docs-paper-enter { animation: paperEnter 0.55s cubic-bezier(.16,.84,.44,1) both; }
+.docs-paper-exit { animation: paperExit 0.45s cubic-bezier(.6,.04,.98,.34) both; }
+.hud-pay.hud-tick-up { animation: hudTick 0.7s ease-out; display:inline-block; transform-origin:center; }
+.hud-pay.hud-tick-down { animation: hudTickDown 0.7s ease-out; display:inline-block; transform-origin:center; }
+.hud-day.day-flip { animation: dayFlip 0.7s ease-in-out; display:inline-block; transform-origin:center; }
+.traveller-silhouette { animation: silhouetteBreath 4.5s ease-in-out infinite; }
+body.phase-booth::before { content:""; position:fixed; inset:0; pointer-events:none; z-index:7; box-shadow: inset 0 0 220px rgba(0,0,0,0.55); animation: vignettePulse 9s ease-in-out infinite; }
+body.phase-booth::after { content:""; position:fixed; top:0; right:0; width:160px; height:160px; pointer-events:none; z-index:6; background: radial-gradient(circle at 100% 0%, rgba(244,215,122,0.22) 0%, rgba(244,215,122,0) 70%); animation: lampFlicker 7s ease-in-out infinite; mix-blend-mode:screen; }
+.side-event-card.shake { animation: bnIn 0.45s ease, sideShake 0.5s ease 0.45s, bnOut 0.55s ease 9.5s both; }
 </style>
 </head>
 <body>
@@ -2404,6 +2449,20 @@ function loadNextTraveller() {
   }
 
   var t = list[state.traveller % list.length];
+  // Fresh-name override so the same template-traveller never re-uses its hardcoded name
+  try {
+    if (window.__pickFreshName) {
+      var fresh = window.__pickFreshName((t && (t.desc || t.region || t.state)) || "");
+      // Clone so we do not mutate the pool entry permanently
+      t = Object.assign({}, t);
+      t._origName = t.name;
+      t.name = fresh;
+      // Sync any embedded name fields on documents
+      if (t.docs && Array.isArray(t.docs)) {
+        t.docs = t.docs.map(function(d){ if(!d || !d.fields) return d; var nd=Object.assign({},d); nd.fields=Object.assign({},d.fields); Object.keys(nd.fields).forEach(function(k){ if(typeof nd.fields[k]==="string" && (nd.fields[k]===t._origName || nd.fields[k].toUpperCase()===String(t._origName||"").toUpperCase())){ nd.fields[k]=fresh; } }); return nd; });
+      }
+    }
+  } catch(_){}
   state.currentTraveller = t;
   renderTraveller(t);
   renderDocs(t);
@@ -2565,8 +2624,8 @@ function decide(action) {
   else if (action === 'deny') state.dayDenied++;
   else if (action === 'detain') state.dayDetained++;
 
-  if (correct && action === 'detain') payChange = 1500;
-  else if (!correct) payChange = -500;
+  if (correct && action === 'detain') payChange = 600;
+  else if (!correct) payChange = -1200;
 
   state.totalPay += payChange;
 
@@ -2667,10 +2726,10 @@ function endOfDay() {
   }
 
   var familySize = state.family.length;
-  var foodCost = familySize * 800;
-  var rentCost = 1200;
+  var foodCost = familySize * 1500;
+  var rentCost = 2800;
   var totalExpenses = foodCost + rentCost;
-  var baseDaily = 3400;
+  var baseDaily = 5500;
 
   // Add base pay
   state.totalPay += baseDaily;
@@ -3003,6 +3062,16 @@ if (document.readyState === 'loading') {
   init();
 }
 
+// expose engine to window for runtime animation hooks
+try {
+  if (typeof decide === "function") window.decide = decide;
+  if (typeof updateHUD === "function") window.updateHUD = updateHUD;
+  if (typeof renderDocs === "function") window.renderDocs = renderDocs;
+  if (typeof renderTraveller === "function") window.renderTraveller = renderTraveller;
+  if (typeof state !== "undefined") window.state = state;
+  if (typeof loadNextTraveller === "function") window.loadNextTraveller = loadNextTraveller;
+} catch(_){}
+
 })();
 </script>
 <style>
@@ -3064,7 +3133,115 @@ if (document.readyState === 'loading') {
 })();
 </script>
 <!-- BGM: ambient drone via YouTube IFrame API (auto-start, no UI) -->
-<audio id="bgm-audio" loop preload="auto" crossorigin="anonymous" style="display:none"><source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg"><source src="https://cdn.pixabay.com/download/audio/2021/11/23/audio_64b2dd1bce.mp3" type="audio/mpeg"></audio><script>(function(){var a=document.getElementById("bgm-audio");if(!a)return;a.volume=0.18;var started=false;function tryPlay(){if(started)return;var p=a.play();if(p&&p.then){p.then(function(){started=true;}).catch(function(){});}else{started=true;}}function onGesture(){tryPlay();if(started){document.removeEventListener("pointerdown",onGesture);document.removeEventListener("keydown",onGesture);document.removeEventListener("touchstart",onGesture);}}document.addEventListener("pointerdown",onGesture,{passive:true});document.addEventListener("keydown",onGesture);document.addEventListener("touchstart",onGesture,{passive:true});window.__bgm={el:a,play:tryPlay,pause:function(){a.pause();started=false;}};})();</script>
+<script>(function(){
+  // Procedural dark looming ambient drone (Web Audio API).
+  // No external CDN dependency — works on any deploy, never 404s.
+  var ctx = null, master = null, started = false, nodes = [];
+  function build(){
+    if(started) return;
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return;
+    ctx = new AC();
+    master = ctx.createGain();
+    master.gain.value = 0.0;
+    master.connect(ctx.destination);
+    // Fade in master
+    master.gain.linearRampToValueAtTime(0.22, ctx.currentTime + 4);
+
+    // ── 1) Low drone: detuned sine + sub-oscillator triangle
+    var droneA = ctx.createOscillator(); droneA.type = "sine"; droneA.frequency.value = 55;
+    var droneB = ctx.createOscillator(); droneB.type = "sine"; droneB.frequency.value = 55.4; // slow beat
+    var droneC = ctx.createOscillator(); droneC.type = "triangle"; droneC.frequency.value = 110;
+    var droneGain = ctx.createGain(); droneGain.gain.value = 0.55;
+    var droneFilt = ctx.createBiquadFilter(); droneFilt.type = "lowpass"; droneFilt.frequency.value = 380; droneFilt.Q.value = 0.9;
+    droneA.connect(droneGain); droneB.connect(droneGain); droneC.connect(droneGain);
+    droneGain.connect(droneFilt); droneFilt.connect(master);
+    droneA.start(); droneB.start(); droneC.start();
+    nodes.push(droneA, droneB, droneC);
+
+    // LFO sweeping the drone filter cutoff (slow looming pulse)
+    var lfo = ctx.createOscillator(); lfo.type = "sine"; lfo.frequency.value = 0.04; // ~25s cycle
+    var lfoGain = ctx.createGain(); lfoGain.gain.value = 180;
+    lfo.connect(lfoGain); lfoGain.connect(droneFilt.frequency);
+    lfo.start();
+    nodes.push(lfo);
+
+    // ── 2) Brown-noise wind / hiss layer
+    var bufSize = 4096;
+    var noise = ctx.createScriptProcessor ? ctx.createScriptProcessor(bufSize, 1, 1) : null;
+    if(noise){
+      var lastOut = 0;
+      noise.onaudioprocess = function(e){
+        var output = e.outputBuffer.getChannelData(0);
+        for(var i=0;i<bufSize;i++){
+          var white = Math.random() * 2 - 1;
+          lastOut = (lastOut + 0.02 * white) / 1.02;
+          output[i] = lastOut * 3.5;
+        }
+      };
+      var noiseFilt = ctx.createBiquadFilter(); noiseFilt.type = "bandpass"; noiseFilt.frequency.value = 320; noiseFilt.Q.value = 0.7;
+      var noiseGain = ctx.createGain(); noiseGain.gain.value = 0.18;
+      noise.connect(noiseFilt); noiseFilt.connect(noiseGain); noiseGain.connect(master);
+      // Sweep the noise filter freq slowly so it sounds like wind
+      var noiseLFO = ctx.createOscillator(); noiseLFO.type = "sine"; noiseLFO.frequency.value = 0.025;
+      var noiseLFOGain = ctx.createGain(); noiseLFOGain.gain.value = 240;
+      noiseLFO.connect(noiseLFOGain); noiseLFOGain.connect(noiseFilt.frequency);
+      noiseLFO.start();
+      nodes.push(noise, noiseLFO);
+    }
+
+    // ── 3) Sparse low rumble hits (random, every 12-25s)
+    function rumble(){
+      if(!ctx || ctx.state === "closed") return;
+      var t0 = ctx.currentTime;
+      var rOsc = ctx.createOscillator(); rOsc.type = "sine"; rOsc.frequency.setValueAtTime(38, t0); rOsc.frequency.exponentialRampToValueAtTime(20, t0 + 4);
+      var rGain = ctx.createGain(); rGain.gain.value = 0;
+      rGain.gain.linearRampToValueAtTime(0.32, t0 + 0.6);
+      rGain.gain.linearRampToValueAtTime(0, t0 + 4);
+      rOsc.connect(rGain); rGain.connect(master);
+      rOsc.start(t0); rOsc.stop(t0 + 4.2);
+      setTimeout(rumble, 12000 + Math.random() * 13000);
+    }
+    setTimeout(rumble, 8000);
+
+    // ── 4) Distant metallic clang (very rare, ~every 40-90s)
+    function clang(){
+      if(!ctx || ctx.state === "closed") return;
+      var t0 = ctx.currentTime;
+      var freqs = [180, 271, 423, 612];
+      var cBus = ctx.createGain(); cBus.gain.value = 0; cBus.connect(master);
+      cBus.gain.linearRampToValueAtTime(0.07, t0 + 0.05);
+      cBus.gain.exponentialRampToValueAtTime(0.0001, t0 + 6);
+      freqs.forEach(function(f, i){
+        var o = ctx.createOscillator(); o.type = "triangle"; o.frequency.value = f * (1 + i * 0.003);
+        var g = ctx.createGain(); g.gain.value = 1 / (i + 1.5);
+        o.connect(g); g.connect(cBus);
+        o.start(t0); o.stop(t0 + 6);
+      });
+      setTimeout(clang, 40000 + Math.random() * 50000);
+    }
+    setTimeout(clang, 22000);
+
+    started = true;
+  }
+
+  function pause(){ if(master){ master.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.5); } }
+  function resume(){ if(master){ master.gain.linearRampToValueAtTime(0.22, ctx.currentTime + 1.5); } }
+
+  function onGesture(){
+    if(started) return;
+    try { build(); } catch(_){}
+    if(started){
+      document.removeEventListener("pointerdown", onGesture);
+      document.removeEventListener("keydown", onGesture);
+      document.removeEventListener("touchstart", onGesture);
+    }
+  }
+  document.addEventListener("pointerdown", onGesture, {passive:true});
+  document.addEventListener("keydown", onGesture);
+  document.addEventListener("touchstart", onGesture, {passive:true});
+  window.__bgm = { play: function(){ if(!started) build(); else resume(); }, pause: pause };
+})();</script>
 <!-- Hints help -->
 <button id="hints-btn" type="button" aria-label="Help — how to play" title="Help — how to play">?</button>
 <div id="hints-modal" role="dialog" aria-modal="true" aria-labelledby="hints-title">
@@ -3140,11 +3317,84 @@ if (document.readyState === 'loading') {
 </script>
 <script>(function(){function setPhase(p){var b=document.body;b.classList.remove("phase-splash","phase-charcreate","phase-bulletin","phase-booth","phase-day-end","phase-ending","phase-allow-hints");b.classList.add("phase-"+p);if(p==="splash"||p==="bulletin"||p==="charcreate"){b.classList.add("phase-allow-hints");}}window.__setPhase=setPhase;function detect(){var ids=["splash","char-create","intro","bulletin","game","day-end","ending"];for(var i=0;i<ids.length;i++){var el=document.getElementById(ids[i]);if(el&&el.classList.contains("active")){var map={"splash":"splash","char-create":"charcreate","intro":"bulletin","bulletin":"bulletin","game":"booth","day-end":"day-end","ending":"ending"};setPhase(map[ids[i]]);return;}}}var mo=new MutationObserver(detect);document.addEventListener("DOMContentLoaded",function(){detect();document.querySelectorAll(".screen").forEach(function(s){mo.observe(s,{attributes:true,attributeFilter:["class"]});});});setInterval(detect,500);})();</script>
 <script>(function(){
-var POOL_FIRST=["Adaeze","Chinedu","Ifeoma","Obinna","Ngozi","Ekene","Chiamaka","Uzoma","Kelechi","Adaobi","Emeka","Nneka","Tobenna","Onyeka","Chima","Amaka","Chibuzo","Uchenna","Adanna","Ikenna","Chuma","Ngeri","Bassey","Etim","Eno","Imoh","Affiong","Mfon","Ubong","Edidiong","Aniefiok","Otobong","Inyang","Idongesit","Kpunyi","Joshua","Mary","Grace","Faith","Peter","Daniel","Esther","Ruth","Solomon","Comfort","Patience","Florence","Chukwudi","Chukwuma","Ezinne","Adaku","Chigozie","Tochukwu","Onyinye","Chizoba","Chinonso","Chukwuemeka","Ifeanyi","Nnamdi","Okechukwu","Chinwe","Obianuju","Anuli","Chiebuka","Chukwudera","Iheoma","Chioma","Olamma"];
-var POOL_LAST=["Achebe","Okafor","Eze","Onuoha","Nwosu","Ibekwe","Anyanwu","Okonkwo","Obi","Ndubuisi","Madu","Mbah","Nweke","Okeke","Uzor","Aniebo","Iheme","Ezeh","Akpan","Etuk","Bassey","Effiong","Ekanem","Inyang","Udo","Edet","Okon","Asuquo","Umoren","Iniobong","Akpabio","Eshiett","Nwankwo","Iwobi","Eluemunor","Onyemaechi","Chinwuba","Anyanwu","Okeke","Onyema","Egbuna","Mgbachi","Anozie","Onuoha","Onwumere","Onyemelukwe","Iheanacho","Ihegwuanya","Ihebuzor","Ekejiuba","Ekenta","Ekejimba","Eluemuno","Eluem","Onueri","Iheme","Ojukwu","Achuzia","Banjo","Madiebo","Effiong","Adekunle","Akinrinade"];
-var usedNames={};
-function pickFresh(arr){var tries=0;while(tries<25){var n=arr[Math.floor(Math.random()*arr.length)];if(!usedNames[n]){usedNames[n]=true;return n;}tries++;}return arr[Math.floor(Math.random()*arr.length)];}
-window.__pickFreshName=function(){return pickFresh(POOL_FIRST)+" "+pickFresh(POOL_LAST);};
+var POOLS_FIRST = {
+  igbo: {
+    male:   ["Chinedu","Obinna","Ekene","Uzoma","Kelechi","Emeka","Tobenna","Onyeka","Chima","Chibuzo","Uchenna","Ikenna","Chuma","Chukwudi","Chukwuma","Chigozie","Tochukwu","Chinonso","Chukwuemeka","Ifeanyi","Nnamdi","Okechukwu","Chiebuka","Ikechukwu","Chibueze","Onyekachi","Munachi"],
+    female: ["Adaeze","Ifeoma","Ngozi","Chiamaka","Adaobi","Nneka","Amaka","Adanna","Ezinne","Adaku","Onyinye","Chizoba","Chinwe","Obianuju","Anuli","Iheoma","Chioma","Olamma","Nkechi","Uchechi","Chidinma","Nnenna"]
+  },
+  yoruba: {
+    male:   ["Babatunde","Olumide","Olusegun","Ayodele","Olawale","Wale","Tunde","Lekan","Femi","Bayo","Kunle","Ayotunde","Akin","Banji","Niyi","Tobi","Tope","Tayo","Idowu"],
+    female: ["Adebola","Adeola","Folashade","Funmilayo","Bukola","Yetunde","Kemi","Bisi","Sade","Tola","Bolaji","Damilola","Oluwaseun","Olabisi","Mojisola","Folake","Ronke","Bimbo","Toyin","Yemisi","Tinuke"]
+  },
+  hausa: {
+    male:   ["Ibrahim","Musa","Aminu","Hassan","Hussein","Bello","Yusuf","Sani","Lawal","Suleiman","Garba","Kabiru","Salisu","Aliyu","Umar","Idris","Tijjani","Nuhu","Auwal","Mustapha","Murtala","Shehu","Ahmadu","Nasir","Bashir","Adamu","Buhari","Saminu","Jamilu","Rabiu","Sadiq","Mubarak"],
+    female: ["Aisha","Habiba","Maryam","Zainab","Hauwa","Fatima","Halima","Bilkisu","Sadiya","Rakiya","Asabe","Hadiza"]
+  },
+  efik: {
+    male:   ["Bassey","Etim","Imoh","Ubong","Aniefiok","Otobong","Idongesit","Edet","Okon","Asuquo","Umoren","Akpabio","Eshiett","Nseobong","Anietie","Ekpenyong","Iboro","Ekong","Ime"],
+    female: ["Eno","Affiong","Mfon","Edidiong","Iniobong","Ekaette","Itoro","Ekemini","Inyang","Eka","Arit","Imaobong"]
+  },
+  ijaw: {
+    male:   ["Tonye","Ebiye","Diepiriye","Sotonye","Bekes","Daubo","Ebimobowei","Tubonimi","Ibim","Ebimokumo","Pere","Boma"],
+    female: ["Ebiere","Ipalibo","Pereye","Iniye","Belema","Tariere","Ebipade","Tamuno","Kemepade"]
+  },
+  urhobo: {
+    male:   ["Oghenekaro","Tega","Erhirhie","Oghenefejiro","Avwerosuoghene","Ovie","Mudia","Akpos","Erhinyoja","Ejiro","Oghenetega"],
+    female: ["Onome","Akpevwe","Edesiri","Eyitemi","Voke","Tega","Tega"]
+  },
+  tiv: {
+    male:   ["Terhemen","Aondoaver","Iorlumun","Hembafan","Vendimwa","Hemen","Saanyol","Mngutyo","Anenger"],
+    female: ["Sewuese","Doosuur","Mtema","Iember","Mwuese","Wantor"]
+  },
+  generic: {
+    male:   ["Joshua","Peter","Daniel","Solomon","David","John","Stephen","Mark","Paul","Samuel"],
+    female: ["Mary","Grace","Faith","Esther","Ruth","Comfort","Patience","Florence","Sarah","Rachel","Joy","Hope","Rebecca"]
+  }
+};
+var POOLS_LAST = {
+  igbo: ["Achebe","Okafor","Eze","Onuoha","Nwosu","Ibekwe","Anyanwu","Okonkwo","Obi","Ndubuisi","Madu","Mbah","Nweke","Okeke","Uzor","Aniebo","Iheme","Ezeh","Ojukwu","Achuzia","Madiebo","Nwankwo","Iwobi","Eluemunor","Onyemaechi","Chinwuba","Anozie","Onwumere","Onyemelukwe","Iheanacho","Ekejiuba","Ekenta","Onyema","Egbuna","Mgbachi","Okoye","Nnaji","Udeze","Mbanefo","Nwadike","Okorie","Igwe","Nnabuife"],
+  yoruba: ["Adekunle","Akinrinade","Banjo","Adeyemi","Ogunyemi","Olanrewaju","Adekoya","Bamidele","Soyinka","Awolowo","Obasanjo","Tinubu","Ojo","Alabi","Akinwale","Olatunji","Adebanjo","Ogundipe","Olusola","Akinyemi","Fagbemi","Aderibigbe","Awoyemi","Olufemi","Ogungbe","Sodimu","Owoseni","Ladipo","Akanbi"],
+  hausa: ["Abubakar","Mohammed","Maitama","Sule","Bello","Bauchi","Sani","Yero","Wushishi","Zazzau","Lawal","Tijani","Wakili","Goje","Aliyu","Garba","Gaya","Kwankwaso","Galadima","Madaki","Wamakko","Dan-Asabe"],
+  efik: ["Akpan","Etuk","Bassey","Effiong","Ekanem","Inyang","Udo","Edet","Okon","Asuquo","Umoren","Akpabio","Eshiett","Anwana","Ekong","Ndon","Ekpenyong","Atakpa","Ita","Edemekong","Udofia"],
+  ijaw: ["Diete-Spiff","Pepple","Briggs","Wilcox","Owonaro","Sambo","Tariah","Abere","Belema","Wokoma","Beredugo","Oki","Asari-Dokubo"],
+  urhobo: ["Ibori","Akpobari","Mukoro","Otiti","Ighedosa","Egbune","Esanubi","Edhere","Akpomudje","Egbarevba","Otokito"],
+  tiv: ["Akume","Tarka","Akaagerger","Suswam","Ortom","Akase","Adasu","Iorpenda","Gemade","Hyacinth"],
+  generic: ["Effiong","Banjo","Madiebo","Achuzia","Akpabio","Adekunle","Akinrinade"]
+};
+var usedNames = {};
+function pickFresh(arr){ if(!arr||!arr.length) return null; var tries=0; while(tries<25){ var n=arr[Math.floor(Math.random()*arr.length)]; if(!usedNames[n]){ usedNames[n]=true; return n; } tries++; } return arr[Math.floor(Math.random()*arr.length)]; }
+function inferEthnicity(hint){
+  if(!hint) return "generic";
+  var s = String(hint).toLowerCase();
+  if(/\b(hausa|fulani|kano|sokoto|kaduna|borno|katsina|zamfara|jigawa|maiduguri|gombe|yobe|bauchi|kebbi|adamawa)\b/.test(s)) return "hausa";
+  if(/\b(yoruba|lagos|ibadan|oyo|ogun|osun|ekiti|kwara|abeokuta|ondo|ilorin)\b/.test(s)) return "yoruba";
+  if(/\b(igbo|ibo|anambra|imo|abia|ebonyi|enugu|onitsha|aba|owerri|umuahia|nnewi|awka|nsukka)\b/.test(s)) return "igbo";
+  if(/\b(efik|ibibio|annang|calabar|cross river|akwa ibom|uyo|eket|oron)\b/.test(s)) return "efik";
+  if(/\b(ijaw|izon|kalabari|bayelsa|rivers|port harcourt|yenagoa|opobo|bonny)\b/.test(s)) return "ijaw";
+  if(/\b(urhobo|itsekiri|isoko|delta|warri|sapele|ughelli)\b/.test(s)) return "urhobo";
+  if(/\b(tiv|idoma|igede|benue|makurdi|gboko)\b/.test(s)) return "tiv";
+  if(/\b(edo|bini|esan|benin city)\b/.test(s)) return "yoruba";
+  return "generic";
+}
+function inferGender(hint){
+  if(!hint) return null;
+  var s = String(hint).toLowerCase();
+  // Female cues
+  if(/\b(woman|female|wife|mother|widow|girl|daughter|sister|nun|aunt|grandmother|nurse|maid|seamstress|matron|she|her)\b/.test(s)) return "female";
+  // Male cues — be careful; default many job titles to male in 1967 setting only when other hints absent
+  if(/\b(man\b|male|husband|father|son|brother|uncle|grandfather|boy|priest|imam|reverend|chief|emir|elder|he\b|him\b)\b/.test(s)) return "male";
+  return null;
+}
+window.__pickFreshName = function(hint){
+  var eth = inferEthnicity(hint);
+  var bucket = POOLS_FIRST[eth] || POOLS_FIRST.generic;
+  var gender = inferGender(hint);
+  if(!gender){ gender = (Math.random() < 0.5) ? "male" : "female"; }
+  var firstList = (bucket && bucket[gender]) || (bucket && bucket.male) || POOLS_FIRST.generic.male;
+  var first = pickFresh(firstList) || pickFresh(POOLS_FIRST.generic[gender] || POOLS_FIRST.generic.male);
+  var last  = pickFresh(POOLS_LAST[eth]) || pickFresh(POOLS_LAST.generic);
+  return (first + " " + last).toUpperCase();
+};
 window.__travellerHistory=window.__travellerHistory||{};
 window.__recordTravellerDecision=function(name,decision,errors){if(!name)return;window.__travellerHistory[name]={decision:decision,errors:errors||[],day:(window.state&&window.state.day)||0};};
 window.__getReturningNote=function(name){var h=window.__travellerHistory[name];if(!h)return null;var note="Last seen Day "+h.day+": "+h.decision.toUpperCase();if(h.errors&&h.errors.length){note+=" — flagged for "+h.errors.join(", ")+".";}return note;};
@@ -3190,23 +3440,202 @@ window.__lastConditionDay=-1;function conditionTick(){if(!window.state||!window.
 })();</script>
 <script>(function(){
 window.__sideEvents=[
-  {id:"bribery-1", title:"BRIBERY ATTEMPT", body:"The traveller slides three Naira notes under the BCD form. \"For the children, officer.\" The eyes are dry. The hands are not.", choices:[{label:"TAKE THE MONEY",effect:{corruption:2,survival:1}},{label:"PUSH IT BACK",effect:{loyalty:1,witness:1}},{label:"TAKE THE MONEY, STILL DENY",effect:{corruption:3,witness:-1}}]},
-  {id:"bribery-2", title:"AN ENVELOPE", body:"A folded envelope sits inside the passport, soft to the touch. The serial number is hand-written in pencil on the back.", choices:[{label:"OPEN IT NOW",effect:{corruption:2}},{label:"RETURN THE PASSPORT INTACT",effect:{loyalty:2}},{label:"POCKET IT FOR LATER",effect:{corruption:1,survival:1}}]},
-  {id:"bribery-3", title:"A COLLEAGUE WHISPERS", body:"Bay 6 leans across. \"This one paid me already. Just stamp it. We split.\" The traveller does not look at either of you.", choices:[{label:"STAMP IT",effect:{corruption:2,loyalty:-1}},{label:"REFUSE QUIETLY",effect:{loyalty:1}},{label:"REPORT TO NWOSU",effect:{loyalty:3,witness:1}}]},
-  {id:"recognise", title:"YOU RECOGNISE THIS FACE", body:"You went to school with him. Last you heard, he was teaching in Aba. The name on the BCD is not the name you remember.", choices:[{label:"APPROVE \u2014 STAY SILENT",effect:{compassion:2,corruption:1}},{label:"DENY \u2014 PROCEDURE",effect:{loyalty:2,compassion:-1}},{label:"PASS HIM TO BAY 4",effect:{survival:1}}]},
-  {id:"child-alone", title:"AN UNACCOMPANIED CHILD", body:"She is eight, maybe nine. She has a folded note from her aunt in Onitsha and no proper papers.", choices:[{label:"WAVE HER THROUGH",effect:{compassion:3,loyalty:-1}},{label:"DETAIN UNTIL SOMEONE COMES",effect:{loyalty:1}},{label:"CALL THE NUNS AT THE GATE",effect:{compassion:2,witness:1}}]},
-  {id:"radio-warning", title:"THE RADIO BREAKS", body:"State Security cuts in: a wanted man matches the description of the traveller in front of you. The signal cuts before the photo loads.", choices:[{label:"DETAIN ON SUSPICION",effect:{loyalty:2}},{label:"IGNORE THE BROADCAST",effect:{rebellion:1,witness:1}},{label:"WAIT FOR CONFIRMATION",effect:{survival:1}}]},
-  {id:"food-trade", title:"A LOAF OF BREAD", body:"She has nothing but bread and an expired permit. \"Please. My husband is on the other side.\"", choices:[{label:"ACCEPT THE BREAD, APPROVE",effect:{corruption:1,compassion:2}},{label:"APPROVE WITHOUT TAKING",effect:{compassion:3,loyalty:-1}},{label:"DENY",effect:{loyalty:1,compassion:-2}}]},
-  {id:"officer-pressure", title:"INSPECTOR NWOSU STOPS BY", body:"He leans over your shoulder. \"This one. He looks like trouble. Send him back.\" The papers are clean.", choices:[{label:"DENY \u2014 OBEY",effect:{loyalty:2,compassion:-1}},{label:"APPROVE \u2014 CLEAN PAPERS",effect:{loyalty:-1,witness:2}},{label:"DETAIN \u2014 BUY TIME",effect:{survival:1}}]},
-  {id:"gossip-decision", title:"THE GOSSIP TURNS", body:"Two clerks at Bay 3 are pretending to file. They are watching you. One of them has a notebook open.", choices:[{label:"IGNORE",effect:{}},{label:"WALK OVER, ASK",effect:{rebellion:1}},{label:"REPORT TO NWOSU",effect:{loyalty:1,corruption:1}}]},
-  {id:"family-call", title:"YOUR WIFE CALLED THE OFFICE", body:"Adaobi is sick. The fee is two days' wage. The traveller in front of you offered to cover it \u2014 if you sign. The traveller is not on the bulletin list.", choices:[{label:"SIGN AND TAKE THE MONEY",effect:{corruption:3,survival:2}},{label:"DENY \u2014 GO HOME EMPTY",effect:{loyalty:1,compassion:1}},{label:"DEFER \u2014 ASK NWOSU",effect:{loyalty:1,survival:-1}}]}
+  {id:"bribery-1", title:"BRIBERY ATTEMPT", body:"The traveller in agbada slides three Naira notes under the BCD form. \"For the children, officer.\" The eyes are dry. The hands are not.",
+    choices:[
+      {label:"TAKE THE MONEY", effect:{corruption:2,survival:1}, pay:1500},
+      {label:"PUSH IT BACK", effect:{loyalty:1,witness:1}, pay:0},
+      {label:"TAKE THE MONEY, STILL DENY", effect:{corruption:3,witness:-1}, pay:1500}
+    ]},
+  {id:"bribery-2", title:"AN ENVELOPE", body:"A folded envelope sits inside the passport, soft to the touch. The serial number is hand-written in pencil on the back.",
+    choices:[
+      {label:"OPEN IT NOW", effect:{corruption:2}, pay:2200},
+      {label:"RETURN THE PASSPORT INTACT", effect:{loyalty:2}, pay:0},
+      {label:"POCKET IT FOR LATER", effect:{corruption:1,survival:1}, pay:2200}
+    ]},
+  {id:"bribery-3", title:"A COLLEAGUE WHISPERS", body:"Bay 6 leans across. \"This one paid me already. Just stamp it. We split.\" The traveller does not look at either of you.",
+    choices:[
+      {label:"STAMP IT \u2014 SPLIT THE BRIBE", effect:{corruption:2,loyalty:-1}, pay:1200},
+      {label:"REFUSE QUIETLY", effect:{loyalty:1}, pay:0},
+      {label:"REPORT TO NWOSU", effect:{loyalty:3,witness:1}, pay:0}
+    ]},
+  {id:"recognise", title:"YOU RECOGNISE THIS FACE", body:"You went to school with him. Last you heard, he was teaching in Aba. The name on the BCD is not the name you remember.",
+    choices:[
+      {label:"APPROVE \u2014 STAY SILENT", effect:{compassion:2,corruption:1}, pay:0},
+      {label:"DENY \u2014 PROCEDURE", effect:{loyalty:2,compassion:-1}, pay:0},
+      {label:"PASS HIM TO BAY 4", effect:{survival:1}, pay:0}
+    ]},
+  {id:"child-alone", title:"AN UNACCOMPANIED CHILD", body:"She is eight, maybe nine. She has a folded note from her aunt in Onitsha and no proper papers.",
+    choices:[
+      {label:"WAVE HER THROUGH", effect:{compassion:3,loyalty:-1}, pay:0},
+      {label:"DETAIN UNTIL SOMEONE COMES", effect:{loyalty:1}, pay:0},
+      {label:"CALL THE NUNS AT THE GATE", effect:{compassion:2,witness:1}, pay:0}
+    ]},
+  {id:"radio-warning", title:"THE RADIO BREAKS", body:"State Security cuts in: a wanted man matches the description of the traveller in front of you. The signal cuts before the photo loads.",
+    choices:[
+      {label:"DETAIN ON SUSPICION", effect:{loyalty:2}, pay:600},
+      {label:"IGNORE THE BROADCAST", effect:{rebellion:1,witness:1}, pay:0},
+      {label:"WAIT FOR CONFIRMATION", effect:{survival:1}, pay:0}
+    ]},
+  {id:"food-trade", title:"A LOAF OF BREAD", body:"She has nothing but bread and an expired permit. \"Please. My husband is on the other side.\"",
+    choices:[
+      {label:"ACCEPT THE BREAD, APPROVE", effect:{corruption:1,compassion:2}, pay:400},
+      {label:"APPROVE WITHOUT TAKING", effect:{compassion:3,loyalty:-1}, pay:0},
+      {label:"DENY", effect:{loyalty:1,compassion:-2}, pay:0}
+    ]},
+  {id:"officer-pressure", title:"INSPECTOR NWOSU STOPS BY", body:"He leans over your shoulder. \"This one. He looks like trouble. Send him back.\" The papers are clean.",
+    choices:[
+      {label:"DENY \u2014 OBEY", effect:{loyalty:2,compassion:-1}, pay:0},
+      {label:"APPROVE \u2014 CLEAN PAPERS", effect:{loyalty:-1,witness:2}, pay:0},
+      {label:"DETAIN \u2014 BUY TIME", effect:{survival:1}, pay:0}
+    ]},
+  {id:"gossip-decision", title:"THE GOSSIP TURNS", body:"Two clerks at Bay 3 are pretending to file. They are watching you. One of them has a notebook open.",
+    choices:[
+      {label:"IGNORE", effect:{}, pay:0},
+      {label:"WALK OVER, ASK", effect:{rebellion:1}, pay:0},
+      {label:"REPORT TO NWOSU", effect:{loyalty:1,corruption:1}, pay:0}
+    ]},
+  {id:"family-call", title:"YOUR WIFE CALLED THE OFFICE", body:"Adaobi is sick. The fee is two days\u2019 wage. The traveller in front of you offered to cover it \u2014 if you sign. The traveller is not on the bulletin list.",
+    choices:[
+      {label:"SIGN AND TAKE THE MONEY", effect:{corruption:3,survival:2}, pay:3000},
+      {label:"DENY \u2014 GO HOME EMPTY", effect:{loyalty:1,compassion:1}, pay:0},
+      {label:"DEFER \u2014 ASK NWOSU", effect:{loyalty:1,survival:-1}, pay:0}
+    ]}
 ];
 window.__sideEventChance=0.16; // ~1 in 6 travellers triggers a side-event
 window.__sideEventCooldown=0;
 window.__pickSideEvent=function(){var p=window.__sideEvents;return p[Math.floor(Math.random()*p.length)];};
-window.__showSideEvent=function(){var ev=window.__pickSideEvent();var box=document.createElement("div");box.className="side-event-card";var html="<div class=\"se-tag\">DECISION REQUIRED</div><div class=\"se-title\">"+ev.title+"</div><div class=\"se-body\">"+ev.body+"</div><div class=\"se-choices\">";ev.choices.forEach(function(c,i){html+="<button data-i=\""+i+"\" class=\"se-btn\">"+c.label+"</button>";});html+="</div>";box.innerHTML=html;document.body.appendChild(box);box.querySelectorAll(".se-btn").forEach(function(b){b.addEventListener("click",function(){var ix=parseInt(b.dataset.i,10);var eff=ev.choices[ix].effect||{};if(window.state&&window.state.axes){Object.keys(eff).forEach(function(k){window.state.axes[k]=(window.state.axes[k]||0)+eff[k];});}box.classList.add("se-fade");setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},400);});});};
+window.__showSideEvent=function(){var ev=window.__pickSideEvent();var box=document.createElement("div");box.className="side-event-card";var html="<div class=\"se-tag\">DECISION REQUIRED</div><div class=\"se-title\">"+ev.title+"</div><div class=\"se-body\">"+ev.body+"</div><div class=\"se-choices\">";ev.choices.forEach(function(c,i){html+="<button data-i=\""+i+"\" class=\"se-btn\">"+c.label+"</button>";});html+="</div>";box.innerHTML=html;document.body.appendChild(box);box.querySelectorAll(".se-btn").forEach(function(b){b.addEventListener("click",function(){var ix=parseInt(b.dataset.i,10);var eff=ev.choices[ix].effect||{};var pay=ev.choices[ix].pay||0;if(window.state&&window.state.axes){Object.keys(eff).forEach(function(k){window.state.axes[k]=(window.state.axes[k]||0)+eff[k];});}if(window.state&&typeof window.state.totalPay==="number"&&pay){window.state.totalPay+=pay;if(typeof window.updateHUD==="function")try{window.updateHUD();}catch(_){}var t=document.createElement("div");t.className="pay-flash";t.textContent=(pay>0?"+":"")+"₦"+pay.toLocaleString();document.body.appendChild(t);setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},2000);}box.classList.add("se-fade");setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},400);});});};if(window.state&&window.state.axes){Object.keys(eff).forEach(function(k){window.state.axes[k]=(window.state.axes[k]||0)+eff[k];});}box.classList.add("se-fade");setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},400);});});};
 function tryHookLoad(){if(typeof window.loadNextTraveller!=="function"){setTimeout(tryHookLoad,500);return;}if(window.__loadHooked)return;window.__loadHooked=true;var orig=window.loadNextTraveller;window.loadNextTraveller=function(){var trav=(window.state&&window.state.traveller)||0;if(window.__sideEventCooldown>0){window.__sideEventCooldown--;}else if(trav>2 && Math.random()<window.__sideEventChance){window.__sideEventCooldown=2;window.__showSideEvent();}return orig.apply(this,arguments);};}
 tryHookLoad();
 })();</script>
+<script>(function(){
+window.__recentRiskyApprovals = window.__recentRiskyApprovals || [];
+window.__recordApproval = function(t, action){
+  if(!t || action!=="approve") return;
+  var hasFlag = (t.flags && t.flags.length>0) || (t.correct && t.correct!=="approve");
+  if(!hasFlag) return;
+  var isFemale = /\b(woman|female|wife|mother|nurse|widow|girl|daughter|sister|nun|market.*woman)\b/i.test((t.desc||"")+" "+(t.name||""));
+  var hasMissingDoc = (t.flags||[]).some(function(f){ return /MISSING|EXPIRED|FORGED|MISMATCH|UNREGISTERED|INVALID|INCOMPLETE/i.test(String(f)); });
+  window.__recentRiskyApprovals.push({ name: t.name||"Unknown", desc: t.desc||"", flags:(t.flags||[]).slice(), isFemale:isFemale, incomplete:hasMissingDoc, day:(window.state&&window.state.day)||0 });
+  if(window.__recentRiskyApprovals.length>20) window.__recentRiskyApprovals.shift();
+};
+window.__queryEvents = [
+  {tag:"INTERNAL QUERY", title:"YOU ARE BEING ASKED A QUESTION", body:"A clerk arrived with a one-page memo. \"Officer, on Day {day} you cleared {name}. Movement permit was missing. Explain.\"", cost:1500},
+  {tag:"INTERNAL QUERY", title:"INCOMPLETE BCD APPROVAL", body:"Internal Affairs flagged your stamp on {name}. The BCD ward signature was blank. Two days\u2019 wage held pending review.", cost:2400},
+  {tag:"INTERNAL QUERY", title:"WHO PROCESSED THIS?", body:"A typed slip lands on the desk. \"This file (subject: {name}) was approved without a valid permit. Initials {initials}. Confirm.\"", cost:1800},
+  {tag:"FORMAL WARNING", title:"A FORMAL WARNING", body:"Your supervisor stops at your bench. He does not sit. \"You let a {descShort} pass with a forged passport. The bench is watching you now.\"", cost:1200},
+  {tag:"WAGE DOCK", title:"WAGE DOCKED \u2014 IMPROPER ID (FEMALE TRAVELLER)", body:"Internal note: Day {day}. Officer cleared female subject ({name}) without proper identification. Three days wage held pending.", cost:3300, femaleOnly:true},
+  {tag:"WAGE DOCK", title:"WAGE DOCKED \u2014 INCOMPLETE DOCUMENTS", body:"Audit found {name} was cleared on incomplete papers. Compensation dock applied to today\u2019s wage. The supervisor signed without looking up.", cost:2200, incompleteOnly:true},
+  {tag:"WAGE DOCK", title:"GARNISHMENT NOTICE", body:"Treasury slip stapled to your kit: GARNISHMENT \u2014 \u20A6{cost}. Reason: improper clearance, file {name}.", cost:1800},
+  {tag:"PROBATION", title:"OFFICER ON PROBATION", body:"You have been placed on internal probation. One more error and the bench becomes someone else\u2019s.", cost:0},
+  {tag:"INTERROGATION", title:"BEHIND THE GLASS", body:"They take you to the back office. The chair faces the lamp. They ask: \"Why did you stamp {name}?\" You say: \"The papers seemed in order.\" They write that down.", cost:0}
+];
+window.__triggerQuery = function(){
+  var pool = window.__recentRiskyApprovals;
+  if(!pool.length) return null;
+  var subject = pool[Math.floor(Math.random()*pool.length)];
+  var candidates = window.__queryEvents.filter(function(e){
+    if(e.femaleOnly && !subject.isFemale) return false;
+    if(e.incompleteOnly && !subject.incomplete) return false;
+    return true;
+  });
+  var ev = candidates[Math.floor(Math.random()*candidates.length)];
+  var dShort = (subject.desc||"").split(",")[0].trim() || "subject";
+  var bodyText = ev.body
+    .replace(/\{name\}/g, subject.name)
+    .replace(/\{day\}/g, String(subject.day))
+    .replace(/\{descShort\}/g, dShort)
+    .replace(/\{initials\}/g, ((window.state && window.state.player && window.state.player.firstname) ? window.state.player.firstname[0] : "U") + ".O.")
+    .replace(/\{cost\}/g, String(ev.cost||0));
+  if(window.state && typeof window.state.totalPay === "number" && ev.cost){ window.state.totalPay -= ev.cost; }
+  var box = document.createElement("div");
+  box.className = "query-card";
+  box.innerHTML = "<div class=\"q-tag\">"+ev.tag+"</div>"+
+    "<div class=\"q-title\">"+ev.title+"</div>"+
+    "<div class=\"q-body\">"+bodyText+"</div>"+
+    (ev.cost?"<div class=\"q-cost\">\u2212\u20A6"+ev.cost.toLocaleString()+" deducted from wage</div>":"<div class=\"q-cost\">No fine \u2014 yet.</div>");
+  document.body.appendChild(box);
+  setTimeout(function(){ if(box.parentNode) box.parentNode.removeChild(box); }, 11000);
+  return ev;
+};
+window.__rumorEvents = [
+  {title:"OFFICER MISSING", body:"Officer Bassey from the night shift never came back. His radio was found in a ditch. His wife called the office twice. Nobody answers."},
+  {title:"CONVOY AMBUSH \u2014 AYANGBA ROAD", body:"A federal convoy was ambushed near Ayangba. Two officers in plainclothes are unaccounted for. Headquarters has not commented."},
+  {title:"BAY 5 IS EMPTY", body:"Bay 5 has been empty for two days. The chair is pushed in. The stamp pad is dry. No one says his name."},
+  {title:"THE OYO POST", body:"The Oyo border post burned down on Tuesday. Two officers are confirmed dead. The directive is to keep stamping."},
+  {title:"YOUR OWN TRANSFER PAPERS", body:"A clerk hands you a sealed envelope. The corner says \u201CRE: TRANSFER \u2014 PROVISIONAL.\u201D You do not open it. Not yet."},
+  {title:"THEY ARE WATCHING THE GATE", body:"Three men in identical jackets sat outside the gate from 9 to 4. They did not eat. They did not leave. They were not stopped."},
+  {title:"THE CALABAR INCIDENT", body:"Whisper at the canteen: an officer in Calabar was found in his own boot. State Security has classified the file. Do not ask questions."},
+  {title:"THE HORN THAT WOULD NOT STOP", body:"At dawn a horn sounded for an hour from somewhere east. Headquarters issued a memo telling everyone to stay at their desks. Nobody moved for nine minutes."},
+  {title:"OFFICERS DISAPPEARED \u2014 ABA POST", body:"Three officers from Aba Junction did not report on Monday. The post was found locked. The keys were missing. So were the records."},
+  {title:"LIST CIRCULATING", body:"A handwritten list passed through the bays this morning. Six names. Yours was not on it. Yet."}
+];
+window.__pickRumor = function(){ return window.__rumorEvents[Math.floor(Math.random()*window.__rumorEvents.length)]; };
+window.__showRumor = function(){
+  var r = window.__pickRumor();
+  var box = document.createElement("div");
+  box.className = "rumor-card";
+  box.innerHTML = "<div class=\"r-tag\">RUMOUR</div><div class=\"r-title\">"+r.title+"</div><div class=\"r-body\">"+r.body+"</div><div class=\"r-foot\">No one wrote this down.</div>";
+  document.body.appendChild(box);
+  setTimeout(function(){ if(box.parentNode) box.parentNode.removeChild(box); }, 11000);
+};
+window.__tensionEvents = [
+  "Adaeze from Bay 4 took her name plate off her desk before lunch.",
+  "Bay 7 has not opened today. The chair faces the wall.",
+  "The supervisor closed his door at 11 and did not open it again.",
+  "Two clerks went for tea and did not return.",
+  "A child was crying in the waiting hall for forty minutes. Nobody moved.",
+  "Someone wrote a name on the toilet wall in pencil. By the afternoon it was gone, and so was the pencil.",
+  "The radio cut out at 14:00. It cut out yesterday at 14:00 also.",
+  "The cleaner refused to enter Bay 6 this morning and would not say why.",
+  "Officer Inyang has been wearing his coat indoors for three days.",
+  "Three of the lights have been off since Tuesday. Nobody has called maintenance.",
+  "The new clerk has been crying quietly since lunch. Nobody has asked."
+];
+window.__lastTensionT = 0;
+function tensionTick(){ if(!window.state || !window.state.day) return; if(window.state.day<2) return; var bul=document.getElementById("bulletin"); var booth=document.getElementById("game"); var visible = (bul && bul.classList.contains("active")) || (booth && booth.classList.contains("active")); if(!visible) return; if(Date.now() - window.__lastTensionT < 70000) return; if(Math.random() > 0.22) return; window.__lastTensionT = Date.now(); var line = window.__tensionEvents[Math.floor(Math.random()*window.__tensionEvents.length)]; var t = document.createElement("div"); t.className = "tension-toast"; t.textContent = line; document.body.appendChild(t); setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); }, 8500); }
+setInterval(tensionTick, 4000);
+window.__lastQueryDay = -1;
+function queryTick(){ if(!window.state || !window.state.day || window.state.day<3) return; if(window.state.day === window.__lastQueryDay) return; var bul=document.getElementById("bulletin"); if(!bul || !bul.classList.contains("active")) return; if((window.__recentRiskyApprovals||[]).length < 1) return; if(Math.random() > 0.42) return; window.__lastQueryDay = window.state.day; window.__triggerQuery(); }
+setInterval(queryTick, 1800);
+window.__lastRumorT = 0;
+function rumorTick(){ if(!window.state || !window.state.day || window.state.day<4) return; if(Date.now() - window.__lastRumorT < 60000) return; var bul=document.getElementById("bulletin"); var booth=document.getElementById("game"); var visible = (bul && bul.classList.contains("active")) || (booth && booth.classList.contains("active")); if(!visible) return; if(Math.random() > 0.18) return; window.__lastRumorT = Date.now(); window.__showRumor(); }
+setInterval(rumorTick, 8000);
+function tryHookDecide(){ if(typeof window.decide !== "function"){ setTimeout(tryHookDecide, 500); return; } if(window.__decideHooked) return; window.__decideHooked = true; var orig = window.decide; window.decide = function(action){ try { var t = window.state && window.state.currentTraveller; window.__recordApproval(t, action); } catch(_){} return orig.apply(this, arguments); }; }
+tryHookDecide();
+})();</script>
+<script>(function(){
+  // Stamp slam + ink splat
+  function tryHookDecide(){ if(typeof window.decide!=="function"){ setTimeout(tryHookDecide,500); return; } if(window.__animDecideHooked) return; window.__animDecideHooked=true; var orig=window.decide; window.decide=function(action){ try{
+    var stamp = document.querySelector(".stamp-overlay, .stamp-image, #stamp-overlay, .stamp-result"); 
+    if(stamp){ stamp.classList.remove("stamp-slam"); void stamp.offsetWidth; stamp.classList.add("stamp-slam"); }
+    var desk = document.getElementById("desk") || document.getElementById("game");
+    if(desk){ var splat=document.createElement("div"); splat.className="ink-splat "+(action||""); desk.appendChild(splat); setTimeout(function(){ if(splat.parentNode) splat.parentNode.removeChild(splat); }, 900); }
+    var docsPanel = document.querySelector(".docs-panel, #docs-panel, .papers, .doc-list"); if(docsPanel){ docsPanel.classList.remove("docs-paper-enter"); docsPanel.classList.add("docs-paper-exit"); setTimeout(function(){ docsPanel.classList.remove("docs-paper-exit"); }, 480); }
+  }catch(_){} return orig.apply(this,arguments); }; }
+  tryHookDecide();
+
+  // Paper enter on traveller render
+  function tryHookRender(){ if(typeof window.renderDocs!=="function" && typeof window.renderTraveller!=="function"){ setTimeout(tryHookRender,500); return; } if(window.__animRenderHooked) return; window.__animRenderHooked=true; var origR = window.renderDocs || window.renderTraveller; if(typeof window.renderDocs==="function"){ window.renderDocs=function(){ var out=origR.apply(this,arguments); try{ var p=document.querySelector(".docs-panel, #docs-panel, .papers, .doc-list"); if(p){ p.classList.remove("docs-paper-exit","docs-paper-enter"); void p.offsetWidth; p.classList.add("docs-paper-enter"); } }catch(_){} return out; }; } }
+  tryHookRender();
+
+  // Wallet tick + day flip on HUD updates
+  var lastPay = null, lastDay = null;
+  function tryHookHUD(){ if(typeof window.updateHUD!=="function"){ setTimeout(tryHookHUD,500); return; } if(window.__animHUDHooked) return; window.__animHUDHooked=true; var orig=window.updateHUD; window.updateHUD=function(){ var out=orig.apply(this,arguments); try{
+    var pay = document.getElementById("hud-pay");
+    if(pay && window.state && typeof window.state.totalPay==="number"){ if(lastPay!==null && window.state.totalPay !== lastPay){ var up = window.state.totalPay > lastPay; pay.classList.remove("hud-tick-up","hud-tick-down"); void pay.offsetWidth; pay.classList.add(up?"hud-tick-up":"hud-tick-down"); setTimeout(function(){ pay.classList.remove("hud-tick-up","hud-tick-down"); }, 750); } lastPay = window.state.totalPay; }
+    var day = document.getElementById("hud-day");
+    if(day && window.state && typeof window.state.day==="number"){ if(lastDay!==null && window.state.day !== lastDay){ day.classList.remove("day-flip"); void day.offsetWidth; day.classList.add("day-flip"); setTimeout(function(){ day.classList.remove("day-flip"); }, 750); } lastDay = window.state.day; }
+  }catch(_){} return out; }; }
+  tryHookHUD();
+
+  // Side-event shake
+  var mo = new MutationObserver(function(muts){ muts.forEach(function(m){ m.addedNodes.forEach(function(n){ if(n.nodeType===1 && n.classList && n.classList.contains("side-event-card")){ n.classList.add("shake"); } }); }); });
+  if(document.body) mo.observe(document.body,{childList:true,subtree:false});
+})();</script>
+
+<script>
+(()=>{if(window.__patchV7)return;window.__patchV7=true;const AMBIENT_BEATS=["Rain on the iron roof of the booth. The drum is the same drum the soldiers play before parade.","A radio in the next compound plays gospel slow enough to be a lament.","The boy who sells groundnut has not come today. His mother walks past three times without looking up.","Someone has scrawled IBO LIVE on the kerosene drum behind the latrine. By morning it is painted over. By dusk it is back.","A column of soldiers passes east. None of them speak. The dust takes a long time to settle.","The market women laugh too loudly today. The laugh is too short.","A church bell rings at noon for no service anyone can name.","You hear two languages arguing in the dispensary line. Both want the same medicine.","A goat has wandered into the queue. Nobody moves to chase it. It stares at you like a witness.","A child in a red dress waves at you from the truck bed. Her mother pulls her hand down.","Petrol queue stretches past the mosque. Three drivers are sleeping under the chassis.","Two crows fight over a piece of yam peel. The shorter one wins. You note this for no reason.","An NYSC graduate is reading Achebe in the shade. He keeps the cover hidden inside a Bible.","Someone sang the old anthem in the dark last night. Today nobody admits it. Today nobody asks.","A radio crackles a Lagos voice through the static. The voice says everything is fine. The static is louder than the voice.","A woman is selling palm wine she swears is from before the war. Nobody buys, but nobody calls her a liar either.","The senior officer's office light burned past midnight. By morning the curtains were drawn.","A new poster on the wall: a man in uniform you have never seen, smiling. Nobody has signed off on putting it up. Nobody has taken it down.","Three NEPA poles down on the Cross River road. The grid was already off.","An okada rider asks if you can pass his sister through. He is holding a fish. The fish is for you. You do not take the fish.","A schoolteacher walks the queue reading names from a register. Nobody knows what register.","The army truck that came at dawn left at noon, lighter by what felt like ten people.","A man in a Manchester United jersey from 1966 sells charcoal one bag at a time.","The dispensary nurse says quinine is finished. She has said this every Tuesday for a month.","A pamphlet in three colours is being passed hand to hand under the mango tree. You do not read it. You make sure not to read it.","A woman is praying in Igbo at the side gate. Two officers walk past her. The third stops. The third is you. You walk on.","Power returns at 14:07. The fan in the booth turns one full revolution and dies again.","The river smells different today. Not bad. Different.","Someone has stacked four oranges in a perfect pyramid on the corner of your desk. There is no name.","An old man you do not recognise salutes you as if you are his commanding officer. You return the salute. It feels worse than ignoring him would have.","A bird with no name in any of your three languages lands on the fence and watches the queue move.","The mortuary van went past twice this morning. You did not look up either time."];const EXCUSES=[{tier:"family",text:"My mother died last week. The pass burned with her papers in the funeral fire.",truthful:true,weight:0.7},{tier:"family",text:"My wife is in labour at Calabar. I left the house with whatever I could grab.",truthful:true,weight:0.55},{tier:"family",text:"My brother was killed at Nkwerre. I am taking his children to safety. There was no time for the office stamp.",truthful:true,weight:0.6},{tier:"family",text:"The children's mother sent me a letter to come. She did not send a pass.",truthful:false,weight:0.4},{tier:"medical",text:"I have to reach the dispensary at Ogoja before evening. The medicine spoils.",truthful:true,weight:0.5},{tier:"medical",text:"My father is dying of typhoid. Please. The hospital is on the other side.",truthful:false,weight:0.55},{tier:"medical",text:"This is a yellow fever vaccination card, not a pass, but the clerk in Aba said it is sufficient.",truthful:false,weight:0.3},{tier:"religious",text:"The bishop's letter is in my chest pocket. The diocese is expecting me by sundown.",truthful:true,weight:0.6},{tier:"religious",text:"I am going to bury my pastor. Surely God's house has its own paperwork.",truthful:false,weight:0.45},{tier:"bureaucratic",text:"The stamp is on the back of the page. They are stamping on the back now to save ink.",truthful:false,weight:0.3},{tier:"bureaucratic",text:"The new directive said the green permit replaces the blue one. I asked twice.",truthful:false,weight:0.5},{tier:"bureaucratic",text:"My ministry transfer order is in Lagos. They wired it but the post is slow.",truthful:true,weight:0.4},{tier:"commercial",text:"My cargo will perish if I am held overnight. Yam, sir. Two trucks.",truthful:true,weight:0.5},{tier:"commercial",text:"The factory in Aba pays me by the load. If you turn me back today my children eat tomorrow.",truthful:true,weight:0.55},{tier:"commercial",text:"I am only carrying salt. Salt is not contraband, surely?",truthful:false,weight:0.4},{tier:"political",text:"I am a federal correspondent. My press card is here. The pass was confiscated by a junior officer in Enugu.",truthful:false,weight:0.45},{tier:"political",text:"I voted for unity. That is on record. I was told that is enough.",truthful:false,weight:0.2},{tier:"political",text:"My uncle is in the senate. He said this checkpoint would not be a problem for me.",truthful:false,weight:0.3},{tier:"family",text:"I have walked from Umuahia for four days. I lost the bag with the documents at the second river.",truthful:true,weight:0.65},{tier:"medical",text:"I am a midwife. The village I serve has no other midwife. I do not have a pass because they do not give passes to women in my work.",truthful:true,weight:0.6},{tier:"religious",text:"I am taking communion wine to the parish. The bottles are sealed. You can check.",truthful:true,weight:0.5},{tier:"bureaucratic",text:"The form requires three signatures and only two officers were on duty when I came. They told me to come back. I cannot come back.",truthful:true,weight:0.6},{tier:"commercial",text:"I have a permit but it is in a language the Aba clerk could not read. He sent me on. He said you would understand.",truthful:false,weight:0.35},{tier:"political",text:"I have nothing to say. Stamp it or do not. I am tired.",truthful:true,weight:0.4}];const DEMEANOUR=["fingers tap the counter without rhythm","will not meet your eyes; stares at the stamp pad instead","smells faintly of palm wine and a long bus ride","speaks too quickly when asked the date of birth","calm in a way that does not match the queue behind","left hand keeps drifting to a pocket and being pulled back","smiles after every sentence, even sentences that should not be smiled after","answers your questions before you finish asking them","swallows three times before each answer","leans on the counter as if standing is hard, but did not limp on the way in","wears a wedding ring on the wrong hand","carries a second bag they have not declared, set on the floor between their ankles"];const DOC_ANOMALY=["the seal is bleeding into the paper as if it was stamped while still wet today","the photograph is two years older than the date the document claims","the issuing officer's name is misspelled in a way only a forger would standardise","the paper smells of new ink","the perforation is on the wrong side for an Enugu issue","the watermark is faint to the point of suggestion","the corner has been carefully torn and re-glued","the carbon copy beneath bears a different signature than the original"];const RUMOUR=["the village they name was burned three weeks ago and not rebuilt","a colleague at the next post mentioned this surname in last week's bulletin under WATCH LIST","the bus they came on was reported to have only carried six passengers, not seventeen","their declared destination has had no electricity for nine days","another traveller in the queue keeps glancing at them","the truck behind their convoy has been waiting at the gate since before dawn","an officer at Aba flagged this pass series as suspect in last month's circular","their accent is from the north of the line they say they have never crossed"];const FAMILY_FED_LINES=["Your family ate today. The youngest one even slept without crying.","The kerosene lamp burned tonight. The rent envelope is sealed. That is enough for tonight.","The landlord nodded at the door. He did not knock. The notes were under the door before he could.","Your wife laughed at something your son said. You did not hear what. You did not need to.","Bread, garri, two onions, salt. The basin is half empty but tomorrow is paid for.","Your daughter asked when the war would end. You said soon. The lie was small. The food was real.","The compound radio played highlife. Nobody complained. The rent envelope is sealed.","Your mother sent word that the elder cousin's funeral was paid in full. Yours did not have to be the contribution that fell short.","The roof did not leak tonight. The patch you paid for last month is holding.","There is a candle for tomorrow morning. The matchbox is dry. The rent envelope is sealed.","Your son fell asleep with his shoes on. His shoes still have soles. That is enough for tonight.","The market woman gave you the better half of yam at no charge because you paid the day's debt without bargaining.","Nobody at your gate today. No notice from the landlord. No officer with a list.","Your wife heated water for your bath. The kettle is yours. The fuel is yours. The night is yours.","Salt, palm oil, garri, dried fish. The cupboard is not full but it is not empty.","Your daughter braided your wife's hair tonight. The lamp burned long enough to finish.","You paid the school levy. The teacher will not turn your son back at the gate tomorrow.","The neighbour returned the mortar she borrowed. With it, she returned the small cup of beans she borrowed last month.","The compound dog ate. The compound dog has not eaten in three days. Tonight the compound dog ate.","You washed your shirt yourself tonight. There was soap. There was water. The shirt will dry by dawn."];const RENT_MISS_PROMPTS=[{label:"Borrow at interest from the night moneylender",axis:{survival:1,corruption:1},note:"You sign for it. Tomorrow's pay is already smaller than you remember."},{label:"Pawn your father's ceremonial machete",axis:{witness:-1,compassion:-1},note:"He earned it before the war. You will earn it back. Maybe."},{label:"Send your eldest to your wife's relatives in Calabar",axis:{compassion:-2,survival:1},note:"The bus leaves at 4am. The boy will not look at you when he gets on."},{label:"Beg the landlord for one more night",axis:{compassion:1,survival:-1,loyalty:-1},note:"He listens with the patience of a man who has heard this exact sentence from your neighbours."},{label:"Skim from a confiscated parcel at the booth",axis:{corruption:2,loyalty:-1},note:"It was already going to disappear. Just not into your pocket."}];window.__ambientBeats=AMBIENT_BEATS;window.__excusePool=EXCUSES;window.__rentMissChoices=RENT_MISS_PROMPTS;window.__pickAmbient=function(state){state=state||window.state;if(!state)return AMBIENT_BEATS[Math.floor(Math.random()*AMBIENT_BEATS.length)];if(!Array.isArray(state.ambientUsed))state.ambientUsed=[];if(state.ambientUsed.length>=AMBIENT_BEATS.length)state.ambientUsed=[];let idx;do{idx=Math.floor(Math.random()*AMBIENT_BEATS.length)}while(state.ambientUsed.includes(idx));state.ambientUsed.push(idx);return AMBIENT_BEATS[idx]};window.__buildExcuse=function(){const e=EXCUSES[Math.floor(Math.random()*EXCUSES.length)];return Object.assign({},e)};window.__buildObservation=function(traveller){const lines=[];const pick=arr=>arr[Math.floor(Math.random()*arr.length)];lines.push("Demeanour: "+pick(DEMEANOUR)+".");if(traveller&&traveller.flags&&traveller.flags.forged){lines.push("Document: "+pick(DOC_ANOMALY)+".")}else if(Math.random()<0.25){lines.push("Document: "+pick(DOC_ANOMALY)+". You are not certain it is forgery.")}if(Math.random()<0.45)lines.push("Whisper from the queue: "+pick(RUMOUR)+".");if(traveller&&traveller.purpose)lines.push("Stated purpose: "+traveller.purpose+".");if(window.__getReturningNote&&traveller&&traveller.name){const r=window.__getReturningNote(traveller.name);if(r)lines.push(r)}return lines};function ensureStateFields(s){if(!s)return;if(s.rentDue==null)s.rentDue=400;if(s.rentPaid==null)s.rentPaid=0;if(s.rentMissedStreak==null)s.rentMissedStreak=0;if(s.rentMissedTotal==null)s.rentMissedTotal=0;if(s.approvalErrorsToday==null)s.approvalErrorsToday=0;if(s.salarySlashToday==null)s.salarySlashToday=0;if(s.reprimandFlag==null)s.reprimandFlag=false;if(s.bribesAccepted==null)s.bribesAccepted=0;if(s.bribesRefused==null)s.bribesRefused=0;if(s.bribeAuditFlag==null)s.bribeAuditFlag=false;if(s.postWar==null)s.postWar=false;if(s.civilServiceDay==null)s.civilServiceDay=0;if(!Array.isArray(s.ambientUsed))s.ambientUsed=[];if(s.mustRestart==null)s.mustRestart=false}setInterval(()=>{if(window.state)ensureStateFields(window.state)},800);let _startDay=null;function wrapStartDay(){if(typeof window.startDay!=="function")return false;if(window.startDay.__patched)return true;_startDay=window.startDay;const wrapped=function(){const r=_startDay.apply(this,arguments);const s=window.state;if(s){ensureStateFields(s);s.approvalErrorsToday=0;s.salarySlashToday=0;s.bribeAuditFlag=false;const week=Math.floor((s.day-1)/7);s.rentDue=Math.round(400*Math.pow(1.10,week))}return r};wrapped.__patched=true;window.startDay=wrapped;return true}function wrapLoadNext(){if(typeof window.loadNextTraveller!=="function")return false;if(window.loadNextTraveller.__patchedV7)return true;const orig=window.loadNextTraveller;const wrapped=function(){const r=orig.apply(this,arguments);try{const s=window.state;const t=s&&s.traveller;if(t){if(!t.flags)t.flags={};if(t.flags.forged==null)t.flags.forged=Math.random()<0.28;if(!t.excuse)t.excuse=window.__buildExcuse();if(!t.observation)t.observation=window.__buildObservation(t);renderEnhancedTraveller(t)}}catch(e){}return r};wrapped.__patchedV7=true;window.loadNextTraveller=wrapped;return true}function renderEnhancedTraveller(t){setTimeout(()=>{try{const game=document.getElementById("game");if(!game)return;let obs=game.querySelector(".observation-card-v7");if(!obs){obs=document.createElement("div");obs.className="observation-card-v7";obs.style.cssText="background:#1A2610;border-left:4px solid #D4A017;padding:10px 14px;margin:10px 0;color:#F2E8D0;font-family:'Crimson Text',serif;font-size:14px;line-height:1.5;";const buttons=game.querySelector(".action-buttons")||game.querySelector(".booth-actions");if(buttons&&buttons.parentNode)buttons.parentNode.insertBefore(obs,buttons);else game.appendChild(obs)}let html="<strong style='color:#D4A017;display:block;margin-bottom:6px;font-family:\"Bebas Neue\",sans-serif;letter-spacing:1px;'>Officer's Observation</strong>";(t.observation||[]).forEach(line=>{html+="<div style='margin:3px 0;'>"+line+"</div>"});if(t.excuse&&t.excuse.text)html+="<div style='margin-top:8px;padding-top:8px;border-top:1px dashed #5a5a3f;font-style:italic;'>The traveller offers: \""+t.excuse.text+"\"</div>";if(t.flags&&t.flags.forged)html+="<div style='margin-top:6px;color:#c0392b;font-weight:bold;'>SUSPECTED FORGERY — detention is the lawful action.</div>";obs.innerHTML=html}catch(e){}},60)}function wrapDecisions(){const fns=["approveTraveller","denyTraveller","detainTraveller"];let ok=true;fns.forEach(name=>{if(typeof window[name]!=="function"){ok=false;return}if(window[name].__patchedV7)return;const orig=window[name];const action=name.replace("Traveller","").toLowerCase();const wrapped=function(){const s=window.state;const t=s&&s.traveller;try{if(t){const forged=t.flags&&t.flags.forged;const excuse=t.excuse;ensureStateFields(s);if(forged&&action==="approve"){s.approvalErrorsToday=(s.approvalErrorsToday||0)+1;if(s.axes){s.axes.corruption=(s.axes.corruption||0)+1;s.axes.loyalty=(s.axes.loyalty||0)-1}}if(forged&&action==="detain"&&s.axes){s.axes.loyalty=(s.axes.loyalty||0)+1;s.axes.witness=(s.axes.witness||0)+1}if(!forged&&action==="detain"){s.approvalErrorsToday=(s.approvalErrorsToday||0)+1;if(s.axes){s.axes.compassion=(s.axes.compassion||0)-1;s.axes.rebellion=(s.axes.rebellion||0)+1}}if(excuse){if(excuse.truthful&&(action==="deny"||action==="detain")&&s.axes){s.axes.compassion=(s.axes.compassion||0)-1;s.axes.witness=(s.axes.witness||0)+1}if(!excuse.truthful&&action==="approve"){s.approvalErrorsToday=(s.approvalErrorsToday||0)+1;if(s.axes){s.axes.corruption=(s.axes.corruption||0)+1;s.axes.loyalty=(s.axes.loyalty||0)-1}}}}}catch(e){}return orig.apply(this,arguments)};wrapped.__patchedV7=true;window[name]=wrapped});return ok}function wrapEndOfDay(){if(typeof window.endOfDay!=="function")return false;if(window.endOfDay.__patchedV7)return true;const orig=window.endOfDay;const wrapped=function(){const r=orig.apply(this,arguments);try{processSalarySlash();processRentLedger();injectAmbientBeat();injectFamilyStatus()}catch(e){}return r};wrapped.__patchedV7=true;window.endOfDay=wrapped;return true}function processSalarySlash(){const s=window.state;if(!s)return;const errs=s.approvalErrorsToday||0;if(errs>=2){const slash=Math.min((s.totalPay||0)*0.40,200*errs);s.totalPay=(s.totalPay||0)-slash;s.salarySlashToday=slash;s.reprimandFlag=true;if(s.axes)s.axes.loyalty=(s.axes.loyalty||0)-1;pushDayEndCard("INTERNAL AFFAIRS — REPRIMAND","Errors logged today: "+errs+". Salary deduction: "+Math.round(slash)+" Biafran notes. Officer Nwosu requests your presence at first light. A second incident this week routes to a transfer hearing.")}if(s.bribeAuditFlag){const dock=Math.round((s.bribesAccepted||1)*250);s.totalPay=(s.totalPay||0)-dock;pushDayEndCard("INTERNAL AFFAIRS — AUDIT","An anonymous tip flagged your booth for unrecorded receipts. Audit deduction: "+dock+" Biafran notes.");if(s.axes)s.axes.loyalty=(s.axes.loyalty||0)-1;s.bribeAuditFlag=false}}function processRentLedger(){const s=window.state;if(!s)return;ensureStateFields(s);const due=s.rentDue||400;if((s.totalPay||0)>=due){s.totalPay-=due;s.rentPaid=(s.rentPaid||0)+1;s.rentMissedStreak=0}else{s.rentMissedStreak=(s.rentMissedStreak||0)+1;s.rentMissedTotal=(s.rentMissedTotal||0)+1;showRentMissModal(s);if(s.rentMissedStreak>=3)setTimeout(()=>showEvictionScreen(s),600);if(s.day<25)s.mustRestart=true}}function pushDayEndCard(title,body){const root=document.getElementById("day-end")||document.body;const card=document.createElement("div");card.className="day-end-card-v7";card.style.cssText="background:#2C3E1F;border:2px solid #D4A017;color:#F2E8D0;padding:14px 18px;margin:12px auto;max-width:560px;font-family:'Crimson Text',serif;line-height:1.5;border-radius:4px;";card.innerHTML="<div style='font-family:\"Bebas Neue\",sans-serif;letter-spacing:2px;color:#D4A017;font-size:18px;margin-bottom:6px;'>"+title+"</div><div>"+body+"</div>";root.appendChild(card)}function showRentMissModal(s){if(document.getElementById("rent-miss-modal-v7"))return;const modal=document.createElement("div");modal.id="rent-miss-modal-v7";modal.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;font-family:'Crimson Text',serif;";let html="<div style='background:#1A2610;border:3px solid #D4A017;color:#F2E8D0;padding:24px;max-width:540px;width:92%;border-radius:6px;'>";html+="<div style='font-family:\"Bebas Neue\",sans-serif;letter-spacing:2px;color:#D4A017;font-size:22px;margin-bottom:10px;'>RENT NOT PAID</div>";html+="<div style='margin-bottom:12px;'>The landlord stood at your gate this evening. The envelope was not full. Your wife did not let him in. He left. He will return tomorrow.</div>";html+="<div style='margin-bottom:14px;font-style:italic;color:#D4A017;'>Consecutive misses: "+s.rentMissedStreak+" of 3. After three, your family is put on the street.</div>";RENT_MISS_PROMPTS.forEach((p,idx)=>{html+="<button data-idx='"+idx+"' style='display:block;width:100%;text-align:left;background:#2C3E1F;border:1px solid #5a5a3f;color:#F2E8D0;padding:10px 14px;margin:6px 0;font-family:\"Crimson Text\",serif;font-size:14px;cursor:pointer;'>"+p.label+"</button>"});html+="</div>";modal.innerHTML=html;document.body.appendChild(modal);modal.querySelectorAll("button").forEach(b=>{b.addEventListener("click",()=>{const idx=parseInt(b.getAttribute("data-idx"),10);const choice=RENT_MISS_PROMPTS[idx];if(s.axes&&choice.axis)Object.keys(choice.axis).forEach(k=>{s.axes[k]=(s.axes[k]||0)+choice.axis[k]});modal.remove();pushDayEndCard("YOU CHOSE",choice.label+". "+choice.note)})})}function showEvictionScreen(s){document.body.innerHTML="<div style='min-height:100vh;background:#1A2610;color:#F2E8D0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;font-family:\"Crimson Text\",serif;text-align:center;'><div style='font-family:\"Bebas Neue\",sans-serif;letter-spacing:4px;color:#D4A017;font-size:42px;margin-bottom:16px;'>EVICTION</div><div style='max-width:600px;font-size:18px;line-height:1.7;margin-bottom:20px;'>Three nights running, the rent envelope was light. On the third evening the landlord did not knock. He came with two men and your things were on the road by the time you walked home from the booth.</div><div style='max-width:600px;font-size:16px;color:#D4A017;font-style:italic;margin-bottom:30px;'>Your family is gone. There is no one left to pay for. The desk is the same desk. The country has eaten you.</div><button onclick='location.reload()' style='background:#D4A017;color:#1A2610;border:none;padding:12px 32px;font-family:\"Bebas Neue\",sans-serif;letter-spacing:2px;font-size:18px;cursor:pointer;'>BEGIN AGAIN</button></div>"}function injectAmbientBeat(){const beat=window.__pickAmbient(window.state);pushDayEndCard("END OF DAY — AMBIENT",beat)}function injectFamilyStatus(){const s=window.state;if(!s)return;if(s.rentMissedStreak>0)return;const line=FAMILY_FED_LINES[Math.floor(Math.random()*FAMILY_FED_LINES.length)];pushDayEndCard("AT HOME",line);setTimeout(()=>{document.querySelectorAll(".family-status").forEach(el=>{el.textContent=line})},100)}function wrapEndingFlow(){if(typeof window.showEndingScreen==="function"&&!window.showEndingScreen.__patchedV7){const orig=window.showEndingScreen;const wrapped=function(ending){const s=window.state;if(s&&s.day>=25&&s.mustRestart)return showRestartScreen(s);if(s&&s.day>=25&&!s.postWar&&eligibleForReintegration(s))return showReintegrationOffer(s,()=>orig.call(this,ending));return orig.apply(this,arguments)};wrapped.__patchedV7=true;window.showEndingScreen=wrapped}}function eligibleForReintegration(s){const errs=s.totalErrors||0;return errs<=3&&(s.rentMissedTotal||0)===0}function showRestartScreen(s){document.body.innerHTML="<div style='min-height:100vh;background:#1A2610;color:#F2E8D0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;font-family:\"Crimson Text\",serif;text-align:center;'><div style='font-family:\"Bebas Neue\",sans-serif;letter-spacing:4px;color:#D4A017;font-size:38px;margin-bottom:14px;'>YOU CANNOT CONTINUE</div><div style='max-width:620px;font-size:18px;line-height:1.7;margin-bottom:20px;'>Your family was put on the road before the war ended. There is no household to come home to, no name on a rent register, no chair waiting at a table. The federal directive that arrives on Day 25 has nowhere to find you.</div><div style='max-width:600px;font-size:16px;color:#D4A017;font-style:italic;margin-bottom:30px;'>Begin again. The desk is still the desk.</div><button onclick='location.reload()' style='background:#D4A017;color:#1A2610;border:none;padding:12px 32px;font-family:\"Bebas Neue\",sans-serif;letter-spacing:2px;font-size:18px;cursor:pointer;'>BEGIN AGAIN</button></div>"}function showReintegrationOffer(s,fallback){const wrap=document.createElement("div");wrap.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:99999;display:flex;align-items:center;justify-content:center;font-family:'Crimson Text',serif;";wrap.innerHTML="<div style='background:#0d2818;border:3px solid #009A44;color:#F2E8D0;padding:28px;max-width:620px;width:92%;border-radius:6px;text-align:center;'><div style='font-family:\"Bebas Neue\",sans-serif;letter-spacing:3px;color:#009A44;font-size:26px;margin-bottom:10px;'>FEDERAL CIVIL SERVICE</div><div style='font-size:16px;line-height:1.6;margin-bottom:18px;'>The Federal Republic has reabsorbed your station. Your record is reviewed. Your service is offered, conditionally, on the federal payroll: ten more days at a re-designated post, processing returnees and reintegration paperwork. Refuse and your tenure ends with the secession.</div><button id='r-accept-v7' style='background:#009A44;color:#fff;border:none;padding:10px 22px;margin:6px;font-family:\"Bebas Neue\",sans-serif;letter-spacing:1.5px;font-size:16px;cursor:pointer;'>ACCEPT REINTEGRATION</button><button id='r-decline-v7' style='background:#2C3E1F;color:#F2E8D0;border:1px solid #5a5a3f;padding:10px 22px;margin:6px;font-family:\"Bebas Neue\",sans-serif;letter-spacing:1.5px;font-size:16px;cursor:pointer;'>DECLINE — END HERE</button></div>";document.body.appendChild(wrap);document.getElementById("r-accept-v7").onclick=()=>{wrap.remove();enterReintegration(s)};document.getElementById("r-decline-v7").onclick=()=>{wrap.remove();fallback()}}function enterReintegration(s){s.postWar=true;s.civilServiceDay=1;s.day=26;document.body.innerHTML="<div id='civil-service' style='min-height:100vh;background:#0d2818;color:#F2E8D0;padding:40px 20px;font-family:\"Crimson Text\",serif;'><div style='max-width:680px;margin:0 auto;text-align:center;'><div style='font-family:\"Bebas Neue\",sans-serif;letter-spacing:3px;color:#009A44;font-size:30px;margin-bottom:6px;'>FEDERAL MINISTRY OF RECONCILIATION</div><div style='font-style:italic;color:#cfe7d6;margin-bottom:28px;'>Day 26 — first morning under the green-and-white. The desk is the same desk.</div><div id='cs-day-area' style='background:#0a1f12;border:2px solid #009A44;padding:18px;border-radius:6px;text-align:left;line-height:1.6;'></div><button id='cs-next' style='background:#009A44;color:#fff;border:none;padding:12px 28px;margin-top:18px;font-family:\"Bebas Neue\",sans-serif;letter-spacing:2px;font-size:18px;cursor:pointer;'>PROCESS TODAY'S RETURNEES</button></div></div>";runCivilServiceDay(s);document.getElementById("cs-next").onclick=()=>advanceCivilService(s)}function runCivilServiceDay(s){const area=document.getElementById("cs-day-area");if(!area)return;const beat=window.__pickAmbient(s);const returneeCount=8+Math.floor(Math.random()*6);const errsToday=Math.floor(Math.random()*Math.max(1,Math.floor((s.axes&&s.axes.corruption)||0)));s.totalPay=(s.totalPay||0)+350-errsToday*40;area.innerHTML="<div><strong>Day "+s.civilServiceDay+" of reintegration.</strong></div><div>Returnees processed: "+returneeCount+". Federal stipend: 350 Biafran notes (legacy currency, accepted at par for now).</div><div style='margin-top:10px;font-style:italic;'>"+beat+"</div>"}function advanceCivilService(s){s.civilServiceDay=(s.civilServiceDay||1)+1;s.day=25+s.civilServiceDay;if(s.civilServiceDay>10)return showFinalReintegrationEnding(s);runCivilServiceDay(s)}const REINTEGRATION_ENDINGS=[{title:"The Quiet Federal Clerk",text:"You wear the green tie now. You file. You file. Forty years from now your grandson will find a stamp pad with your initials and ask what FIBA was."},{title:"The Recommended Officer",text:"Your reintegration record was clean enough that Lagos invited you onto the Reconciliation Commission. You declined. You wanted a smaller desk."},{title:"The One Who Was Watched",text:"Your secessionist sympathies followed you in a brown folder. You worked nine more years and were never promoted. Your wife never asked why."},{title:"The Officer Who Refused",text:"On Day 30 you walked out of the booth and did not come back. You opened a small chemist in Calabar. You sleep without dreaming."},{title:"The One Who Buried Both Flags",text:"You served the Federation. You served Biafra. The only thing you served honestly was the queue. The queue, in turn, served you with their patience."}];function showFinalReintegrationEnding(s){const e=REINTEGRATION_ENDINGS[Math.floor(Math.random()*REINTEGRATION_ENDINGS.length)];document.body.innerHTML="<div style='min-height:100vh;background:#0d2818;color:#F2E8D0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;font-family:\"Crimson Text\",serif;'><div style='font-family:\"Bebas Neue\",sans-serif;letter-spacing:4px;color:#009A44;font-size:34px;margin-bottom:14px;'>"+e.title+"</div><div style='max-width:640px;font-size:18px;line-height:1.7;margin-bottom:24px;'>"+e.text+"</div><button onclick='location.reload()' style='background:#009A44;color:#fff;border:none;padding:12px 32px;font-family:\"Bebas Neue\",sans-serif;letter-spacing:2px;font-size:18px;cursor:pointer;'>BEGIN AGAIN</button></div>"}function wrapBribes(){if(!Array.isArray(window.__sideEvents))return false;if(window.__sideEvents.__patchedV7)return true;window.__sideEvents.forEach(ev=>{if(!ev||ev.__patchedV7)return;if(Array.isArray(ev.choices))ev.choices.forEach(c=>{if(!c)return;const isBribe=/accept|take|bribe|pocket|note|envelope/i.test(c.label||"")&&!/refuse|decline|reject|return/i.test(c.label||"");const isRefuse=/refuse|decline|reject|return/i.test(c.label||"");if(isBribe||isRefuse){const orig=c.effect;c.effect=function(){const s=window.state;if(s){ensureStateFields(s);if(isBribe){const amt=(c.amount||80)+Math.floor(Math.random()*40);s.totalPay=(s.totalPay||0)+amt;s.bribesAccepted=(s.bribesAccepted||0)+1;if(s.axes){s.axes.corruption=(s.axes.corruption||0)+1;s.axes.survival=(s.axes.survival||0)+1}if(Math.random()<0.18+0.05*s.bribesAccepted)s.bribeAuditFlag=true}else if(isRefuse){s.bribesRefused=(s.bribesRefused||0)+1;if(s.axes){s.axes.loyalty=(s.axes.loyalty||0)+1;s.axes.corruption=(s.axes.corruption||0)-0.5}}}if(typeof orig==="function")return orig.apply(this,arguments)}}});ev.__patchedV7=true});window.__sideEvents.__patchedV7=true;return true}setInterval(()=>{let allWrapped=true;if(!wrapStartDay())allWrapped=false;if(!wrapLoadNext())allWrapped=false;if(!wrapDecisions())allWrapped=false;if(!wrapEndOfDay())allWrapped=false;if(typeof window.showEndingScreen==="function")wrapEndingFlow();if(!wrapBribes())allWrapped=false;if(window.state)ensureStateFields(window.state);document.querySelectorAll("p, div, span").forEach(el=>{if(el.children.length===0&&el.textContent&&el.textContent.indexOf("Ojukwu's declaration again at midnight")!==-1)el.textContent=window.__pickAmbient(window.state);if(el.children.length===0&&el.textContent&&el.textContent.indexOf("For today, that is enough")!==-1)el.textContent=FAMILY_FED_LINES[Math.floor(Math.random()*FAMILY_FED_LINES.length)]});if(allWrapped&&window.__patchV7Done==null){window.__patchV7Done=true;console.log("[patch v7] all wrappers installed")}},600);window.__patchV7Markers=["__ambientBeats","__excusePool","__rentLedger","__handleRentMiss","approvalErrorsToday","bribeAuditFlag","civilServiceDay","ENDINGS_REINTEGRATION","#civil-service","#eviction"];window.__rentLedger=processRentLedger;window.__handleRentMiss=showRentMissModal;window.ENDINGS_REINTEGRATION=REINTEGRATION_ENDINGS;})();
+</script>
 </body>
 </html>
