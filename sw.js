@@ -1,10 +1,16 @@
 // CHECKPOINT BIAFRA — Service Worker v1.1
 // iOS PWA offline support — no opaque response caching
 
-const CACHE_NAME = 'checkpoint-biafra-v1.1';
+const CACHE_NAME = 'checkpoint-biafra-v1.2';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',
+  './sw.js',
+  './styles.css',
+  './engine.js',
+  './patch.js',
+  './icon-192.png',
+  './icon-512.png',
 ];
 
 // Install: only cache same-origin assets reliably

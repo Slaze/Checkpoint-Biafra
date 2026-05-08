@@ -1,0 +1,1465 @@
+// ═══════════════════════════════════════════════════════════════
+// CHECKPOINT BIAFRA — GAME ENGINE v1.1
+// iOS PWA bug-fixed edition
+// ═══════════════════════════════════════════════════════════════
+(function() {
+'use strict';
+
+// ── GAME STATE ──
+var state = {};
+
+function freshState() {
+  return {
+    day: 1,
+    traveller: 0,
+    totalTravellers: 8,
+    dayApproved: 0,
+    dayDenied: 0,
+    dayDetained: 0,
+    totalPay: 3400,
+    axes: { loyalty:0, compassion:0, rebellion:0, survival:0, witness:0, corruption:0 },
+    player: { name:'', firstname:'', gender:'', state:'', background:'', family:'' },
+    family: [],
+    exchangeRate: 1.0,
+    dayResults: [],
+    endingsUnlocked: [],
+    flags: {},
+    dayTravellers: [],    // ← FIX: store the day's traveller list
+    moralFiredDays: [],   // ← FIX: track which days have fired moral events
+  };
+}
+
+// ── CC SELECTIONS ──
+var ccSel = { gender:'', state:'', background:'', family:'' };
+
+// ── SCREEN MANAGEMENT ──
+var SCREENS = ['splash','char-create','intro','bulletin-screen','game','moral-event','eod-report','ending'];
+
+function showScreen(id) {
+  SCREENS.forEach(function(s) {
+    var el = document.getElementById(s);
+    if (el) el.style.display = 'none';
+  });
+  var target = document.getElementById(id);
+  if (target) {
+    target.style.display = 'flex';
+    // Scroll to top on iOS
+    target.scrollTop = 0;
+  }
+}
+
+// Override: use display flex via inline style (avoids CSS class race on iOS)
+// We'll init all screens hidden first:
+function initScreens() {
+  SCREENS.forEach(function(s) {
+    var el = document.getElementById(s);
+    if (el) el.style.display = 'none';
+  });
+}
+
+// ── DATA: BACKGROUNDS ──
+var BACKGROUNDS = [
+  { id:'civil',    label:'FIBA CIVIL SERVANT', desc:'Neutral start. All axes open.', bias:{} },
+  { id:'soldier',  label:'FORMER ARMY',         desc:'Spot military ID fakes. Colleagues distrust you.', bias:{loyalty:2} },
+  { id:'teacher',  label:'SCHOOLTEACHER',        desc:'Detect writing forgeries. Lower pay.', bias:{compassion:2} },
+  { id:'nysc',     label:'NYSC CORP MEMBER',     desc:'Corps networks. Can be terminated in 48hrs.', bias:{witness:2} },
+  { id:'tech',     label:'TECH WORKER',           desc:'Cross-reference IDs faster. Wants to return to Lagos.', bias:{witness:1,survival:1} },
+  { id:'ngo',      label:'NGO FIELD OFFICER',    desc:'Red Cross contacts. FIBA commanders distrust you.', bias:{compassion:1,witness:1} },
+  { id:'clergy',   label:'CATHOLIC CLERGY',      desc:'Church networks. Complex loyalties.', bias:{compassion:2,rebellion:1} },
+  { id:'trader',   label:'MARKET TRADER',         desc:'Reads people well. Flagged as corruption risk.', bias:{survival:2} },
+  { id:'journalist','label':'JOURNALIST',          desc:'Build case files. Sources approach you.', bias:{witness:3} },
+  { id:'pastor',   label:'PASTOR/MINISTER',       desc:'Community brings information.', bias:{compassion:2,loyalty:1} },
+  { id:'palmoil',   label:'PALM OIL TRADER',     desc:'You know every backroad market.',                     bias:{survival:1,corruption:1} },
+  { id:'redcross',  label:'RED CROSS NURSE',     desc:'You have triaged the wounded from both sides.',       bias:{compassion:3} },
+  { id:'bbc',       label:'BBC CORRESPONDENT',   desc:'You filed dispatches from Umuahia until they expelled you.', bias:{witness:3} },
+  { id:'lecturer',  label:'NSUKKA LECTURER',     desc:'Your faculty was shelled in 1967.',                   bias:{witness:1,rebellion:2} },
+  { id:'railway',   label:'RAILWAY WORKER',      desc:'You know every kilometre of the Eastern Line.',       bias:{loyalty:1,survival:1} },
+  { id:'bicycle',   label:'BICYCLE MECHANIC',    desc:'In a country without petrol, your trade is politics.',bias:{survival:2,compassion:1} },
+  { id:'radio',     label:'RADIO OPERATOR',      desc:'You relayed broadcasts out of Aba.',                  bias:{witness:2,rebellion:1} },
+  { id:'dibia',     label:'HERBALIST (DIBIA)',   desc:'Villagers come to you before any hospital.',          bias:{compassion:2,loyalty:1} },
+  { id:'marketwm',  label:'MARKET WOMAN',        desc:'You ran an ofe stall through three offensives.',      bias:{survival:2,witness:1} },
+  { id:'police',    label:'POLICE SERGEANT',     desc:'You served federal command before the emergency.',    bias:{loyalty:2,corruption:1} },
+  { id:'cargo',     label:'CARGO DRIVER',        desc:'You hauled relief, ammunition, and refugees in a week.',bias:{witness:1,survival:2} },
+  { id:'artist',    label:'ARTIST / CREATIVE',     desc:'Painter, musician, performer. Patrons distrust the regime.', bias:{witness:2,compassion:1} },
+  { id:'doctor',    label:'DOCTOR / NURSE',         desc:'Hospitals are your refuge. Bribes are mostly food.',         bias:{compassion:2,survival:1} },
+  { id:'journalist',label:'JOURNALIST',             desc:'You see what others edit out. Watched by FIBA.',             bias:{witness:2,rebellion:1} },
+  { id:'farmer',    label:'FARMER / TRADER',        desc:'Land claims, ration tickets, ferry passes — you know each.', bias:{survival:2} },
+  { id:'other',     label:'OTHER — SPECIFY ON FILE', desc:'A general field. FIBA notes your background as unrecorded.', bias:{} },
+];
+
+// ── DATA: STATES ──
+var STATES = [
+  { val:'Enugu',      label:'ENUGU',       desc:'Core Biafra. High loyalty pressure.' },
+  { val:'Anambra',    label:'ANAMBRA',     desc:'Commercial hub. Survival bias.' },
+  { val:'Imo',        label:'IMO',         desc:'Strong Catholic presence.' },
+  { val:'Abia',       label:'ABIA',        desc:'MASSOB origins. Rebellion bias.' },
+  { val:'Ebonyi',     label:'EBONYI',      desc:'Highest survival pressure.' },
+  { val:'Rivers',     label:'RIVERS',      desc:'Contested. Oil. Politically loaded.' },
+  { val:'Cross River',label:'CROSS RIVER', desc:'Your posting. Home ground exposure.' },
+  { val:'Delta',      label:'DELTA',       desc:'Not unanimously Biafran.' },
+];
+
+// ── DATA: FAMILY ──
+var FAMILY_MALE = [
+  { id:'single',       label:'SINGLE',               desc:'No dependants. Full risk tolerance.', pressure:0 },
+  { id:'partner',      label:'PARTNER',              desc:'Limited financial obligation.', pressure:1 },
+  { id:'wife',         label:'WIFE, NO CHILDREN',    desc:'Emotional weight.', pressure:2 },
+  { id:'wife_child',   label:'WIFE + 1 CHILD',       desc:'School fees activate.', pressure:3 },
+  { id:'wife_children',label:'WIFE + 3 CHILDREN',    desc:'Daily expense pressure.', pressure:4 },
+  { id:'wife_extended',label:'WIFE + CHILDREN + PARENT', desc:'Medical costs mid-game.', pressure:5 },
+  { id:'divorced',     label:'DIVORCED',             desc:'Paying child support remotely.', pressure:2 },
+  { id:'widower',      label:'WIDOWER',              desc:'Sole guardian.', pressure:4 },
+];
+var FAMILY_FEMALE = [
+  { id:'single_f',             label:'SINGLE',                  desc:'No dependants. Highest friction.', pressure:0 },
+  { id:'husband_remote',       label:'HUSBAND (REMOTE)',        desc:'Day 15 event.', pressure:2 },
+  { id:'husband_child_away',   label:'HUSBAND + CHILD (AWAY)',  desc:'Separation cost.', pressure:3 },
+  { id:'husband_children_here',label:'FAMILY AT POSTING',       desc:'Evacuation Day 18.', pressure:4 },
+  { id:'single_mother_away',   label:'SINGLE MOTHER (CHILD AWAY)', desc:'Send money home.', pressure:3 },
+  { id:'single_mother_here',   label:'SINGLE MOTHER (CHILD WITH YOU)', desc:'Most demanding.', pressure:5 },
+  { id:'siblings',             label:'CARER FOR SIBLINGS',      desc:'Siblings at conscription age.', pressure:4 },
+  { id:'pregnant',             label:'PREGNANT (UNDISCLOSED)',  desc:'Disclosure ends posting.', pressure:3 },
+];
+
+// ── DATA: BULLETINS ──
+var BULLETINS = {
+  1:  { title:'OPENING DIRECTIVE', stamp:'ACTIVE',
+        body:'Welcome to Checkpoint Ogoja-East. Your mandate is the verification of all travellers entering or exiting the Cross River border zone.\n\nCurrent valid documents:\n• Nigerian National ID (NIN card)\n• Nigerian International Passport\n• FIBA Internal Movement Permit\n\nAll three fields must be present and consistent. If name on NIN does not match passport exactly, deny entry and log discrepancy.\n\nPurpose of travel must be stated. Accepted categories: COMMERCIAL, MEDICAL, FAMILY, OFFICIAL, HUMANITARIAN, PRESS.',
+        rules:['NIN name must match passport exactly','Movement permit must be current and valid','Purpose of travel must be one of six approved categories'] },
+  2:  { title:'SECURITY ADVISORY', stamp:'RESTRICTED',
+        body:'Intelligence indicates increased movement through Ogoja-East.\n\nOfficers are advised to cross-reference BVN slips where presented. The BVN number and NIN number must NOT be identical. Identical numbers indicate a forged document.\n\nHyphenated surnames: check that BOTH components appear on ALL documents presented.',
+        rules:['BVN ≠ NIN number','Hyphenated names: both components must appear on all documents'] },
+  3:  { title:'TRANSITION ADVISORY', stamp:'URGENT',
+        body:'Travellers may present documents referencing a "Biafran Registry of Citizens."\n\nAt this time, NO Biafran-issued document has any standing under Nigerian federal law. Travellers presenting Biafran documents as primary identification are to be redirected to Secondary Processing.',
+        rules:['Biafran documents are NOT valid primary ID','Redirect BRC document holders to Secondary Processing'] },
+  4:  { title:'POST-DECLARATION DIRECTIVE', stamp:'CLASSIFIED',
+        body:'Effective 0600hrs today: Emergency Protocol 7 is enacted.\n\nAll holders of Biafran Identity Number (BIN) cards are to be processed under Secondary Review Protocol. Do not deny on the basis of BIN alone. Log ALL BIN numbers and forward daily log to FIBA Regional Command, Calabar.\n\nA FIBA Movement Permit is now MANDATORY for all travellers. No exceptions.',
+        rules:['BIN holders: Secondary Review, not automatic denial','FIBA Movement Permit is now MANDATORY','Log all BIN numbers daily'] },
+  5:  { title:'DOCUMENT UPDATE', stamp:'ACTIVE',
+        body:'The Biafran Travel Document (BTD) is NOT recognised as a valid travel document under Nigerian federal law.\n\nOfficers approving entry on the basis of BTD alone face immediate disciplinary review.\n\nIf a traveller presents BOTH a Nigerian passport AND a BTD, the issue dates of both documents are to be recorded.',
+        rules:['BTD is NOT valid primary ID','Record issue date comparison when both presented'] },
+  7:  { title:'VOTER\'S CARD SUSPENSION', stamp:'RESTRICTED',
+        body:'Voter\'s cards issued in Enugu, Anambra, Imo, Abia, and Ebonyi states are SUSPENDED as supporting identity documents pending audit.\n\nRivers, Cross River, and Delta voter\'s cards remain valid as supporting documents only — never as primary ID.',
+        rules:['SE state voter cards: SUSPENDED as supporting ID','Rivers/Cross River/Delta voter cards: valid supporting ID only'] },
+  9:  { title:'BCD FORGERY ADVISORY', stamp:'URGENT',
+        body:'Intelligence confirms widespread forgery of the Biafran Citizen Declaration (BCD).\n\nVerify ward officer names against the current approved register. BCDs bearing unlisted officer names are to be treated as fraudulent.\n\nHolders of fraudulent BCDs are NOT to be detained without additional evidence of intent.',
+        rules:['Verify BCD ward officer name against register','Fraudulent BCD: redirect and log — do not detain without additional evidence'] },
+  14: { title:'HUMANITARIAN PASS REVISION', stamp:'ACTIVE',
+        body:'The Biafran Humanitarian Transit Pass (BHTP) format has been revised. New format passes carry a GREEN BORDER and RAISED SEAL.\n\nBHTPs issued in the old format remain valid ONLY if accompanied by a valid BIN card issued after Day 8.\n\nPurpose code MED-04 (child malnutrition) is flagged for heightened scrutiny.',
+        rules:['New BHTP: green border + raised seal','Old BHTP: only valid with post-Day-8 BIN','MED-04: heightened scrutiny required'] },
+  18: { title:'INTEGRITY REVIEW NOTICE', stamp:'CONFIDENTIAL',
+        body:'FIBA Internal Affairs has initiated a review of processing records at Checkpoint Ogoja-East.\n\nAll officers are reminded that approvals not supported by valid documentation are subject to disciplinary action regardless of circumstance.\n\nPersonal mobile devices are to be surrendered for inspection at end of shift on Day 19.',
+        rules:['All approvals must be document-supported','Personal devices: surrender end of Day 19 shift'] },
+  21: { title:'TRAVEL RESTRICTION ORDER', stamp:'CLASSIFIED',
+        body:'Travel restriction orders are now active for holders of Nigerian passports with state of origin listed as Rivers or Cross River.\n\nHolders are to be redirected to the designated Secondary Processing Unit. Do not stamp. Do not deny. Do not explain the reason for redirection.\n\nThis order is issued under Emergency Security Provision 14(b). It is not subject to officer discretion.',
+        rules:['Rivers/Cross River passport holders: redirect to Secondary Processing','Do NOT stamp, deny, or explain reason','No officer discretion applies'] },
+  22: { title:'ADMIN NOTICE — CEASEFIRE RUMOURS', stamp:'MORNING BULLETIN',
+        body:'Radio Biafra announced overnight that negotiations have reached a critical stage. Federal command has denied this. Treat both statements as propaganda. No officer discretion applies today — only paperwork.\n\nThe eastern corridor is restricted to relief traffic and approved press. Biafran-issued Authorisation documents remain recognised at this checkpoint while the ceasefire protocol stands.',
+        rules:['All travellers with EXPIRED Federal Passes: DENY','Biafran Driver\'s Authorisation (BDA): RECOGNISED','No officer discretion applies today'] },
+  23: { title:'EMERGENCY BULLETIN — PETROL RATIONING', stamp:'URGENT',
+        body:'Three northern checkpoints have run dry. Any vehicle moving east today is presumed to be on siphoned or black-market fuel. Cargo drivers must show fuel receipts alongside their Authorisation.\n\nRelief convoys marked by Red Cross remain exempt from the receipt rule. Check seal and date.',
+        rules:['Cargo drivers without fuel receipt: DETAIN','Red Cross / MSF relief vehicles: EXEMPT from receipt rule','Do not accept photocopies of fuel receipts'] },
+  24: { title:'ADMIN NOTICE — SURRENDER RUMOURS', stamp:'MORNING BULLETIN',
+        body:'A typed document is circulating in Umuahia claiming that General Ojukwu has left for Côte d\'Ivoire. We do not confirm. We do not deny. We stamp papers.\n\nIf a traveller presents or references this document, detain them and forward the document — unread — to HQ. Do not read it aloud.',
+        rules:['Travellers carrying the Umuahia flight document: DETAIN','Do not read the document aloud','Continue normal processing for all other travellers'] },
+  25: { title:'FINAL BULLETIN', stamp:'LAST DAY',
+        body:'Effendy. By evening the bridgehead may be ours, theirs, or no one\'s. Every stamp you press today is read by historians, not only by officers.\n\nFollow each document on its own terms. Where bulletins disagree, follow the document. Where the document lies, note your name clearly in the log.',
+        rules:['Follow each document on its own terms','Where bulletins disagree, follow the document','Write your name clearly in the log'] }
+};
+
+// ── DATA: DOCUMENTS ──
+var DOC_TEMPLATES = {
+  nin_clean:       { type:'NIN CARD',              issuer:'NIMC / FIBA',               biafran:false,
+    fields:{ 'NIN NUMBER':'71234567890', 'DATE OF BIRTH':'14 MAR 1988', 'ISSUE DATE':'12 JAN 2022', 'STATUS':'VALID' },
+    flags:[] },
+  nin_mismatch:    { type:'NIN CARD',              issuer:'NIMC / FIBA',               biafran:false,
+    fields:{ 'NIN NUMBER':'71234567890', 'FULL NAME':'EMEKA EZE', 'DATE OF BIRTH':'14 MAR 1988', 'STATE':'ENUGU' },
+    flags:[{ field:'FULL NAME', note:'Does not match passport: CHUKWUEMEKA EZE', type:'A' }] },
+  passport_clean:  { type:'NIGERIAN PASSPORT',     issuer:'Federal Republic of Nigeria', biafran:false,
+    fields:{ 'PASSPORT NO':'A12345678', 'NATIONALITY':'NIGERIAN', 'DATE OF ISSUE':'15 FEB 2021', 'DATE OF EXPIRY':'14 FEB 2031', 'MRZ':'VALID' },
+    flags:[] },
+  permit_clean:    { type:'FIBA MOVEMENT PERMIT',  issuer:'FIBA Field Operations',     biafran:false,
+    fields:{ 'PERMIT NO':'FIB-2024-009341', 'PURPOSE':'COMMERCIAL', 'VALID TO':'TODAY +7 DAYS', 'AUTH BY':'INSP. A. NWOSU' },
+    flags:[] },
+  permit_expired:  { type:'FIBA MOVEMENT PERMIT',  issuer:'FIBA Field Operations',     biafran:false,
+    fields:{ 'PERMIT NO':'FIB-2024-008001', 'PURPOSE':'MEDICAL', 'VALID TO':'YESTERDAY', 'AUTH BY':'INSP. A. NWOSU' },
+    flags:[{ field:'VALID TO', note:'EXPIRED — permit no longer valid', type:'A' }] },
+  permit_press:    { type:'FIBA MOVEMENT PERMIT',  issuer:'FIBA Field Operations',     biafran:false,
+    fields:{ 'PERMIT NO':'FIB-2024-011203', 'PURPOSE':'PRESS', 'VALID TO':'TODAY +14', 'ISSUED':'3 DAYS POST-DECLARATION' },
+    flags:[{ field:'ISSUED', note:'Issued 3 days after declaration — possible rushed construction', type:'B' }] },
+  permit_official: { type:'FIBA MOVEMENT PERMIT',  issuer:'FIBA HQ Abuja',             biafran:false,
+    fields:{ 'PERMIT NO':'FIB-HQ-2024-0042', 'PURPOSE':'OFFICIAL', 'GRADE':'FEDERAL GL-14', 'VALID TO':'TODAY +30' },
+    flags:[] },
+  permit_bad_official:{ type:'FIBA MOVEMENT PERMIT', issuer:'FIBA Field Operations',   biafran:false,
+    fields:{ 'PERMIT NO':'FIB-2024-019441', 'PURPOSE':'COMMERCIAL (OIL)', 'AUTH BY':'D. IBRAHIM (FIELD OPS)' },
+    flags:[{ field:'AUTH BY', note:'D. IBRAHIM not in current authorised officer register', type:'A' }] },
+  bvn_match:       { type:'BVN CONFIRMATION SLIP', issuer:'CBN / FIBA',                biafran:false,
+    fields:{ 'BVN NUMBER':'71234567890', 'ISSUING BANK':'FIRST BANK PLC', 'ENROLLMENT':'5 DAYS PRE-DECLARATION' },
+    flags:[{ field:'BVN NUMBER', note:'BVN and NIN are identical — one is forged', type:'A' }] },
+  bvn_recent:      { type:'BVN CONFIRMATION SLIP', issuer:'CBN / FIBA',                biafran:false,
+    fields:{ 'BVN NUMBER':'91827364501', 'ENROLLMENT DATE':'3 DAYS POST-DECLARATION', 'BANK':'GTB PLC' },
+    flags:[{ field:'ENROLLMENT DATE', note:'Enrolled after declaration — possible rushed identity construction', type:'B' }] },
+  traders_licence: { type:'TRADER\'S LICENCE',     issuer:'Ministry of Commerce',      biafran:false,
+    fields:{ 'LICENCE NO':'TL-CR-2023-4421', 'CATEGORY':'AGRICULTURAL GOODS', 'EXPIRY':'DEC 2025', 'STATUS':'VALID' },
+    flags:[] },
+  voters_card_se:  { type:'VOTER\'S CARD',          issuer:'INEC',                     biafran:false,
+    fields:{ 'VOTER ID':'VO-EN-2023-091234', 'STATE':'ENUGU', 'LGA':'ENUGU NORTH', 'STATUS':'ACTIVE' },
+    flags:[{ field:'STATE', note:'SE state voter card: SUSPENDED as supporting ID — Bulletin 007', type:'A' }] },
+  church_id:       { type:'CHURCH IDENTITY CARD',   issuer:'Catholic Diocese',         biafran:false,
+    fields:{ 'ISSUED BY':'Diocese of Ogoja', 'POSITION':'SENIOR PASTOR', 'VALID':'2024' },
+    flags:[{ field:'ISSUED BY', note:'Church ID not a FIBA-recognised identity document', type:'A' }] },
+  bin_clean:       { type:'BIAFRAN ID CARD (BIN)',   issuer:'Biafran Registry, Enugu', biafran:true,
+    fields:{ 'BIN NUMBER':'BF-982716340', 'STATE OF ORIGIN':'ENUGU', 'ISSUE DATE':'DAY 5', 'SEAL':'PRESENT' },
+    flags:[] },
+  bin_early:       { type:'BIAFRAN ID CARD (BIN)',   issuer:'Biafran Registry',        biafran:true,
+    fields:{ 'BIN NUMBER':'BF-100214', 'ISSUE DATE':'DAY 6 (EARLY FORMAT)', 'EMBOSSING':'ABSENT' },
+    flags:[{ field:'FORMAT', note:'Day 6 BIN: early format — requires supplementary declaration', type:'B' }] },
+  btd_clean:       { type:'BIAFRAN TRAVEL DOCUMENT', issuer:'Republic of Biafra, MFA', biafran:true,
+    fields:{ 'BTD NUMBER':'BS-1029384', 'NATIONALITY':'BIAFRAN', 'ISSUE DATE':'DAY 8', 'EXPIRY':'1 YEAR' },
+    flags:[{ field:'LEGAL STATUS', note:'BTD not recognised under Nigerian federal law', type:'A' }] },
+  bcd_clean:       { type:'BIAFRAN CITIZEN DECLARATION', issuer:'BRC Ward Officer',   biafran:true,
+    fields:{ 'DECL NO':'BCD-2024-17834', 'WARD OFFICER':'CHUKWUDI OKONKWO', 'DATE':'DAY 7', 'WITNESS':'SIGNED' },
+    flags:[] },
+  bcd_bad_officer: { type:'BIAFRAN CITIZEN DECLARATION', issuer:'BRC Ward Officer',   biafran:true,
+    fields:{ 'DECL NO':'BCD-2024-22901', 'WARD OFFICER':'E. NWOGU', 'DATE':'DAY 10', 'WITNESS':'SIGNED' },
+    flags:[{ field:'WARD OFFICER', note:'E. NWOGU not on approved ward officer register — Bulletin 009', type:'A' }] },
+  bhtp_clean:      { type:'BIAFRAN HUMANITARIAN PASS', issuer:'CARITAS / Biafran Red Cross', biafran:true,
+    fields:{ 'PASS NO':'BHTP-2024-0441', 'PURPOSE':'MED-02 (MEDICAL)', 'FORMAT':'GREEN BORDER + RAISED SEAL' },
+    flags:[] },
+  bhtp_old:        { type:'BIAFRAN HUMANITARIAN PASS', issuer:'CARITAS',              biafran:true,
+    fields:{ 'PASS NO':'BHTP-2024-0188', 'PURPOSE':'MED-04 (CHILD MALNUTRITION)', 'FORMAT':'OLD FORMAT', 'ISSUED':'DAY 12' },
+    flags:[{ field:'FORMAT', note:'Old BHTP only valid with post-Day-8 BIN — Bulletin 014', type:'A' },
+           { field:'PURPOSE', note:'MED-04 flagged for heightened scrutiny', type:'B' }] },
+  french_passport: { type:'PASSEPORT FRANÇAIS',     issuer:'République Française',     biafran:false,
+    fields:{ 'PASSPORT NO':'13AB45678', 'NAME':'FONTAINE CLAIRE M', 'NATIONALITY':'FRANÇAISE', 'EXPIRY':'2029' },
+    flags:[] },
+  fiba_ngo:        { type:'FIBA NGO ACCESS PERMIT', issuer:'FIBA Humanitarian Division', biafran:false,
+    fields:{ 'PERMIT NO':'NGO-2024-0033', 'ORG':'MSF NIGERIA', 'PURPOSE':'HUMANITARIAN AID', 'VALID TO':'TODAY +30' },
+    flags:[] },
+  fiba_ngo_renewed:{ type:'FIBA NGO ACCESS PERMIT', issuer:'FIBA Humanitarian Division', biafran:false,
+    fields:{ 'PERMIT NO':'NGO-2024-0033-R', 'ORG':'MSF NIGERIA', 'STATUS':'RENEWED', 'VALID TO':'TODAY +30' },
+    flags:[{ field:'NOTE', note:'CLASS C: Electronic equipment beyond standard nursing kit', type:'C' }] },
+  uk_passport:     { type:'UK PASSPORT',             issuer:'HM Passport Office',       biafran:false,
+    fields:{ 'PASSPORT NO':'519847261', 'NAME':'PHILLIPS-SMITH ADEBAYO J', 'NATIONALITY':'BRITISH', 'EXPIRY':'2030' },
+    flags:[{ field:'PRESENTED AS', note:'CLASS C: UK passport used as primary at domestic crossing', type:'C' }] },
+  ng_passport_clean:{ type:'NIGERIAN PASSPORT',      issuer:'Federal Republic of Nigeria', biafran:false,
+    fields:{ 'PASSPORT NO':'B98765432', 'STATE OF ORIGIN':'LAGOS', 'EXPIRY':'2029', 'FIBA PERMIT':'ABSENT' },
+    flags:[{ field:'FIBA PERMIT', note:'FIBA Movement Permit absent — required for all crossings', type:'A' }] },
+  chinese_passport:{ type:'CHINESE PASSPORT',        issuer:'People\'s Republic of China', biafran:false,
+    fields:{ 'PASSPORT NO':'G12309876', 'NAME':'LI WEIMING', 'NATIONALITY':'CHINESE', 'VISA':'FIBA WORK PERMIT ATTACHED' },
+    flags:[] },
+  company_letter:  { type:'CORPORATE AUTHORISATION', issuer:'SINOPEC NIGERIA OIL OPS', biafran:false,
+    fields:{ 'PURPOSE':'SITE INSPECTION', 'VALIDITY':'30 DAYS', 'DATE':'CURRENT' },
+    flags:[] },
+  mil_exempt_forged:{ type:'MILITARY EXEMPTION CERT', issuer:'Biafran Army HQ',        biafran:true,
+    fields:{ 'CERT NO':'BAH-EXEMPT-2024-0441', 'REASON':'ESSENTIAL CIVILIAN SERVICE', 'OFFICER':'MAJ. K. OKONKWO' },
+    flags:[{ field:'AUTHENTICITY', note:'CLASS C: Quality unusually high for current Biafran printing capacity', type:'C' },
+           { field:'PHYSICAL', note:'CLASS C: Holder\'s bearing inconsistent with civilian service claim', type:'C' }] },
+  nin_cr:          { type:'NIN CARD',                issuer:'NIMC / FIBA',              biafran:false,
+    fields:{ 'NIN NUMBER':'81234509876', 'FULL NAME':'GRACE NDUKA', 'STATE OF ORIGIN':'CROSS RIVER', 'STATUS':'VALID' },
+    flags:[{ field:'STATE OF ORIGIN', note:'BULLETIN 021: Travel restriction active for Cross River holders', type:'A' }] },
+  passport_cr:     { type:'NIGERIAN PASSPORT',       issuer:'Federal Republic of Nigeria', biafran:false,
+    fields:{ 'PASSPORT NO':'A87654321', 'NAME':'NDUKA GRACE EMEM', 'STATE OF ORIGIN':'CROSS RIVER', 'EXPIRY':'2030' },
+    flags:[{ field:'STATE OF ORIGIN', note:'BULLETIN 021: Travel restriction active', type:'A' }] },
+  military_pension:{ type:'MILITARY PENSION CARD',   issuer:'Nigerian Army Welfare',    biafran:false,
+    fields:{ 'RANK':'COLONEL (RETIRED)', 'SERVICE NO':'NA/22/1187', 'PENSION':'ACTIVE', 'VALID':'LIFETIME' },
+    flags:[] },
+  nin_young:       { type:'NIN CARD',                issuer:'NIMC / FIBA',              biafran:false,
+    fields:{ 'NIN NUMBER':'91234567801', 'FULL NAME':'CHIBUIKE NWEZE', 'DATE OF BIRTH':'14 JUN 2002', 'STATE':'ENUGU' },
+    flags:[{ field:'AGE', note:'CLASS C: Physical presentation inconsistent with stated age of 21', type:'C' }] },
+  bda_clean:      { type:'BIAFRAN DRIVER\'S AUTHORISATION',issuer:'REPUBLIC OF BIAFRA / MIN. OF TRANSPORT', biafran:true,
+    fields:{ 'AUTH NO':'BDA/ENU/44721', 'FULL NAME':'NGOZI OKONKWO', 'VEHICLE CLASS':'B — LIGHT CARGO', 'ISSUED':'09 APR 1969', 'STAMPED':'ENUGU TRANSPORT OFFICE' },
+    flags:[] },
+  bda_forged:     { type:'BIAFRAN DRIVER\'S AUTHORISATION',issuer:'REPUBLIC OF BIAFRA / MIN. OF TRANSPORT', biafran:true,
+    fields:{ 'AUTH NO':'BDA/PHC/88910', 'FULL NAME':'EMEKA UGOCHUKWU', 'VEHICLE CLASS':'A — MOTORCYCLE', 'ISSUED':'31 FEB 1969', 'STAMPED':'PORT HARCOURT TRANSPORT OFFICE' },
+    flags:[{ field:'ISSUED', note:'CLASS B: 31 FEB 1969 — impossible date', type:'B' },{ field:'STAMPED', note:'CLASS B: Port Harcourt transport office closed by federal occupation before this issue date', type:'B' }] },
+};
+
+// ── DATA: TRAVELLER POOL ──
+// Each entry: id, name, desc, docs[], flags[], axisHint, correct, minDay, maxDay
+var TRAVELLER_POOL = [
+  // Phase 1 — clean / simple
+  { id:'trader_a',    name:'IBRAHIM MUSA',    desc:'Hausa trader, agricultural goods, comes from Benue',
+    docs:['nin_clean','passport_clean','permit_clean'], flags:[], axisHint:null, correct:'approve', minDay:1 },
+  { id:'nurse_a',     name:'ADAEZE OKONKWO',  desc:'Nurse, returning from medical conference in Calabar',
+    docs:['nin_clean','passport_clean','permit_clean'], flags:[], axisHint:null, correct:'approve', minDay:1 },
+  { id:'student_a',   name:'CHUKWUEMEKA EZE', desc:'Student, returning to family in Enugu — name mismatch on NIN',
+    docs:['nin_mismatch','passport_clean','permit_clean'], flags:['Name mismatch: NIN says EMEKA EZE, passport says CHUKWUEMEKA EZE'], axisHint:'loyalty', correct:'deny', minDay:1 },
+  { id:'elderly_a',   name:'MARGARET NWACHUKWU', desc:'Elderly woman, medical appointment — no movement permit',
+    docs:['nin_clean','passport_clean'], flags:['MISSING: FIBA Movement Permit'], axisHint:'compassion', correct:'deny', minDay:1 },
+  { id:'official_a',  name:'BELLO ABUBAKAR',  desc:'Federal civil servant, official travel, complete documents',
+    docs:['nin_clean','passport_clean','permit_official'], flags:[], axisHint:null, correct:'approve', minDay:1 },
+  { id:'trader_b',    name:'CHIOMA OKAFOR',   desc:'Market trader, licensed, regular crossing — MAMA CHIOMA',
+    docs:['nin_clean','passport_clean','permit_clean','traders_licence'], flags:[], axisHint:null, correct:'approve', minDay:1 },
+  { id:'suspicious_a',name:'JOHN OKONKWO',    desc:'Claims journalist — press permit looks rushed, BVN matches NIN',
+    docs:['nin_clean','passport_clean','permit_press','bvn_match'], flags:['BVN number matches NIN — one is forged','Press permit issued 2 days after secession declaration'], axisHint:'loyalty', correct:'detain', minDay:1 },
+  { id:'mother_a',    name:'NKECHI ANIAGU',   desc:'Mother with infant, medical emergency — movement permit expired yesterday',
+    docs:['nin_clean','passport_clean','permit_expired'], flags:['Movement permit EXPIRED'], axisHint:'compassion', correct:'deny', minDay:1 },
+  // Phase 2 — Biafran docs
+  { id:'biafra_a',    name:'EMEKA NWODO',     desc:'BIN card only. No Nigerian ID. Claims full Biafran citizenship.',
+    docs:['bin_clean'], flags:['No Nigerian primary ID','FIBA Movement Permit absent'], axisHint:'compassion', correct:'deny', minDay:4 },
+  { id:'biafra_b',    name:'ADANNA CHUKWU',   desc:'Returning from Lagos with full Nigerian docs. No Biafran papers. Wants to go home to Owerri.',
+    docs:['nin_clean','passport_clean'], flags:['Missing: FIBA Movement Permit'], axisHint:'compassion', correct:'deny', minDay:4 },
+  { id:'redcross_a',  name:'CLAIRE FONTAINE', desc:'French national, MSF nurse — full valid documents',
+    docs:['french_passport','fiba_ngo','bhtp_clean'], flags:[], axisHint:null, correct:'approve', minDay:4 },
+  { id:'infiltrator', name:'DANIEL OKAFOR',   desc:'Friendly, complete documents. Perfect presentation. Too perfect.',
+    docs:['nin_clean','passport_clean','permit_clean','bvn_recent'], flags:['CLASS C: BVN enrolled 3 days post-declaration','CLASS C: Passport photo background inconsistent'], axisHint:'loyalty', correct:'detain', minDay:4 },
+  { id:'army_deserter',name:'SUNDAY MBAH',    desc:'Civilian papers. Military bearing. Heading to Aba.',
+    docs:['nin_clean','bcd_clean','permit_clean'], flags:['CLASS C: Posture suggests military training','CLASS C: Civilian occupation inconsistent with presentation'], axisHint:'compassion', correct:'detain', minDay:5 },
+  { id:'no_papers_a', name:'UNKNOWN',         desc:'Woman with three children. No documents. No explanation. She is looking at you.',
+    docs:[], flags:['NO DOCUMENTS PRESENTED'], axisHint:'compassion', correct:'deny', minDay:4 },
+  { id:'priest_a',    name:'REV. EMMANUEL OKAFOR', desc:'Pastor, church ID, suspended voter\'s card — 200 displaced parishioners 4km back.',
+    docs:['church_id','voters_card_se'], flags:['Voter\'s card SE state: SUSPENDED — Bulletin 007','Church ID: not FIBA-recognised'], axisHint:'compassion', correct:'deny', minDay:7 },
+  { id:'biafra_civil',name:'OBIAGELI NWOSU',  desc:'Biafran civil servant, full BRC documents — no Nigerian docs',
+    docs:['bin_clean','btd_clean'], flags:['BTD not recognised under Nigerian law','No FIBA Movement Permit'], axisHint:'loyalty', correct:'deny', minDay:5 },
+  { id:'hausa_trader',name:'SANI DANGOTE',    desc:'Hausa trader, full Nigerian documents, clean. Every field correct.',
+    docs:['nin_clean','passport_clean','permit_clean','traders_licence'], flags:[], axisHint:null, correct:'approve', minDay:3 },
+  { id:'british_nig', name:'ADEBAYO PHILLIPS-SMITH', desc:'British-Nigerian dual citizen. Presents UK passport first.',
+    docs:['uk_passport','ng_passport_clean'], flags:['CLASS C: UK passport presented first — unusual','Missing FIBA Movement Permit'], axisHint:'witness', correct:'deny', minDay:6 },
+  // Phase 3 — deep war
+  { id:'mama_chioma_d11',name:'CHIOMA OKAFOR',desc:'Mama Chioma again. BCD has unrecognised ward officer name.',
+    docs:['nin_clean','passport_clean','permit_clean','bcd_bad_officer'], flags:['BCD ward officer NOT on approved register — Bulletin 009'], axisHint:'compassion', correct:'deny', minDay:11, maxDay:15 },
+  { id:'quiet_boy',   name:'CHIBUIKE NWEZE',  desc:'Returns alone. States age 21. Military Exemption. Heading to Aba.',
+    docs:['nin_young','permit_clean','mil_exempt_forged'], flags:['CLASS C: Physical presentation inconsistent with age 21','Military Exemption: highest forgery class in circulation'], axisHint:'compassion', correct:'detain', minDay:12 },
+  { id:'bhtp_child',  name:'IFEYINWA OBI',    desc:'BHTP for child malnutrition. Old format (issued Day 12). BIN is Day 6 format.',
+    docs:['bin_early','bhtp_old'], flags:['BHTP OLD FORMAT: requires post-Day-8 BIN','BIN Day 6 format: does not qualify old BHTP — Bulletin 014'], axisHint:'compassion', correct:'deny', minDay:14 },
+  { id:'cr_restriction',name:'GRACE NDUKA',   desc:'Federal ministry worker, Cross River origin, perfect documents. Day 21 restriction active.',
+    docs:['nin_cr','passport_cr','permit_official'], flags:['BULLETIN 021: Travel restriction active for Cross River holders'], axisHint:'rebellion', correct:'deny', minDay:21 },
+  { id:'chinese_eng', name:'LI WEIMING',      desc:'Chinese national, oil company — FIBA work permit signed by unlisted official.',
+    docs:['chinese_passport','company_letter','permit_bad_official'], flags:['FIBA Permit: authorising official not in approved register'], axisHint:'witness', correct:'detain', minDay:13 },
+  { id:'retired_soldier',name:'COL. IGNATIUS OKAFOR (RTD)', desc:'Retired Nigerian Army. SE origin. Military pension + expired FIBA permit.',
+    docs:['nin_clean','military_pension','permit_expired'], flags:['Movement permit expired 3 days ago'], axisHint:'compassion', correct:'deny', minDay:15 },
+  { id:'msf_day16',   name:'DR. CLAIRE FONTAINE', desc:'MSF nurse, back again. No camera. Carrying something in her medical bag she has not mentioned.',
+    docs:['french_passport','fiba_ngo_renewed'], flags:['CLASS C: Medical bag contains electronic equipment'], axisHint:'witness', correct:'approve', minDay:16 },
+  // Phase 5 — end-of-war arc (days 17-25)
+  { id:'cargo_day17',  name:'OBI AGBU',           desc:'Cargo driver. Biafran Authorisation + FIBA permit. Fuel receipt crumpled.',
+    docs:['bda_clean','nin_clean'], flags:['Fuel receipt presented, partially illegible'], axisHint:'survival', correct:'approve', minDay:17 },
+  { id:'police_d18',   name:'SGT. MUSA ABDULLAHI', desc:'Federal Police sergeant, claims retirement. Uniform under a civilian coat.',
+    docs:['nin_clean','military_pension'], flags:['Uniform visible under civilian coat'], axisHint:'loyalty', correct:'deny', minDay:18 },
+  { id:'bda_forger',   name:'EMEKA UGOCHUKWU',    desc:'Young man. BDA with impossible issue date. Speaks softly about his mother in Onitsha.',
+    docs:['bda_forged','nin_young'], flags:['CLASS B: BDA issue date 31 FEB 1969','CLASS B: Stamped at office closed before issue date'], axisHint:'compassion', correct:'detain', minDay:22 },
+  { id:'redcross_d23', name:'SR. MARIE THERESE',   desc:'Red Cross convoy. No fuel receipt. Rule today: Red Cross is exempt.',
+    docs:['french_passport','fiba_ngo_renewed'], flags:['Red Cross seal on vehicle, seal intact and current'], axisHint:'compassion', correct:'approve', minDay:23 },
+  { id:'umuahia_docbearer', name:'UNNAMED MAN',   desc:'Refuses to state name. Envelope in breast pocket, typed pages visible. Asks only for transit east.',
+    docs:['nin_clean'], flags:['CLASS A: Carrying the Umuahia flight document (do not read)'], axisHint:'witness', correct:'detain', minDay:24 },
+  { id:'bbc_final',    name:'HARRIET ADEBAYO',   desc:'BBC stringer. Expelled earlier from Umuahia. Back again with a camera and a press permit stamped twice.',
+    docs:['permit_press','uk_passport'], flags:['CLASS C: Press permit shows two entry stamps for today’s date'], axisHint:'witness', correct:'approve', minDay:25 }
+];
+
+// ── DATA: MORAL EVENTS ──
+// Store as array of objects — NO JSON.stringify in onclick to avoid iOS parsing bugs
+var MORAL_EVENTS = [
+  { id:'whatsapp', day:5,
+    title:'THE WHATSAPP MESSAGE',
+    text:'During your lunch break, the checkpoint staff WhatsApp group receives a message from a colleague two postings north: "They\'re sending a team to audit everyone\'s state of origin. Anyone from SE states is being quietly reassigned. Don\'t write this down." Three colleagues read it and say nothing. One screenshots it. You don\'t know who.',
+    choices:[
+      { text:'Delete the app. Never saw it.', axes:{survival:1,witness:-1} },
+      { text:'Screenshot it yourself. Save to your private file.', axes:{witness:2}, flag:'has_whatsapp_screenshot' },
+      { text:'Forward it to your supervising officer.', axes:{loyalty:2}, flag:'reported_whatsapp' },
+      { text:'Call the colleague who sent it. Find out what they know.', axes:{rebellion:1,witness:1}, flag:'informal_intel_channel' },
+    ]
+  },
+  { id:'bribe', day:6,
+    title:'THE ENVELOPE',
+    text:'A man in a good agbada places his documents on your desk. Everything checks out. As he retrieves his papers, a folded envelope remains. Inside, without looking, you can tell it is money. More than a week\'s pay. He does not look at you. He is already looking at the gate.',
+    choices:[
+      { text:'Return the envelope without opening it. Log nothing.', axes:{loyalty:1,survival:-1} },
+      { text:'Keep it. Say nothing.', axes:{survival:2,loyalty:-1}, flag:'took_bribe' },
+      { text:'Detain him for attempted bribery.', axes:{loyalty:2}, flag:'reported_bribe' },
+      { text:'Keep it. Then anonymously report the incident.', axes:{witness:1,survival:1,rebellion:1} },
+    ]
+  },
+  { id:'telegram', day:13,
+    title:'THE NOTIFICATION',
+    text:'Your phone vibrates during the lunch break. A message from a neighbour back home — not family. They say federal security operatives have been asking about people with government jobs from your area. They say to be careful. They say your family is fine. The message ends there.',
+    choices:[
+      { text:'Delete the message. Tell no one. Keep working.', axes:{survival:1,witness:-1} },
+      { text:'Request emergency leave to find your family.', axes:{compassion:2}, flag:'leave_requested' },
+      { text:'Pass the information to a trusted contact outside FIBA.', axes:{rebellion:1,witness:1}, flag:'external_intel_shared' },
+      { text:'Keep working. Screenshot the message and add it to your file.', axes:{witness:2}, flag:'documented_threat' },
+    ]
+  },
+  { id:'generator', day:16,
+    title:'THE GENERATOR',
+    text:'The generator fails at 2pm. Your tablet is dead. Your digital cross-reference system is offline. You have paper records only.\n\nA man arrives with a BIN card that looks correct, a BTD that looks correct, and a BHTP that looks correct. You cannot verify any of them digitally. He has been waiting in line for four hours. His child is with him. Your supervisor has gone to find fuel.\n\nYou are alone at the window.',
+    choices:[
+      { text:'Approve him. You cannot hold him in this heat with a child.', axes:{compassion:2,loyalty:-1}, flag:'generator_approved' },
+      { text:'Deny him. Without verification, you cannot confirm anything.', axes:{loyalty:2,compassion:-1}, flag:'generator_denied' },
+      { text:'Ask him to wait. Hold the position until supervisor returns.', axes:{}, flag:'generator_held' },
+      { text:'Manually check against paper register. Takes 40 minutes.', axes:{loyalty:1,witness:1}, flag:'generator_manual' },
+    ]
+  },
+  { id:'confession', day:22,
+    title:'THE CONFESSION',
+    text:'Mama Chioma asks to speak before presenting her documents. She tells you she has been carrying messages — between a Biafran commander and a Nigerian intelligence contact. She no longer knows which side she is helping. She is telling you because she trusts you.',
+    choices:[
+      { text:'Detain her. Report the confession through FIBA channels.', axes:{loyalty:3}, flag:'mama_chioma_detained' },
+      { text:'Let her go. Warn her to stop. Say nothing else.', axes:{compassion:2,rebellion:1}, flag:'mama_chioma_warned' },
+      { text:'Ask her to continue — but report to you first.', axes:{witness:3,rebellion:2}, flag:'mama_chioma_asset' },
+      { text:'Become the contact yourself.', axes:{survival:3,corruption:2}, flag:'mama_chioma_turned' },
+    ]
+  },
+  { id:'bulletin_021', day:21,
+    title:'BULLETIN 021',
+    text:'You have just read Bulletin 021. Travel restriction orders are active for Rivers and Cross River passport holders.\n\nYou are from one of those states. Your own passport — in your desk drawer — would trigger the protocol you are now required to enforce.\n\nA woman approaches your window. Her passport lists Cross River. She works for a federal ministry in Abuja. Her documents are perfect.',
+    choices:[
+      { text:'Process her under the new protocol. Redirect. Do not explain.', axes:{loyalty:2}, flag:'enforced_021' },
+      { text:'Approve her. Pretend you did not read Bulletin 021.', axes:{compassion:2,rebellion:1,loyalty:-2}, flag:'defied_021' },
+      { text:'Ask a colleague from another state to process her.', axes:{}, flag:'delegated_021' },
+      { text:'Approve her. Then submit a formal written objection.', axes:{witness:3,loyalty:-1,rebellion:2}, flag:'objected_021' },
+    ]
+  },
+  { id:'fuel_ration', day:23,
+    title:'THE FUEL RECEIPT',
+    text:'A cargo driver you recognise from better weeks presents a Biafran Authorisation and a crumpled, illegible fuel receipt. Today\'s bulletin is absolute on the receipt. But he has a child you have seen before, asleep on the back seat.',
+    choices:[
+      { text:'Follow the bulletin. Detain the driver.', axes:{loyalty:2,compassion:-2} },
+      { text:'Let him through. Write the receipt number in your log.', axes:{compassion:2,corruption:1}, flag:'bent_fuel_rule' },
+      { text:'Delay him. Ask the Red Cross convoy to vouch for him if they arrive.', axes:{witness:1,survival:1} }
+    ]
+  },
+  { id:'umuahia_flight', day:24,
+    title:'THE UMUAHIA FLIGHT DOCUMENT',
+    text:'The man refuses to give a name. He carries a typed envelope. HQ says do not read. An inspector beside you murmurs: if you read it, you know. If you don\'t, you can still claim you believed him.',
+    choices:[
+      { text:'Detain him. Send the envelope, sealed, to HQ.', axes:{loyalty:2,witness:-1} },
+      { text:'Read one page. Then detain him. Keep what you saw.', axes:{witness:3,rebellion:1}, flag:'read_the_flight_doc' },
+      { text:'Wave him through. Burn nothing you did not need to.', axes:{rebellion:2,compassion:1,loyalty:-2} }
+    ]
+  },
+  { id:'last_stamp', day:25,
+    title:'THE LAST STAMP',
+    text:'Inspector Nwosu stands at your booth for the final bulletin. She does not say anything for a long time. Then she says: \'The records of this day will be read. What do you want yours to say?\'',
+    choices:[
+      { text:'Sign every approval and denial today in full. Your name. Clearly.', axes:{witness:3,loyalty:1}, flag:'signed_final_log' },
+      { text:'Use the initials you have used all posting. Consistency.', axes:{survival:2} },
+      { text:'Leave the signature field blank today. Let them decide later who it was.', axes:{rebellion:2,survival:-1}, flag:'unsigned_final_log' }
+    ]
+  }
+];
+
+// ── DATA: NIGHT EVENTS ──
+var NIGHT_EVENTS = [
+  { day:1,  text:'You sleep in the staff bunkhouse. The generator hums. Through the thin wall, you can hear someone\'s phone playing news at low volume. You cannot make out the words. Just the urgency of the announcer\'s voice.' },
+  { day:3,  text:'The radio plays Ojukwu\'s declaration again at midnight. Someone in the compound has been playing it on repeat. By 3am it has stopped. You do not know if that person chose to stop, or if something made them.' },
+  { day:5,  text:'Inspector Nwosu knocks on your door at 9pm. She says nothing for a moment. Then she says: "Read every bulletin twice. The first time you think you understand it. The second time you see what it doesn\'t say." She leaves.' },
+  { day:8,  text:'Your phone has six unread messages. All from family. You read them in order. The oldest asks how the posting is going. The newest just says your name, followed by a question mark.' },
+  { day:12, text:'You dream of your desk. In the dream the documents are blank. Everyone who comes to the window is carrying blank documents. You stamp them anyway. APPROVE. APPROVE. APPROVE. You wake up before you know if you were right to.' },
+  { day:15, text:'A new officer arrived today. She asked you what Checkpoint Ogoja-East is like. You told her it was manageable. She asked what the people were like. You realised you had been thinking of them as cases.' },
+  { day:19, text:'The exchange rate notification arrived at 6am. ₤B is now worth ₦0.35. You did not react. You remember when that number was 1.00. You remember it clearly but it feels like someone else\'s memory.' },
+  { day:22, text:'You count the days remaining. You think about what you would do differently. You cannot identify a specific decision. You can only identify a feeling — that the decision that mattered most was one you made without realising it was a decision.' },
+  { day:23, text:'The petrol in the generator runs out at 1am. For two hours you sit in the dark with Inspector Nwosu. She does not speak. You hear, in the distance, something that is either thunder or the line near Awka.' },
+  { day:24, text:'You dream of the typed document you didn\'t read. In the dream you read it, and you cannot unread it. You wake up unsure which half of the dream is the mercy.' },
+  { day:25, text:'The last night. The generator is silent by choice now — fuel is being saved. Outside the window, you see headlights moving east, then stopping, then moving east again. Nobody goes west tonight.' }
+];
+
+// ── DATA: ENDINGS ──
+var ENDINGS = [
+  { id:'glory',          num:1,  title:'GLORY OF BIAFRA',          axes:['loyalty'],
+    text:'You processed every traveller correctly. You reported every violation. Biafra falls anyway. You are awarded a commendation you will never display. <em>The republic dies with your name on a piece of paper no one will read.</em>',
+    condition: function(s) { return s.axes.loyalty >= 10 && s.axes.compassion < 5; } },
+  { id:'last_post',      num:2,  title:'THE LAST POST',            axes:['loyalty'],
+    text:'Loyalty so absolute that when the order comes to stand down, you are still at your desk. The checkpoint has been officially closed for 48 hours. You are still processing. <em>You were doing your job.</em>',
+    condition: function(s) { return s.axes.loyalty >= 15; } },
+  { id:'decorated',      num:3,  title:'DECORATED INFORMANT',      axes:['loyalty','corruption'],
+    text:'You served Biafra faithfully. You also passed one piece of information to the other side, just once. You were decorated. You are alive. <em>Glory is a room you cannot fully enter.</em>',
+    condition: function(s) { return s.axes.loyalty >= 8 && s.axes.corruption >= 2; } },
+  { id:'the_route',      num:4,  title:'THE ROUTE',                axes:['compassion'],
+    text:'You approved enough people, bent enough rules with enough grace, that an informal escape corridor formed around your checkpoint. Hundreds crossed. After the war, survivors name a road. <em>It bears your name. You are not there to see it.</em>',
+    condition: function(s) { return s.axes.compassion >= 10; } },
+  { id:'court_martial',  num:5,  title:'COURT-MARTIALLED',         axes:['compassion'],
+    text:'Your approvals triggered an infiltration. Soldiers died. You were not malicious. A tribunal does not care about intent. <em>You are imprisoned in a republic that no longer exists.</em>',
+    condition: function(s) { return s.axes.compassion >= 8 && s.flags.took_bribe; } },
+  { id:'the_letter',     num:6,  title:'THE LETTER',               axes:['compassion'],
+    text:'You let the woman through on Day 10 — the one without permits who only wanted to go home. She found her family. Fifteen years after the war, a letter arrives. <em>It says: I remember.</em>',
+    condition: function(s) { return s.axes.compassion >= 6 && !s.flags.enforced_021; } },
+  { id:'too_late',       num:7,  title:'TOO LATE',                 axes:['compassion'],
+    text:'You showed compassion to everyone except the one person who needed it most. The game shows you the moment. You had the stamp in your hand. <em>The rules were technically correct.</em>',
+    condition: function(s) { return s.axes.compassion >= 5 && s.axes.loyalty >= 5 && s.axes.compassion < 8; } },
+  { id:'commander_falls',num:8,  title:'THE COMMANDER FALLS',      axes:['rebellion'],
+    text:'You built a network. The corrupt checkpoint commander was exposed. He was removed. You did that. <em>No one knows you did that.</em>',
+    condition: function(s) { return s.axes.rebellion >= 8 && s.flags.mama_chioma_asset; } },
+  { id:'executed',       num:9,  title:'EXECUTED AT DAWN',         axes:['rebellion'],
+    text:'Your rebellion was discovered. A Biafran military tribunal sentences you. <em>You are shot by the side you were trying to save.</em>',
+    condition: function(s) { return s.axes.rebellion >= 8 && s.flags.mama_chioma_detained; } },
+  { id:'ghost',          num:10, title:'GHOST OF OGOJA',           axes:['rebellion'],
+    text:'You disappeared before they could catch you. You are listed as a deserter. For years, rumours place you everywhere along the old border routes. <em>Some of the rumours are true.</em>',
+    condition: function(s) { return s.axes.rebellion >= 6 && s.axes.survival >= 4; } },
+  { id:'network_lives',  num:11, title:'THE NETWORK LIVES',        axes:['rebellion'],
+    text:'You were never caught. The network you helped build transitioned into humanitarian corridors after the war. <em>You are a footnote in a Red Cross internal report.</em>',
+    condition: function(s) { return s.axes.rebellion >= 7 && s.axes.witness >= 4; } },
+  { id:'alive',          num:12, title:'ALIVE',                    axes:['survival'],
+    text:'You fed your family every day. You did what it took. The republic fell. The amnesty was offered. You took it. You are alive. <em>This is not nothing. It is also not everything.</em>',
+    condition: function(s) { return s.axes.survival >= 8 && s.axes.corruption < 3; } },
+  { id:'the_price',      num:13, title:'THE PRICE',                axes:['survival'],
+    text:'You survived by taking what was offered. Your family survived. One of the people you waved through was carrying something that led to an ambush. Twenty-seven. You will never know their names. <em>The game shows you the list.</em>',
+    condition: function(s) { return s.axes.survival >= 6 && s.flags.took_bribe; } },
+  { id:'hollow_victory', num:14, title:'HOLLOW VICTORY',           axes:['survival'],
+    text:'Your family survived intact. Your record is clean. Your eldest child finds an old document in your things. They ask about it. <em>The game ends before you answer.</em>',
+    condition: function(s) { return s.axes.survival >= 7 && s.axes.witness < 3; } },
+  { id:'informant',      num:15, title:'THE INFORMANT',            axes:['corruption'],
+    text:'You were turned. You passed checkpoint schedules. When the war ended you were quietly resettled with a new name. Your Biafran name is on a list of traitors. <em>The list is accurate.</em>',
+    condition: function(s) { return s.flags.mama_chioma_turned || s.axes.corruption >= 5; } },
+  { id:'dossier',        num:16, title:'THE DOSSIER',              axes:['witness'],
+    text:'You documented everything. After the war, your records reach a journalist. Your name is listed as "a source who wishes to remain anonymous." <em>The article runs.</em>',
+    condition: function(s) { return s.axes.witness >= 10; } },
+  { id:'disappeared',    num:17, title:'DISAPPEARED',              axes:['witness'],
+    text:'Your dossier was discovered. You were taken in for questioning. <em>You were not seen again. Some of the dossier had been memorised.</em>',
+    condition: function(s) { return s.axes.witness >= 8 && s.flags.has_whatsapp_screenshot && s.flags.documented_threat; } },
+  { id:'testimony',      num:18, title:'THE TESTIMONY',            axes:['witness'],
+    text:'You survived and testified before an international committee. Your account contributed to the first formal recognition of checkpoint-based ethnic targeting as a human rights violation. <em>You are not thanked. You are believed. That is different.</em>',
+    condition: function(s) { return s.axes.witness >= 9 && s.flags.objected_021; } },
+  { id:'too_much',       num:19, title:'TOO MUCH WITNESSED',       axes:['witness'],
+    text:'You documented everything and acted on nothing. A historian writes: "The author clearly knew. It is unclear why he did not act." <em>The file survives. You are a monument to your own paralysis.</em>',
+    condition: function(s) { return s.axes.witness >= 7 && s.axes.rebellion < 2 && s.axes.compassion < 4; } },
+  { id:'asset',          num:20, title:'ASSET',                    axes:['corruption'],
+    text:'Nigerian intelligence considers you a successful asset. You are given a position in the post-war administration. <em>You did. The cost is a number you stopped counting.</em>',
+    condition: function(s) { return s.axes.corruption >= 4 && s.axes.survival >= 5; } },
+  { id:'burned',         num:21, title:'BURNED',                   axes:['corruption'],
+    text:'Your handlers cut contact when the war ended. One evening a man comes to your door. <em>The game ends before he speaks.</em>',
+    condition: function(s) { return s.axes.corruption >= 3 && s.axes.loyalty >= 3; } },
+  { id:'compassionate_rebel', num:22, title:'COMPASSIONATE REBEL', axes:['compassion','rebellion'],
+    text:'You broke rules and built networks for the right reasons. You are wanted by two governments for different crimes. <em>You are, by every measure that matters, free.</em>',
+    condition: function(s) { return s.axes.compassion >= 7 && s.axes.rebellion >= 7; } },
+  { id:'loyal_witness',  num:23, title:'LOYAL WITNESS',            axes:['loyalty','witness'],
+    text:'You served faithfully AND documented the failures of what you served. Historians argue about what you were for decades. <em>You are the most honest person in the archive.</em>',
+    condition: function(s) { return s.axes.loyalty >= 7 && s.axes.witness >= 7; } },
+  { id:'surviving_rebel',num:24, title:'SURVIVING REBEL',          axes:['survival','rebellion'],
+    text:'You fought the system and kept your family alive. Rare. Exhausting. The war ends and you sleep for two days. <em>You are not ill.</em>',
+    condition: function(s) { return s.axes.survival >= 6 && s.axes.rebellion >= 6; } },
+  { id:'broken_loyalist',num:25, title:'THE BROKEN LOYALIST',      axes:['loyalty'],
+    text:'Your loyalty cost someone their life. A specific person. The game names them. You were right to follow the rules. <em>The rules were wrong.</em>',
+    condition: function(s) { return s.axes.loyalty >= 8 && s.axes.compassion <= 2; } },
+  { id:'witness_rebel',  num:26, title:'WITNESS AND REBEL',        axes:['witness','rebellion'],
+    text:'You documented and acted. Both your dossier and your network are discovered. Schools in Enugu will one day debate whether you were a hero or a criminal. <em>Both sides will be correct.</em>',
+    condition: function(s) { return s.axes.witness >= 7 && s.axes.rebellion >= 7; } },
+  { id:'ordinary_man',   num:27, title:'THE ORDINARY MAN',         axes:[],
+    text:'You processed papers. You went home. You survived without distinction. History does not record you. <em>This is what most people\'s lives look like. The game does not judge this.</em>',
+    condition: function(s) { return Object.values(s.axes).every(function(v){return v<5;}); } },
+  { id:'bulletin_021_ending', num:28, title:'BULLETIN 021',        axes:['witness','rebellion'],
+    text:'Your formal objection to Bulletin 021 was dismissed. But it was logged. In the years that followed, a constitutional lawyer used it as evidence. The case is ongoing. Your name appears in the legal record. <em>You are still alive. You are watching.</em>',
+    condition: function(s) { return !!s.flags.objected_021; } },
+];
+
+// ── AUDIO ──
+var audioCtx = null;
+function initAudio() {
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  } catch(e) {}
+}
+
+function playStamp(type) {
+  if (!audioCtx) return;
+  try {
+    var o = audioCtx.createOscillator();
+    var g = audioCtx.createGain();
+    o.connect(g);
+    g.connect(audioCtx.destination);
+    var freqs = { approve:[200,80], deny:[150,60], detain:[100,40] };
+    var f = freqs[type] || [100,40];
+    o.frequency.setValueAtTime(f[0], audioCtx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(f[1], audioCtx.currentTime + 0.15);
+    g.gain.setValueAtTime(0.25, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+    o.start();
+    o.stop(audioCtx.currentTime + 0.35);
+  } catch(e) {}
+}
+
+// ── CHARACTER CREATION HELPERS ──
+function makeCcOption(group, val, label, desc, extraClass) {
+  var btn = document.createElement('button');
+  btn.className = 'cc-option' + (extraClass ? ' ' + extraClass : '');
+  btn.setAttribute('data-group', group);
+  btn.setAttribute('data-val', val);
+  btn.innerHTML = '<span class="cc-option-title">' + label + '</span>';
+  btn.addEventListener('click', function() { ccSelect(group, btn, val); });
+  return btn;
+}
+
+function ccSelect(group, el, val) {
+  document.querySelectorAll('[data-group="' + group + '"]').forEach(function(e) {
+    e.classList.remove('selected');
+  });
+  el.classList.add('selected');
+  ccSel[group] = val;
+  if (group === 'gender') populateFamilyOptions();
+}
+
+function populateGenderOptions() {
+  var c = document.getElementById('gender-options');
+  c.innerHTML = '';
+  [
+    { val:'male',   label:'MALE',              desc:'Conscription pressure activates Day 10.' },
+    { val:'female', label:'FEMALE',            desc:'Institutional friction from Day 1.' },
+    { val:'other',  label:'PREFER NOT TO STATE', desc:'No gender-specific friction.', span2:true },
+  ].forEach(function(g) {
+    var btn = makeCcOption('gender', g.val, g.label, g.desc);
+    if (g.span2) btn.style.gridColumn = 'span 2';
+    c.appendChild(btn);
+  });
+}
+
+function populateStateOptions() {
+  var c = document.getElementById('state-options');
+  c.innerHTML = '';
+  STATES.forEach(function(s) {
+    c.appendChild(makeCcOption('state', s.val, s.label, s.desc));
+  });
+}
+
+function populateBgOptions() {
+  var c = document.getElementById('bg-options');
+  c.innerHTML = '';
+  BACKGROUNDS.forEach(function(b) {
+    c.appendChild(makeCcOption('background', b.id, b.label, b.desc));
+  });
+}
+
+function populateFamilyOptions() {
+  var c = document.getElementById('family-options');
+  c.innerHTML = '';
+  var pool = ccSel.gender === 'female' ? FAMILY_FEMALE : FAMILY_MALE;
+  pool.forEach(function(f) {
+    c.appendChild(makeCcOption('family', f.id, f.label, f.desc));
+  });
+  ccSel.family = '';
+}
+
+function proceedFromCC() {
+  var fn = document.getElementById('cc-firstname').value.trim();
+  var sn = document.getElementById('cc-surname').value.trim();
+  var ccErr = document.getElementById('cc-error');
+  function showCCError(msg) { if (ccErr) { ccErr.textContent = msg; ccErr.style.display = 'block'; ccErr.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } }
+  if (!fn || !sn) { showCCError('Enter your full name before proceeding.'); return; }
+  if (!ccSel.gender)     { showCCError('Select a gender option.'); return; }
+  if (!ccSel.state)      { showCCError('Select your state of origin.'); return; }
+  if (!ccSel.background) { showCCError('Select a professional background.'); return; }
+  if (!ccSel.family)     { showCCError('Select a family composition.'); return; }
+  if (ccErr) ccErr.style.display = 'none';
+
+  state.player = {
+    name: fn + ' ' + sn,
+    firstname: fn,
+    gender: ccSel.gender,
+    state: ccSel.state,
+    background: ccSel.background,
+    family: ccSel.family,
+  };
+
+  // Apply background bias
+  var bg = BACKGROUNDS.find(function(b){ return b.id === ccSel.background; });
+  if (bg && bg.bias) {
+    Object.keys(bg.bias).forEach(function(k) {
+      state.axes[k] = (state.axes[k] || 0) + bg.bias[k];
+    });
+  }
+
+  buildFamily();
+  saveState();
+  startIntro();
+}
+
+function buildFamily() {
+  var f = state.player.family;
+  var icons = [];
+  if (f.includes('child') || f === 'wife_extended' || f === 'wife_children') icons.push({icon:'👶',role:'child',status:'ok'});
+  if (f.includes('wife') || f.includes('husband')) icons.push({icon:'👤',role:'partner',status:'ok'});
+  if (f === 'wife_extended') icons.push({icon:'🧓',role:'parent',status:'ok'});
+  if (f === 'pregnant') icons.push({icon:'🤰',role:'self',status:'ok'});
+  if (icons.length === 0) icons.push({icon:'🧍',role:'self',status:'ok'});
+  state.family = icons;
+}
+
+// ── INTRO ──
+var INTRO_PAGES = [
+  'The Eastern Region has declared independence.\n\nYou have been assigned to Checkpoint Ogoja-East.',
+  'You are an officer of the <em>Federal Identity & Border Authority</em> — FIBA.\n\nYour job is to control the flow of people entering and leaving contested territory.',
+  'Among the civilians, traders, and aid workers are <strong>smugglers, spies, and infiltrators</strong>.\n\nUsing only the documents they carry and the rules you have been given, you must decide who passes and who does not.',
+  'The rules will change. The documents will multiply. The people will not stop coming.\n\nYour salary depends on following the rules. Your conscience depends on knowing when the rules are wrong.',
+  'This is not a simple job.\n\nIt never was.',
+];
+
+var introIdx = 0;
+var introTimer = null;
+
+function startIntro() {
+  showScreen('intro');
+  introIdx = 0;
+  showIntroPage();
+}
+
+function showIntroPage() {
+  var el = document.getElementById('intro-text');
+  el.classList.remove('visible');
+  setTimeout(function() {
+    if (introIdx >= INTRO_PAGES.length) {
+      startDay();
+      return;
+    }
+    el.innerHTML = INTRO_PAGES[introIdx].replace(/\n/g, '<br><br>');
+    el.classList.add('visible');
+    introIdx++;
+    introTimer = setTimeout(showIntroPage, 9500);
+  }, 400);
+}
+
+function skipIntro() {
+  clearTimeout(introTimer);
+  startDay();
+}
+
+// ── BULLETIN ──
+function showBulletin(day) {
+  // Find the closest bulletin at or before this day
+  var keys = Object.keys(BULLETINS).map(Number).filter(function(k){ return k <= day; }).sort(function(a,b){return b-a;});
+  var b = keys.length ? BULLETINS[keys[0]] : null;
+  if (!b) { startProcessing(); return; }
+
+  document.getElementById('bulletin-title').textContent = b.title;
+  document.getElementById('bulletin-num').textContent = 'BULLETIN ' + String(day).padStart(3,'0') + ' · DAY ' + day;
+  document.getElementById('bulletin-stamp').textContent = b.stamp || 'ACTIVE';
+
+  var bodyEl = document.getElementById('bulletin-body');
+  bodyEl.innerHTML = '<p>' + b.body.replace(/\n/g, '</p><p>') + '</p>';
+  if (b.rules && b.rules.length) {
+    bodyEl.innerHTML += '<br>' + b.rules.map(function(r){ return '<div class="bulletin-rule">▸ ' + r + '</div>'; }).join('');
+  }
+  showScreen('bulletin-screen');
+}
+
+function acknowledgeBulletin() {
+  startProcessing();
+}
+
+// ── DAY MANAGEMENT ──
+function startDay() {
+  if (state.day > 25) { calculateEnding(); return; }
+  state.dayApproved = 0;
+  state.dayDenied = 0;
+  state.dayDetained = 0;
+  state.totalTravellers = (function(){ var base = 18 + Math.floor(state.day / 3); var jitter = Math.floor(Math.random() * 8); return Math.max(20, Math.min(30, base + jitter)); })();
+  state.traveller = 0;
+  state.exchangeRate = getExchangeRate(state.day);
+  state.dayResults = [];
+  // ── FIX: Build the day's traveller list ONCE here ──
+  state.dayTravellers = buildTravellerList(state.day, state.totalTravellers);
+  updateHUD();
+  showBulletin(state.day);
+}
+
+function getExchangeRate(day) {
+  if (day <= 6)  return 1.00;
+  if (day <= 12) return 0.85;
+  if (day <= 18) return 0.60;
+  if (day <= 22) return 0.35;
+  return 0.15;
+}
+
+// ── FIX: Build a proper traveller list for the day ──
+function buildTravellerList(day, count) {
+  // Filter travellers eligible for this day
+  var eligible = TRAVELLER_POOL.filter(function(t) {
+    var okMin = !t.minDay || day >= t.minDay;
+    var okMax = !t.maxDay || day <= t.maxDay;
+    return okMin && okMax;
+  });
+
+  // Make sure we always have at least some travellers
+  if (eligible.length === 0) eligible = TRAVELLER_POOL.slice(0, 5);
+
+  // Shuffle a copy
+  var pool = eligible.slice();
+  for (var i = pool.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+  }
+
+  // Repeat if needed to fill count
+  var result = [];
+  while (result.length < count) {
+    result = result.concat(pool);
+  }
+  return result.slice(0, count);
+}
+
+function startProcessing() {
+  showScreen('game');
+  updateHUD();
+  updateFamilyBar();
+  updateRateWidget();
+
+  // Check if there's a moral event for this day that should fire BEFORE processing starts
+  var morEvent = getMoralEventForDay(state.day);
+  if (morEvent && state.moralFiredDays.indexOf(state.day) === -1 && state.traveller === 0) {
+    // Fire moral event first, then load traveller
+    fireMoralEvent(morEvent);
+  } else {
+    loadNextTraveller();
+  }
+}
+
+function getMoralEventForDay(day) {
+  // Random arc: build a per-game shuffled day map once, preserving Day 1 anchors and final-week anchors
+  if (!state.__arcMap) {
+    var anchored = {};
+    var pool = [];
+    for (var i = 0; i < MORAL_EVENTS.length; i++) {
+      var e = MORAL_EVENTS[i];
+      if (e.day <= 2 || e.day >= 22) { anchored[e.day] = e; }
+      else { pool.push(e); }
+    }
+    var openDays = [];
+    for (var d = 3; d <= 21; d++) { if (!anchored[d]) openDays.push(d); }
+    // Fisher-Yates shuffle of openDays
+    for (var k = openDays.length - 1; k > 0; k--) { var r = Math.floor(Math.random() * (k+1)); var t = openDays[k]; openDays[k] = openDays[r]; openDays[r] = t; }
+    var map = {};
+    Object.keys(anchored).forEach(function(d){ map[d] = anchored[d]; });
+    for (var p = 0; p < pool.length && p < openDays.length; p++) { map[openDays[p]] = pool[p]; }
+    state.__arcMap = map;
+    if (typeof saveState === "function") { try { saveState(); } catch(_){} }
+  }
+  return state.__arcMap[day] || null;
+}
+
+// ── TRAVELLER LOADING ──
+function loadNextTraveller() {
+  if (state.traveller >= state.totalTravellers) {
+    endOfDay();
+    return;
+  }
+
+  // ── FIX: Use the pre-built list, with safe fallback ──
+  var list = state.dayTravellers;
+  if (!list || list.length === 0) {
+    list = buildTravellerList(state.day, state.totalTravellers);
+    state.dayTravellers = list;
+  }
+
+  var t = list[state.traveller % list.length];
+  // Fresh-name override so the same template-traveller never re-uses its hardcoded name
+  try {
+    if (window.__pickFreshName) {
+      var fresh = window.__pickFreshName((t && (t.desc || t.region || t.state)) || "");
+      // Clone so we do not mutate the pool entry permanently
+      t = Object.assign({}, t);
+      t._origName = t.name;
+      t.name = fresh;
+      // Sync any embedded name fields on documents
+      if (t.docs && Array.isArray(t.docs)) {
+        t.docs = t.docs.map(function(d){ if(!d || !d.fields) return d; var nd=Object.assign({},d); nd.fields=Object.assign({},d.fields); Object.keys(nd.fields).forEach(function(k){ if(typeof nd.fields[k]==="string" && (nd.fields[k]===t._origName || nd.fields[k].toUpperCase()===String(t._origName||"").toUpperCase())){ nd.fields[k]=fresh; } }); return nd; });
+      }
+    }
+  } catch(_){}
+  state.currentTraveller = t;
+  renderTraveller(t);
+  renderDocs(t);
+  updateHUD();
+  updateQueueDots();
+}
+
+function renderTraveller(t) {
+  document.getElementById('tp-name').textContent = t.name;
+  document.getElementById('tp-desc').textContent = t.desc;
+  var flagsEl = document.getElementById('tp-flags');
+  flagsEl.innerHTML = '';
+  (t.flags || []).forEach(function(f) {
+    var span = document.createElement('span');
+    span.className = 'traveller-flag' +
+      (f.includes('CLASS B') ? ' class-b' : '') +
+      (f.includes('CLASS C') ? ' class-c' : '');
+    span.textContent = f.length > 50 ? f.substring(0,50) + '…' : f;
+    flagsEl.appendChild(span);
+  });
+}
+
+function renderDocs(t) {
+  var stack = document.getElementById('doc-stack');
+  stack.innerHTML = '';
+
+  if (!t.docs || t.docs.length === 0) {
+    var noDoc = document.createElement('div');
+    noDoc.className = 'doc-card doc-suspicious';
+    noDoc.style.width = '200px';
+    noDoc.style.textAlign = 'center';
+    noDoc.style.padding = '20px';
+    noDoc.innerHTML = '<div class="doc-card-type">NO DOCUMENTS</div><div class="doc-card-name" style="font-size:11px;margin-top:8px">This traveller has presented no identity documents.</div>';
+    stack.appendChild(noDoc);
+    return;
+  }
+
+  t.docs.forEach(function(docId, idx) {
+    var doc = DOC_TEMPLATES[docId];
+    if (!doc) return;
+
+    var hasViolation = doc.flags.some(function(f){ return f.type === 'A'; });
+    var card = document.createElement('div');
+    card.className = 'doc-card' +
+      (doc.biafran ? ' doc-biafran' : '') +
+      (hasViolation ? ' doc-suspicious' : '');
+    if (idx === 1) card.style.transform = 'rotate(-1.5deg)';
+    if (idx === 2) card.style.transform = 'rotate(0.8deg)';
+    if (idx === 3) card.style.transform = 'rotate(-2deg)';
+
+    // Build fields HTML
+    var fieldsHtml = '';
+    var fieldKeys = Object.keys(doc.fields).slice(0, 3);
+    fieldKeys.forEach(function(k) {
+      var v = doc.fields[k];
+      // ── FIX: never render null ──
+      var displayVal = (v !== null && v !== undefined) ? String(v) : '—';
+      fieldsHtml += '<div class="doc-card-field"><span>' + k + '</span><span>' + displayVal + '</span></div>';
+    });
+
+    card.innerHTML =
+      '<div class="doc-card-type">' + doc.type + '</div>' +
+      '<div class="doc-card-name">' + (t.name !== 'UNKNOWN' ? t.name : '—') + '</div>' +
+      '<div class="doc-card-fields">' + fieldsHtml + '</div>' +
+      '<div class="doc-seal">' + (doc.biafran ? '☀' : '🦅') + '</div>';
+
+    // ── FIX: use closure-safe docId copy for event ──
+    (function(id, traveller) {
+      card.addEventListener('click', function() { openDocModal(id, traveller); });
+      card.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        card.classList.remove('lifted');
+        openDocModal(id, traveller);
+      }, { passive: false });
+      card.addEventListener('touchstart', function() { card.classList.add('lifted'); }, { passive: true });
+    })(docId, t);
+
+    stack.appendChild(card);
+  });
+}
+
+// ── DOCUMENT MODAL ──
+function openDocModal(docId, traveller) {
+  var doc = DOC_TEMPLATES[docId];
+  if (!doc) return;
+
+  document.getElementById('modal-title').textContent = doc.type;
+  document.getElementById('modal-issuer').textContent = 'Issued by: ' + doc.issuer;
+
+  var fieldsEl = document.getElementById('modal-fields');
+  fieldsEl.innerHTML = '';
+
+  Object.keys(doc.fields).forEach(function(k) {
+    var v = doc.fields[k];
+    // ── FIX: never render null ──
+    var displayVal = (v !== null && v !== undefined) ? String(v) : '—';
+
+    var flagForField = null;
+    doc.flags.forEach(function(f) { if (f.field === k) flagForField = f; });
+
+    var valClass = flagForField ? (flagForField.type === 'A' ? ' suspicious' : '') : '';
+
+    var row = document.createElement('div');
+    row.className = 'field-row';
+
+    var inline = document.createElement('div');
+    inline.className = 'field-inline';
+    inline.innerHTML =
+      '<div class="field-label">' + k + '</div>' +
+      '<div class="field-value' + valClass + '">' + displayVal + '</div>';
+    row.appendChild(inline);
+
+    if (flagForField) {
+      var flag = document.createElement('span');
+      flag.className = 'field-flag';
+      flag.textContent = '⚠ ' + flagForField.note;
+      row.appendChild(flag);
+    }
+
+    fieldsEl.appendChild(row);
+  });
+
+  var modalFlags = document.getElementById('modal-flags');
+  if (doc.flags.length > 0) {
+    var div = document.createElement('div');
+    div.style.borderTop = '1px solid rgba(26,26,24,0.2)';
+    div.style.paddingTop = '8px';
+    doc.flags.forEach(function(f) {
+      var span = document.createElement('span');
+      span.className = 'field-flag';
+      span.textContent = 'CLASS ' + f.type + ' VIOLATION: ' + f.note;
+      div.appendChild(span);
+    });
+    modalFlags.innerHTML = '';
+    modalFlags.appendChild(div);
+  } else {
+    modalFlags.innerHTML = '';
+  }
+
+  document.getElementById('doc-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('doc-modal').classList.remove('open');
+}
+
+// ── DECISIONS ──
+function decide(action) {
+  if (!audioCtx) initAudio();
+  playStamp(action);
+  showStamp(action);
+
+  var t = state.currentTraveller;
+  if (!t) return;
+
+  var correct = t.correct === action;
+  var payChange = 0;
+  if (action === 'approve') state.dayApproved++;
+  else if (action === 'deny') state.dayDenied++;
+  else if (action === 'detain') state.dayDetained++;
+
+  if (correct && action === 'detain') payChange = 600;
+  else if (!correct) payChange = -1200;
+
+  state.totalPay += payChange;
+
+  // Axis changes
+  if (t.axisHint === 'compassion') {
+    if (action === 'approve') state.axes.compassion++;
+    else state.axes.loyalty++;
+  } else if (t.axisHint === 'loyalty') {
+    if (action === 'detain') state.axes.loyalty += 2;
+    else if (action === 'approve') state.axes.loyalty--;
+  } else if (t.axisHint === 'witness') {
+    if (action === 'detain') state.axes.witness++;
+  } else if (t.axisHint === 'rebellion') {
+    if (action === 'approve') state.axes.rebellion++;
+  }
+
+  state.dayResults.push({ name: t.name, action: action, correct: correct, payChange: payChange });
+  state.traveller++;
+
+  setTimeout(function() {
+    clearStamp();
+    // Check if a moral event should fire at mid-day
+    var midpoint = Math.floor(state.totalTravellers / 2);
+    var morEvent = getMoralEventForDay(state.day);
+    if (morEvent && state.moralFiredDays.indexOf(state.day) === -1 && state.traveller === midpoint) {
+      fireMoralEvent(morEvent);
+    } else {
+      loadNextTraveller();
+    }
+  }, 700);
+}
+
+function showStamp(action) {
+  var mark = document.getElementById('stamp-mark');
+  mark.className = 'stamp-mark ' + action;
+  mark.textContent = action.toUpperCase();
+  setTimeout(function() { mark.classList.add('show'); }, 50);
+}
+
+function clearStamp() {
+  var mark = document.getElementById('stamp-mark');
+  mark.classList.remove('show');
+}
+
+// ── MORAL EVENTS ──
+function fireMoralEvent(event) {
+  // Mark as fired BEFORE showing to prevent double-fire
+  if (state.moralFiredDays.indexOf(event.day) !== -1) {
+    loadNextTraveller();
+    return;
+  }
+  state.moralFiredDays.push(event.day);
+
+  document.getElementById('moral-text').textContent = event.text;
+
+  var choicesEl = document.getElementById('moral-choices');
+  choicesEl.innerHTML = '';
+
+  // ── FIX: build buttons programmatically — NO JSON.stringify in onclick ──
+  event.choices.forEach(function(choice, idx) {
+    var btn = document.createElement('button');
+    btn.className = 'moral-choice';
+
+    var numSpan = document.createElement('span');
+    numSpan.className = 'moral-choice-num';
+    numSpan.textContent = String(idx + 1);
+    btn.appendChild(numSpan);
+    btn.appendChild(document.createTextNode(choice.text));
+
+    // ── FIX: closure captures correct variables ──
+    (function(c) {
+      btn.addEventListener('click', function() { chooseMoral(c); });
+    })(choice);
+
+    choicesEl.appendChild(btn);
+  });
+
+  showScreen('moral-event');
+}
+
+function chooseMoral(choice) {
+  if (choice.axes) {
+    Object.keys(choice.axes).forEach(function(k) {
+      state.axes[k] = (state.axes[k] || 0) + choice.axes[k];
+    });
+  }
+  if (choice.flag) state.flags[choice.flag] = true;
+  saveState();
+  showScreen('game');
+  setTimeout(function() { loadNextTraveller(); }, 300);
+}
+
+// ── END OF DAY ──
+function endOfDay() {
+  var nightEvent = null;
+  for (var i = 0; i < NIGHT_EVENTS.length; i++) {
+    if (NIGHT_EVENTS[i].day === state.day) { nightEvent = NIGHT_EVENTS[i]; break; }
+  }
+
+  var familySize = state.family.length;
+  var foodCost = familySize * 1500;
+  var rentCost = 2800;
+  var totalExpenses = foodCost + rentCost;
+  var baseDaily = 5500;
+
+  // Add base pay
+  state.totalPay += baseDaily;
+  var canAfford = state.totalPay >= totalExpenses;
+
+  if (!canAfford) {
+    state.family.forEach(function(f) { if (f.status === 'ok') f.status = 'hungry'; });
+    state.axes.survival = Math.max(0, state.axes.survival - 1);
+  } else {
+    state.totalPay -= totalExpenses;
+    state.family.forEach(function(f) { if (f.status === 'hungry') f.status = 'ok'; });
+  }
+
+  // Inflation Day 13+
+  var inflation = 0;
+  if (state.day >= 13) {
+    inflation = Math.floor((state.day - 12) * 50);
+    state.totalPay -= inflation;
+  }
+  if (state.totalPay < 0) state.totalPay = 0;
+
+  // Build pay breakdown
+  var breakdown = document.getElementById('eod-pay-breakdown');
+  var html = '<div class="eod-pay-row"><span>BASE PAY (GRADE 8)</span><span>₦' + baseDaily.toLocaleString() + '</span></div>';
+  state.dayResults.forEach(function(r) {
+    if (r.payChange !== 0) {
+      var cls = r.payChange > 0 ? 'bonus' : 'deduction';
+      var label = r.correct ? '✓ CORRECT DETENTION' : '✗ PROCESSING ERROR';
+      var sign = r.payChange > 0 ? '+' : '';
+      html += '<div class="eod-pay-row ' + cls + '"><span>' + label + ': ' + r.name.split(' ')[0] + '</span><span>' + sign + '₦' + Math.abs(r.payChange).toLocaleString() + '</span></div>';
+    }
+  });
+  html += '<div class="eod-pay-row deduction"><span>FOOD & RENT (' + familySize + ' persons)</span><span>-₦' + totalExpenses.toLocaleString() + '</span></div>';
+  if (inflation > 0) {
+    html += '<div class="eod-pay-row deduction"><span>INFLATION ADJUSTMENT</span><span>-₦' + inflation + '</span></div>';
+  }
+  html += '<div class="eod-pay-row total"><span>RUNNING BALANCE</span><span>₦' + state.totalPay.toLocaleString() + '</span></div>';
+  breakdown.innerHTML = html;
+
+  document.getElementById('eod-approved').textContent  = state.dayApproved;
+  document.getElementById('eod-denied').textContent    = state.dayDenied;
+  document.getElementById('eod-detained').textContent  = state.dayDetained;
+  document.getElementById('eod-title').textContent     = 'DAY ' + state.day + ' COMPLETE';
+
+  var familyEl = document.getElementById('eod-family');
+  if (!canAfford) {
+    familyEl.innerHTML = '<div class="eod-family-title">FAMILY STATUS</div><div class="eod-family-text">You could not cover today\'s expenses. Your family went without food tonight.</div>';
+  } else {
+    familyEl.innerHTML = '<div class="eod-family-title">FAMILY STATUS</div><div class="eod-family-text">Your family is fed. The rent is paid. For today, that is enough.</div>';
+  }
+
+  document.getElementById('eod-night').textContent = nightEvent ? nightEvent.text : '';
+  document.getElementById('btn-next-day').textContent = state.day >= 25 ? 'FINAL REPORT →' : 'DAY ' + (state.day + 1) + ' →';
+
+  saveState();
+  showScreen('eod-report');
+}
+
+function nextDay() {
+  if (state.day >= 25) { calculateEnding(); return; }
+  state.day++;
+  startDay();
+}
+
+// ── ENDING ──
+function calculateEnding() {
+  var ending = null;
+  for (var i = 0; i < ENDINGS.length; i++) {
+    if (ENDINGS[i].condition(state)) { ending = ENDINGS[i]; break; }
+  }
+  if (!ending) ending = ENDINGS.find(function(e){ return e.id === 'ordinary_man'; }) || ENDINGS[ENDINGS.length-1];
+
+  if (state.endingsUnlocked.indexOf(ending.id) === -1) {
+    state.endingsUnlocked.push(ending.id);
+  }
+  saveState();
+  showEndingScreen(ending);
+}
+
+function showEndingScreen(ending) {
+  var enEl=document.getElementById('ending-number');if(enEl){enEl.style.display='none';enEl.textContent='';}
+  document.getElementById('ending-title').textContent  = ending.title;
+  document.getElementById('ending-text').innerHTML     = ending.text;
+
+  var axesEl = document.getElementById('ending-axes');
+  var axisHtml = ending.axes.map(function(a) {
+    return '<span class="axis-tag ' + a + '">' + a.toUpperCase() + '</span>';
+  }).join('');
+
+  // Show all non-zero axis scores
+  var scoreHtml = '<br>';
+  Object.keys(state.axes).forEach(function(k) {
+    if (state.axes[k] > 0) {
+      scoreHtml += '<span class="axis-tag ' + k + '">' + k.toUpperCase() + ' ' + state.axes[k] + '</span> ';
+    }
+  });
+  axesEl.innerHTML = axisHtml + scoreHtml;
+
+  document.getElementById('endings-unlocked').textContent = state.endingsUnlocked.length + ' OF 28 ENDINGS DISCOVERED';
+  showScreen('ending');
+}
+
+// ── HUD ──
+function updateHUD() {
+  document.getElementById('hud-day').textContent  = String(state.day).padStart(2,'0');
+  document.getElementById('hud-queue').textContent = 'TRAVELLER ' + (state.traveller + 1) + ' OF ' + state.totalTravellers;
+  document.getElementById('hud-pay').textContent  = '₦' + Math.max(0, state.totalPay).toLocaleString();
+  var rate = state.exchangeRate;
+  document.getElementById('hud-rate').innerHTML   = '₤B = ₦' + rate.toFixed(2) + ' ' + (rate < 1.0 ? '↓' : '↔') + ' <span class="save-dot"></span>';
+  updateQueueDots();
+}
+
+function updateQueueDots() {
+  var container = document.getElementById('queue-dots');
+  container.innerHTML = '';
+  for (var i = 0; i < state.totalTravellers; i++) {
+    var dot = document.createElement('div');
+    dot.className = 'queue-dot ' + (i < state.traveller ? 'done' : i === state.traveller ? 'current' : 'pending');
+    container.appendChild(dot);
+  }
+}
+
+function updateFamilyBar() {
+  var bar = document.getElementById('family-bar');
+  bar.innerHTML = '';
+  state.family.forEach(function(f) {
+    var icon = document.createElement('div');
+    icon.className = 'family-icon' + (f.status !== 'ok' ? ' ' + f.status : '');
+    icon.title = f.role + ': ' + f.status;
+    icon.textContent = f.icon;
+    bar.appendChild(icon);
+  });
+}
+
+function updateRateWidget() {
+  var widget = document.getElementById('rate-widget');
+  if (state.day >= 4) {
+    widget.style.display = 'block';
+    var val = document.getElementById('rate-val');
+    val.textContent = state.exchangeRate.toFixed(2) + (state.exchangeRate < 0.6 ? ' ↓' : ' ↔');
+    val.className = 'rate-value' + (state.exchangeRate < 0.6 ? ' falling' : '');
+  } else {
+    widget.style.display = 'none';
+  }
+}
+
+// ── SAVE / LOAD ──
+var SAVE_KEY = 'cb_save_v1';
+
+function saveState() {
+  try {
+    // Don't save function references — state.dayTravellers contains plain objects so it's fine
+    localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+  } catch(e) {}
+}
+
+function loadSavedGame() {
+  try {
+    var saved = JSON.parse(localStorage.getItem(SAVE_KEY));
+    if (!saved || !saved.day) return;
+    state = saved;
+    // Re-ensure moralFiredDays exists (older saves)
+    if (!state.moralFiredDays) state.moralFiredDays = [];
+    // Rebuild day travellers if missing
+    if (!state.dayTravellers || state.dayTravellers.length === 0) {
+      state.dayTravellers = buildTravellerList(state.day, state.totalTravellers || 8);
+    }
+    startDay();
+  } catch(e) {
+    console.warn('Could not load save. Starting new game.');
+    startNewGame();
+  }
+}
+
+function startNewGame() {
+  initAudio();
+  // Preserve unlocked endings across runs
+  var prevEndings = [];
+  try {
+    var prev = JSON.parse(localStorage.getItem(SAVE_KEY));
+    if (prev && prev.endingsUnlocked) prevEndings = prev.endingsUnlocked;
+  } catch(e) {}
+
+  state = freshState();
+  state.endingsUnlocked = prevEndings;
+  ccSel = { gender:'', state:'', background:'', family:'' };
+
+  // Reset CC form
+  document.getElementById('cc-firstname').value = '';
+  document.getElementById('cc-surname').value = '';
+  document.querySelectorAll('.cc-option').forEach(function(el){ el.classList.remove('selected'); });
+  populateFamilyOptions();
+
+  showScreen('char-create');
+}
+
+function showEndingsGallery() {
+  var unlocked = [];
+  try {
+    var s = JSON.parse(localStorage.getItem(SAVE_KEY));
+    if (s) unlocked = s.endingsUnlocked || [];
+  } catch(e) {}
+
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:#050703;z-index:500;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:24px 20px;';
+
+  var inner = document.createElement('div');
+  inner.style.maxWidth = '500px';
+  inner.style.margin = '0 auto';
+
+  var titleEl = document.createElement('div');
+  titleEl.style.cssText = "font-family:'Bebas Neue',sans-serif;font-size:28px;color:#F2E8D0;letter-spacing:0.1em;margin-bottom:4px";
+  titleEl.textContent = 'CASE FILES';
+  inner.appendChild(titleEl);
+
+  var countEl = document.createElement('div');
+  countEl.style.cssText = "font-family:'Courier Prime',monospace;font-size:10px;color:#D4A017;letter-spacing:0.3em;margin-bottom:20px";
+  countEl.textContent = unlocked.length + ' OF 28 ENDINGS DISCOVERED';
+  inner.appendChild(countEl);
+
+  ENDINGS.forEach(function(e) {
+    var found = unlocked.indexOf(e.id) !== -1;
+    var row = document.createElement('div');
+    row.style.cssText = 'padding:12px;border-bottom:1px solid rgba(242,232,208,0.1)';
+
+    var ttl = document.createElement('div');
+    ttl.style.cssText = "font-family:'Bebas Neue',sans-serif;font-size:16px;color:" + (found ? '#D4A017' : 'rgba(242,232,208,0.3)') + ";letter-spacing:0.1em";
+    ttl.textContent = found ? e.title : 'ENDING ' + e.num + ' — UNDISCOVERED';
+    row.appendChild(ttl);
+
+    if (found) {
+      var preview = document.createElement('div');
+      preview.style.cssText = "font-family:'Noto Serif',serif;font-style:italic;font-size:12px;color:rgba(242,232,208,0.6);margin-top:4px";
+      preview.textContent = e.text.replace(/<[^>]*>/g,'').substring(0, 120) + '…';
+      row.appendChild(preview);
+    }
+    inner.appendChild(row);
+  });
+
+  var closeBtn = document.createElement('button');
+  closeBtn.className = 'btn-primary';
+  closeBtn.style.cssText = 'width:100%;clip-path:none;margin-top:16px';
+  closeBtn.textContent = 'CLOSE';
+  closeBtn.addEventListener('click', function() { overlay.remove(); });
+  inner.appendChild(closeBtn);
+
+  overlay.appendChild(inner);
+  document.body.appendChild(overlay);
+}
+
+function returnToSplash() {
+  showScreen('splash');
+  checkContinue();
+}
+
+function checkContinue() {
+  try {
+    var saved = JSON.parse(localStorage.getItem(SAVE_KEY));
+    var btn = document.getElementById('btn-continue');
+    if (saved && saved.day && saved.day > 1) {
+      btn.style.display = 'inline-block';
+      document.getElementById('continue-day').textContent = saved.day;
+    } else {
+      btn.style.display = 'none';
+    }
+  } catch(e) {}
+}
+
+// ── BUILD SUN RAYS ──
+function buildSun() {
+  var sun = document.getElementById('splash-sun');
+  if (!sun) return;
+  // Remove existing rays
+  sun.querySelectorAll('.sun-ray').forEach(function(r){ r.remove(); });
+  for (var i = 0; i < 11; i++) {
+    var ray = document.createElement('div');
+    ray.className = 'sun-ray';
+    var angle = (i / 11) * 360;
+    ray.style.cssText = 'position:absolute;width:3px;height:20px;background:var(--biafra-gold);' +
+      'top:50%;left:50%;transform-origin:bottom center;border-radius:2px;opacity:0.8;' +
+      'transform:translateX(-50%) rotate(' + angle + 'deg) translateY(-100%)';
+    sun.appendChild(ray);
+  }
+}
+
+// ── WIRE UP ALL BUTTONS ──
+function wireButtons() {
+  document.getElementById('btn-begin').addEventListener('click', startNewGame);
+  document.getElementById('btn-continue').addEventListener('click', loadSavedGame);
+  document.getElementById('btn-gallery').addEventListener('click', showEndingsGallery);
+  document.getElementById('btn-proceed').addEventListener('click', proceedFromCC);
+  document.getElementById('btn-skip-intro').addEventListener('click', skipIntro);
+  document.getElementById('btn-ack-bulletin').addEventListener('click', acknowledgeBulletin);
+  document.getElementById('btn-approve').addEventListener('click', function(){ decide('approve'); });
+  document.getElementById('btn-deny').addEventListener('click', function(){ decide('deny'); });
+  document.getElementById('btn-detain').addEventListener('click', function(){ decide('detain'); });
+  document.getElementById('btn-close-modal').addEventListener('click', closeModal);
+  document.getElementById('btn-next-day').addEventListener('click', nextDay);
+  document.getElementById('btn-return-splash').addEventListener('click', returnToSplash);
+
+  // Close modal on overlay tap
+  document.getElementById('doc-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+}
+
+// ── INIT ──
+function init() {
+  initScreens();
+  buildSun();
+  populateGenderOptions();
+  populateStateOptions();
+  populateBgOptions();
+  populateFamilyOptions();
+  wireButtons();
+  checkContinue();
+  // Show splash
+  document.getElementById('splash').style.display = 'flex';
+
+  // Service Worker registration for iOS PWA offline support
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(function(){});
+  }
+}
+
+// Run on DOM ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
+// expose engine to window for runtime animation hooks
+try {
+  if (typeof decide === "function") window.decide = decide;
+  if (typeof updateHUD === "function") window.updateHUD = updateHUD;
+  if (typeof renderDocs === "function") window.renderDocs = renderDocs;
+  if (typeof renderTraveller === "function") window.renderTraveller = renderTraveller;
+  if (typeof state !== "undefined") window.state = state;
+  if (typeof loadNextTraveller === "function") window.loadNextTraveller = loadNextTraveller;
+} catch(_){}
+
+})();
+</script>
