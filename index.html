@@ -266,13 +266,13 @@
   try {
     var isStandalone = (window.navigator.standalone === true) || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
     var caveatSeen = false;
-    try { caveatSeen = localStorage.getItem("caveatSeen") === "1"; } catch(e){}
+    try { caveatSeen = sessionStorage.getItem("caveatSeen") === "1"; } catch(e){}
     if (!isStandalone && !caveatSeen) {
       var el = document.getElementById("install-caveat");
       if (el) {
         el.classList.add("active");
         var markSeen = function(){
-          try { localStorage.setItem("caveatSeen","1"); } catch(e){}
+          try { sessionStorage.setItem("caveatSeen","1"); } catch(e){}
           el.classList.remove("active");
         };
         var c1 = document.getElementById("caveat-continue");
