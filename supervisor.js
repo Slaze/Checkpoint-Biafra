@@ -1,5 +1,5 @@
 /**
- * Inspector Nwosu — Gameplay Supervisor (v1.16)
+ * Inspector Nwosu — Gameplay Supervisor (v1.17)
  * ─────────────────────────────────────────
  * Observes play, learns locally, invents drama within the game's doctrine,
  * and applies SAFE runtime upgrades (narrative, soft difficulty, scenarios).
@@ -11,6 +11,10 @@
  * Optional online brain: multi-provider LLM chain (xAI, OpenRouter open models,
  * Groq/Llama, Gemini, OpenAI, local Ollama, custom OpenAI-compat). Keys stay in
  * localStorage only. If every online provider fails, offline templates continue.
+ *
+ * ADMIN UI: The NW button/panel is ADMIN-ONLY. Public players never see it.
+ * Localhost is always admin. On the live site, unlock with PIN or secret URL
+ * (client-side gate — static sites cannot hide source from determined readers).
  */
 (function () {
   'use strict';
@@ -21,6 +25,10 @@
   var KEY_LLM = 'cb_llm_config_v1';
   var KEY_ON = 'cb_supervisor_on';
   var KEY_HIST = 'cb_supervisor_history_notes';
+  var KEY_ADMIN = 'cb_nwosu_admin';
+  // SHA-256("OgojaBridge1967") — change PIN by updating this hash after re-hashing
+  var ADMIN_PIN_HASH =
+    '341c920c38f22d2e3be9da9cc72ada4f505313a6582ee5ddcf80a056ff4aabf2';
 
   /** Browser-callable providers (OpenAI-compatible chat + Gemini). */
   var LLM_PROVIDERS = {
@@ -1235,19 +1243,114 @@
     }
   }
 
+  // ── Admin gate (NW UI only; public never sees the panel) ─────
+  function isLocalDevHost() {
+    try {
+      var h = (location.hostname || '').toLowerCase();
+      return (
+        h === 'localhost' ||
+        h === '127.0.0.1' ||
+        h === '0.0.0.0' ||
+        h === '::1' ||
+        location.protocol === 'file:'
+      );
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function isAdmin() {
+    if (isLocalDevHost()) return true;
+    try {
+      return localStorage.getItem(KEY_ADMIN) === '1';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function setAdminUnlocked(on) {
+    try {
+      if (on) localStorage.setItem(KEY_ADMIN, '1');
+      else localStorage.removeItem(KEY_ADMIN);
+    } catch (e) {}
+  }
+
+  function sha256Hex(text) {
+    if (!window.crypto || !window.crypto.subtle) {
+      return Promise.reject(new Error('no subtle crypto'));
+    }
+    var data = new TextEncoder().encode(String(text));
+    return window.crypto.subtle.digest('SHA-256', data).then(function (buf) {
+      var bytes = new Uint8Array(buf);
+      var hex = '';
+      for (var i = 0; i < bytes.length; i++) {
+        hex += bytes[i].toString(16).padStart(2, '0');
+      }
+      return hex;
+    });
+  }
+
+  function verifyAdminPin(pin) {
+    return sha256Hex(String(pin || '').trim()).then(function (h) {
+      return h === ADMIN_PIN_HASH;
+    });
+  }
+
+  function stripAdminQueryFromUrl() {
+    try {
+      var u = new URL(location.href);
+      if (!u.searchParams.has('nwosu_admin')) return;
+      u.searchParams.delete('nwosu_admin');
+      var next = u.pathname + (u.search || '') + (u.hash || '');
+      if (window.history && history.replaceState) {
+        history.replaceState({}, '', next);
+      }
+    } catch (e) {}
+  }
+
+  /** Resolve admin unlock from URL ?nwosu_admin=PIN (once). */
+  function tryAdminUnlockFromUrl() {
+    try {
+      var u = new URL(location.href);
+      var pin = u.searchParams.get('nwosu_admin');
+      if (!pin) return Promise.resolve(isAdmin());
+      return verifyAdminPin(pin).then(function (ok) {
+        if (ok) {
+          setAdminUnlocked(true);
+          stripAdminQueryFromUrl();
+          return true;
+        }
+        stripAdminQueryFromUrl();
+        return isAdmin();
+      });
+    } catch (e) {
+      return Promise.resolve(isAdmin());
+    }
+  }
+
+  function lockAdminUi() {
+    setAdminUnlocked(false);
+    var root = document.getElementById('nwosu-root');
+    if (root && root.parentNode) root.parentNode.removeChild(root);
+    // Clear keys from this browser so a shared machine does not keep secrets
+    // (optional hard lock — only keys, learning store stays)
+  }
+
   function ensurePanel() {
+    if (!isAdmin()) return;
     if (document.getElementById('nwosu-root')) return;
     var root = document.createElement('div');
     root.id = 'nwosu-root';
+    root.setAttribute('data-admin-only', '1');
     root.innerHTML =
-      '<button type="button" id="nwosu-fab" class="nwosu-fab" title="Inspector Nwosu">NW</button>' +
+      '<button type="button" id="nwosu-fab" class="nwosu-fab" title="Inspector Nwosu (admin)">NW</button>' +
       '<div id="nwosu-panel" class="nwosu-panel" hidden>' +
       '<div class="nwosu-panel-h">' +
-      '<div><strong>Inspector Nwosu</strong><span>Supervisor · multi-LLM</span></div>' +
+      '<div><strong>Inspector Nwosu</strong><span>Admin · multi-LLM</span></div>' +
       '<button type="button" id="nwosu-close" class="nwosu-x">✕</button>' +
       '</div>' +
       '<div class="nwosu-panel-b">' +
-      '<p class="nwosu-doctrine">Goal: teach the human cost of 1967–70 through a checkpoint desk — memory, household, conscience.</p>' +
+      '<p class="nwosu-doctrine">Admin console — not shown to public players. Goal: teach the human cost of 1967–70 through a checkpoint desk.</p>' +
       '<label class="nwosu-row"><input type="checkbox" id="nwosu-on"/> Supervisor on</label>' +
       '<label class="nwosu-row"><input type="checkbox" id="nwosu-hist"/> History notes on EOD</label>' +
       '<label class="nwosu-row"><input type="checkbox" id="nwosu-fallback" checked/> Fallback chain (try next LLM if one fails)</label>' +
@@ -1263,6 +1366,7 @@
       '<button type="button" id="nwosu-assess" class="nwosu-btn">Assess growth</button>' +
       '<button type="button" id="nwosu-invent" class="nwosu-btn">Invent scenario now</button>' +
       '<button type="button" id="nwosu-probe" class="nwosu-btn nwosu-btn-ghost">Test LLMs</button>' +
+      '<button type="button" id="nwosu-lock" class="nwosu-btn nwosu-btn-ghost">Hide admin UI</button>' +
       '</div>' +
       '<div id="nwosu-status" class="nwosu-status"></div>' +
       '<div id="nwosu-log" class="nwosu-log"></div>' +
@@ -1326,6 +1430,40 @@
     document.getElementById('nwosu-probe').onclick = function () {
       probeProviders();
     };
+    document.getElementById('nwosu-lock').onclick = function () {
+      if (isLocalDevHost()) {
+        speak('On localhost the admin UI stays available. Use the live site to test public view.');
+        return;
+      }
+      lockAdminUi();
+      speak('Admin UI locked on this browser.');
+    };
+  }
+
+  /** Quiet keyboard unlock on live: Alt+Shift+N → prompt for PIN */
+  function installAdminHotkey() {
+    if (isLocalDevHost()) return;
+    document.addEventListener('keydown', function (ev) {
+      if (!(ev.altKey && ev.shiftKey && (ev.key === 'N' || ev.key === 'n'))) return;
+      if (isAdmin()) {
+        exposeAdminApi();
+        ensurePanel();
+        refreshPanel();
+        return;
+      }
+      var pin = window.prompt('Admin unlock');
+      if (!pin) return;
+      verifyAdminPin(pin).then(function (ok) {
+        if (!ok) {
+          window.alert('Denied.');
+          return;
+        }
+        setAdminUnlocked(true);
+        exposeAdminApi();
+        ensurePanel();
+        refreshPanel();
+      });
+    });
   }
 
   function probeProviders() {
@@ -1411,9 +1549,15 @@
 
   // ── Boot ─────────────────────────────────────────────────────
   function boot() {
-    ensurePanel();
     installHooks();
-    refreshPanel();
+    installAdminHotkey();
+    tryAdminUnlockFromUrl().then(function () {
+      if (isAdmin()) {
+        exposeAdminApi();
+        ensurePanel();
+        refreshPanel();
+      }
+    });
     // late re-seed hooks if patch wraps later
     setInterval(function () {
       if (!window.decide || !window.decide.__nwosuWrapped) installHooks();
@@ -1428,22 +1572,60 @@
     setTimeout(boot, 600);
   }
 
+  // Public surface: minimal. Full admin tools only after unlock.
   window.__NwosuSupervisor = {
-    doctrine: DOCTRINE,
-    observe: observe,
-    assess: assessAndGrow,
-    invent: function () {
-      inventDayDrama(gameState());
+    isAdmin: isAdmin,
+    unlock: function (pin) {
+      return verifyAdminPin(pin).then(function (ok) {
+        if (!ok) return false;
+        setAdminUnlocked(true);
+        ensurePanel();
+        refreshPanel();
+        return true;
+      });
     },
-    speak: speak,
-    getStore: function () {
-      return JSON.parse(JSON.stringify(store));
+    lock: function () {
+      if (isLocalDevHost()) return false;
+      lockAdminUi();
+      return true;
     },
-    getLlmConfig: function () {
-      return JSON.parse(JSON.stringify(llmConfig));
-    },
-    providers: LLM_PROVIDERS,
-    probe: probeProviders,
-    applySafeUpgrade: applySafeUpgrade,
   };
+
+  // Admin-only API attached after unlock (and immediately on localhost)
+  function exposeAdminApi() {
+    if (!isAdmin()) return;
+    window.__NwosuSupervisor.doctrine = DOCTRINE;
+    window.__NwosuSupervisor.observe = observe;
+    window.__NwosuSupervisor.assess = assessAndGrow;
+    window.__NwosuSupervisor.invent = function () {
+      inventDayDrama(gameState());
+    };
+    window.__NwosuSupervisor.speak = speak;
+    window.__NwosuSupervisor.getStore = function () {
+      return JSON.parse(JSON.stringify(store));
+    };
+    window.__NwosuSupervisor.getLlmConfig = function () {
+      // Redact key material in returned config
+      var c = JSON.parse(JSON.stringify(llmConfig));
+      if (c.keys) {
+        Object.keys(c.keys).forEach(function (k) {
+          if (c.keys[k]) c.keys[k] = '•••';
+        });
+      }
+      return c;
+    };
+    window.__NwosuSupervisor.providers = LLM_PROVIDERS;
+    window.__NwosuSupervisor.probe = probeProviders;
+    window.__NwosuSupervisor.applySafeUpgrade = applySafeUpgrade;
+  }
+
+  // Patch unlock to also expose API
+  var _unlock = window.__NwosuSupervisor.unlock;
+  window.__NwosuSupervisor.unlock = function (pin) {
+    return _unlock(pin).then(function (ok) {
+      if (ok) exposeAdminApi();
+      return ok;
+    });
+  };
+  if (isAdmin()) exposeAdminApi();
 })();

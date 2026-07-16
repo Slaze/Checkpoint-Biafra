@@ -1,5 +1,26 @@
 # Checkpoint Biafra — Project Recap
 
+## Latest session (2026-07-16) — admin-only NW UI (v1.17)
+
+### Goals
+- NW admin panel must not be visible to public online players
+
+### Changes
+- Admin gate on NW fab/panel only
+- Localhost always admin; live site needs PIN unlock
+- Unlock: ?nwosu_admin=PIN, Alt+Shift+N, or __NwosuSupervisor.unlock(pin)
+- Hide admin UI button locks production browser
+
+### Admin PIN
+- PIN: OgojaBridge1967 (hashed in source; rotate if leaked)
+
+### Verification
+- node --check supervisor.js OK
+
+---
+
+# Checkpoint Biafra — Project Recap
+
 ## Latest session (2026-07-16) — multi-LLM Nwosu
 
 ### Goals
