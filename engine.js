@@ -1357,7 +1357,9 @@ function backgroundHomePhrase() {
 // ── END OF DAY ──
 // Single wartime ledger: pay packet → food → rent → consequences.
 // Missing bills is not a toast — it is hunger, shame, flight, and sometimes death.
-function endOfDay() {
+function endOfDay(opts) {
+  opts = opts || {};
+  var replay = (opts === true) || !!(opts && opts.replay);
   state.__billsEngineV15 = true;
   state._resumePhase = 'eod';
 
@@ -1366,7 +1368,10 @@ function endOfDay() {
     if (NIGHT_EVENTS[i].day === state.day) { nightEvent = NIGHT_EVENTS[i]; break; }
   }
 
-  var pressure = getFamilyPressure();
+  var pressure, mouths, foodCost, rentCost, totalExpenses, baseDaily, wagePenalty, suspicionDock;
+  var canAfford, familyReport, crisisNote, intelLine, warWeek, foodPerMouth, inflation;
+  if (!replay) {
+  pressure = getFamilyPressure();
   state.familyPressure = pressure;
   var mouths = Math.max(1, livingFamily().length + (pressure > 3 ? 1 : 0));
 
@@ -1497,6 +1502,40 @@ function endOfDay() {
     }
   }
 
+  // Persist report for safe CONTINUE from end-of-day screen
+  state.lastBillReport = {
+    canAfford: canAfford,
+    streak: state.missedBillsStreak,
+    foodCost: foodCost,
+    rentCost: rentCost,
+    familyReport: familyReport,
+    crisisNote: crisisNote,
+    intelLine: intelLine,
+    baseDaily: baseDaily,
+    wagePenalty: wagePenalty,
+    suspicionDock: suspicionDock,
+    inflation: inflation,
+    mouths: mouths,
+    warWeek: warWeek
+  };
+  } else {
+    // Replay from save: restore display fields only
+    var br = state.lastBillReport || {};
+    canAfford = !!br.canAfford;
+    familyReport = br.familyReport || '';
+    crisisNote = br.crisisNote || '';
+    intelLine = br.intelLine || '';
+    foodCost = br.foodCost || 0;
+    rentCost = br.rentCost || 0;
+    baseDaily = br.baseDaily || 0;
+    wagePenalty = br.wagePenalty || 0;
+    suspicionDock = br.suspicionDock || 0;
+    inflation = br.inflation || 0;
+    mouths = br.mouths || 1;
+    warWeek = br.warWeek || 0;
+    pressure = state.familyPressure || 0;
+  }
+
   // Build pay breakdown
   var breakdown = document.getElementById('eod-pay-breakdown');
   var html = '<div class="eod-pay-row"><span>DAY PAY PACKET (GRADE 8)</span><span>' + formatNotes(baseDaily) + '</span></div>';
@@ -1550,8 +1589,8 @@ function endOfDay() {
   document.getElementById('eod-night').textContent = nightText;
   document.getElementById('btn-next-day').textContent = state.day >= 25 ? 'FINAL REPORT →' : 'DAY ' + (state.day + 1) + ' →';
 
-  state.lastBillReport = { canAfford: canAfford, streak: state.missedBillsStreak, foodCost: foodCost, rentCost: rentCost };
   updateFamilyBar();
+
   saveState();
   showScreen('eod-report');
 }
@@ -1756,8 +1795,8 @@ function loadSavedGame() {
       return;
     }
     if (phase === 'eod') {
-      // Re-run end-of-day screen from saved counters (safe rebuild)
-      endOfDay();
+      // Rebuild EOD UI only — do NOT re-apply bills/hunger
+      endOfDay({ replay: true });
       return;
     }
     // Default: morning of current day (bulletin), keep progress stats if any
@@ -1959,9 +1998,7 @@ if (document.readyState === 'loading') {
   init();
 }
 
-// expose engine to window for runtime animation hooks / patches
-// window.state must stay live: `state = freshState()` rebinds the local var;
-// a one-shot assignment left patches talking to a dead empty object.
+// expose engine to window for runtime hooks / patch.js wrappers
 try {
   if (typeof decide === "function") window.decide = decide;
   if (typeof updateHUD === "function") window.updateHUD = updateHUD;
@@ -1970,6 +2007,12 @@ try {
   if (typeof loadNextTraveller === "function") window.loadNextTraveller = loadNextTraveller;
   if (typeof formatNotes === "function") window.formatNotes = formatNotes;
   if (typeof formatNotesSigned === "function") window.formatNotesSigned = formatNotesSigned;
+  if (typeof startDay === "function") window.startDay = startDay;
+  if (typeof endOfDay === "function") window.endOfDay = endOfDay;
+  if (typeof showEndingScreen === "function") window.showEndingScreen = showEndingScreen;
+  if (typeof nextDay === "function") window.nextDay = nextDay;
+  if (typeof saveState === "function") window.saveState = saveState;
+  if (typeof showBulletin === "function") window.showBulletin = showBulletin;
   try { delete window.state; } catch (_) {}
   Object.defineProperty(window, 'state', {
     configurable: true,
