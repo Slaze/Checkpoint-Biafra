@@ -1,0 +1,5 @@
+
+# local secrets helpers — never commit
+_local_inject_key.html
+.env
+.env.*

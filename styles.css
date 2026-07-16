@@ -2423,6 +2423,39 @@ body.doc-inspecting .action-bar {
 /* hand detail pass v1.14 */
 
 /* ═══ v1.15 Inspector Nwosu Supervisor ═══ */
+/* ═══ v1.16 multi-LLM fallback panel extras ═══ */
+.nwosu-hint {
+  font-family: "Courier Prime", monospace;
+  font-size: 10px;
+  line-height: 1.4;
+  opacity: 0.65;
+  margin: 6px 0 8px;
+}
+.nwosu-details {
+  margin: 8px 0 4px;
+  border: 1px solid rgba(232,223,196,0.12);
+  border-radius: 10px;
+  padding: 6px 10px 10px;
+  background: rgba(0,0,0,0.2);
+}
+.nwosu-details summary {
+  cursor: pointer;
+  font-family: "Bebas Neue", sans-serif;
+  letter-spacing: 0.08em;
+  color: #d4a017;
+  font-size: 14px;
+  padding: 4px 0;
+  list-style: none;
+}
+.nwosu-details summary::-webkit-details-marker { display: none; }
+.nwosu-details[open] summary { margin-bottom: 6px; }
+.nwosu-prov { margin-bottom: 6px; }
+.nwosu-model-in { margin-top: 4px; font-size: 12px !important; opacity: 0.95; }
+.nwosu-btn-ghost {
+  background: transparent !important;
+  border-color: rgba(232,223,196,0.25) !important;
+  opacity: 0.9;
+}
 .nwosu-fab {
   position: fixed;
   right: 12px;
@@ -2447,7 +2480,7 @@ body.doc-inspecting .action-bar {
   right: 12px;
   bottom: max(130px, calc(110px + env(safe-area-inset-bottom)));
   width: min(360px, calc(100vw - 24px));
-  max-height: min(70vh, 520px);
+  max-height: min(78vh, 640px);
   z-index: 9501;
   background: rgba(14, 18, 12, 0.96);
   border: 1px solid rgba(212,160,23,0.45);

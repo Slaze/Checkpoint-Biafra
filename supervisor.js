@@ -1,5 +1,5 @@
 /**
- * Inspector Nwosu — Gameplay Supervisor (v1)
+ * Inspector Nwosu — Gameplay Supervisor (v1.16)
  * ─────────────────────────────────────────
  * Observes play, learns locally, invents drama within the game's doctrine,
  * and applies SAFE runtime upgrades (narrative, soft difficulty, scenarios).
@@ -8,17 +8,99 @@
  * - Unsupervised rewriting of engine.js / repo files (that needs a human).
  * - A guarantee of "true AGI". Learning = local weights + optional LLM.
  *
- * Optional online brain: user pastes XAI_API_KEY in Settings (localStorage only).
- * If the API is unreachable, offline supervisor continues fully.
+ * Optional online brain: multi-provider LLM chain (xAI, OpenRouter open models,
+ * Groq/Llama, Gemini, OpenAI, local Ollama, custom OpenAI-compat). Keys stay in
+ * localStorage only. If every online provider fails, offline templates continue.
  */
 (function () {
   'use strict';
   if (window.__NwosuSupervisor) return;
 
   var STORE_KEY = 'cb_supervisor_v1';
-  var KEY_API = 'cb_xai_api_key';
+  var KEY_API = 'cb_xai_api_key'; // legacy single-key slot (migrated into LLM config)
+  var KEY_LLM = 'cb_llm_config_v1';
   var KEY_ON = 'cb_supervisor_on';
   var KEY_HIST = 'cb_supervisor_history_notes';
+
+  /** Browser-callable providers (OpenAI-compatible chat + Gemini). */
+  var LLM_PROVIDERS = {
+    xai: {
+      id: 'xai',
+      label: 'xAI Grok',
+      kind: 'openai',
+      base: 'https://api.x.ai/v1',
+      defaultModel: 'grok-4-1-fast-non-reasoning',
+      placeholder: 'xai-...',
+      hint: 'console.x.ai',
+    },
+    openrouter: {
+      id: 'openrouter',
+      label: 'OpenRouter (open models)',
+      kind: 'openai',
+      base: 'https://openrouter.ai/api/v1',
+      defaultModel: 'meta-llama/llama-3.3-70b-instruct:free',
+      placeholder: 'sk-or-...',
+      hint: 'openrouter.ai — free Llama/Gemma/etc.',
+    },
+    groq: {
+      id: 'groq',
+      label: 'Groq (Llama)',
+      kind: 'openai',
+      base: 'https://api.groq.com/openai/v1',
+      defaultModel: 'llama-3.3-70b-versatile',
+      placeholder: 'gsk_...',
+      hint: 'console.groq.com',
+    },
+    gemini: {
+      id: 'gemini',
+      label: 'Google Gemini',
+      kind: 'gemini',
+      defaultModel: 'gemini-2.0-flash',
+      placeholder: 'AIza...',
+      hint: 'aistudio.google.com',
+    },
+    openai: {
+      id: 'openai',
+      label: 'OpenAI',
+      kind: 'openai',
+      base: 'https://api.openai.com/v1',
+      defaultModel: 'gpt-4o-mini',
+      placeholder: 'sk-...',
+      hint: 'platform.openai.com',
+    },
+    ollama: {
+      id: 'ollama',
+      label: 'Ollama (local open models)',
+      kind: 'openai',
+      base: 'http://127.0.0.1:11434/v1',
+      defaultModel: 'llama3.2',
+      // Put "local" in the key field to enable (no cloud secret needed)
+      placeholder: 'type local to enable',
+      hint: 'ollama run llama3.2 — key field: local',
+      keyOptional: false,
+      enableToken: true,
+    },
+    custom: {
+      id: 'custom',
+      label: 'Custom OpenAI-compat',
+      kind: 'openai',
+      defaultModel: 'llama3',
+      placeholder: 'key if required (or local)',
+      hint: 'Any /v1/chat/completions host + base URL',
+      keyOptional: true,
+      needsBase: true,
+    },
+  };
+
+  var DEFAULT_LLM_ORDER = [
+    'xai',
+    'openrouter',
+    'groq',
+    'gemini',
+    'openai',
+    'ollama',
+    'custom',
+  ];
 
   /** Immutable goal of Checkpoint Biafra — all interventions must serve this. */
   var DOCTRINE = {
@@ -118,12 +200,233 @@
     }
   }
 
-  function getApiKey() {
+  function defaultLlmConfig() {
+    return {
+      version: 1,
+      order: DEFAULT_LLM_ORDER.slice(),
+      keys: {},
+      models: {},
+      customBase: '',
+      ollamaBase: 'http://127.0.0.1:11434/v1',
+      fallback: true,
+      lastOk: null,
+      lastErr: null,
+    };
+  }
+
+  function loadLlmConfig() {
+    var cfg = defaultLlmConfig();
     try {
-      return (localStorage.getItem(KEY_API) || '').trim();
-    } catch (e) {
-      return '';
+      var raw = localStorage.getItem(KEY_LLM);
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') {
+          cfg.order = Array.isArray(parsed.order) ? parsed.order : cfg.order;
+          cfg.keys = parsed.keys && typeof parsed.keys === 'object' ? parsed.keys : {};
+          cfg.models = parsed.models && typeof parsed.models === 'object' ? parsed.models : {};
+          cfg.customBase = parsed.customBase || '';
+          cfg.ollamaBase = parsed.ollamaBase || cfg.ollamaBase;
+          cfg.fallback = parsed.fallback !== false;
+          cfg.lastOk = parsed.lastOk || null;
+          cfg.lastErr = parsed.lastErr || null;
+        }
+      }
+      // Migrate legacy single xAI key
+      var legacy = (localStorage.getItem(KEY_API) || '').trim();
+      if (legacy && !cfg.keys.xai) {
+        cfg.keys.xai = legacy;
+        saveLlmConfig(cfg);
+      }
+    } catch (e) {}
+    return cfg;
+  }
+
+  function saveLlmConfig(cfg) {
+    try {
+      localStorage.setItem(KEY_LLM, JSON.stringify(cfg));
+      if (cfg.keys && cfg.keys.xai) {
+        localStorage.setItem(KEY_API, cfg.keys.xai);
+      }
+    } catch (e) {}
+  }
+
+  var llmConfig = loadLlmConfig();
+
+  function getApiKey(providerId) {
+    if (providerId) {
+      return (llmConfig.keys[providerId] || '').trim();
     }
+    // Any configured provider (backward compat for callers)
+    var list = configuredProviders();
+    if (!list.length) return '';
+    return (llmConfig.keys[list[0].id] || list[0].id || '').trim();
+  }
+
+  function configuredProviders() {
+    var list = [];
+    var order = llmConfig.order && llmConfig.order.length ? llmConfig.order : DEFAULT_LLM_ORDER;
+    for (var i = 0; i < order.length; i++) {
+      var id = order[i];
+      var p = LLM_PROVIDERS[id];
+      if (!p) continue;
+      var key = (llmConfig.keys[id] || '').trim();
+      if (id === 'custom') {
+        if ((llmConfig.customBase || '').trim() && (key || p.keyOptional)) {
+          list.push(p);
+        }
+        continue;
+      }
+      // Ollama / token-enabled local: key "local" or any non-empty enables
+      if (key) list.push(p);
+    }
+    // If fallback off, only first configured
+    if (!llmConfig.fallback && list.length > 1) return [list[0]];
+    return list;
+  }
+
+  function providerModel(p) {
+    return (llmConfig.models[p.id] || p.defaultModel || '').trim();
+  }
+
+  function providerBase(p) {
+    if (p.id === 'custom') return (llmConfig.customBase || '').replace(/\/$/, '');
+    if (p.id === 'ollama') return (llmConfig.ollamaBase || p.base || '').replace(/\/$/, '');
+    return (p.base || '').replace(/\/$/, '');
+  }
+
+  function extractJsonScenario(text) {
+    if (!text) return null;
+    var json = String(text)
+      .replace(/^```json\s*/i, '')
+      .replace(/^```\s*/i, '')
+      .replace(/```$/i, '')
+      .trim();
+    // salvage first {...} if model wrapped prose
+    if (json.charAt(0) !== '{') {
+      var a = json.indexOf('{');
+      var b = json.lastIndexOf('}');
+      if (a >= 0 && b > a) json = json.slice(a, b + 1);
+    }
+    try {
+      var sc = JSON.parse(json);
+      if (sc && sc.title && sc.choices) return sc;
+    } catch (e) {}
+    return null;
+  }
+
+  function inventPrompt(context) {
+    return (
+      'You are Inspector Nwosu, supervisor at a 1967-70 Nigerian Civil War federal checkpoint game. ' +
+      'Doctrine goals: ' +
+      DOCTRINE.goals.join('; ') +
+      '. Forbidden: ' +
+      DOCTRINE.forbidden.join('; ') +
+      '. ' +
+      'Invent ONE short dramatic intervention as JSON only: {"title":"...","body":"...","choices":[{"label":"...","pay":0,"effect":{"loyalty":0}}]} ' +
+      'Period voice, household consequences, no modern tech. Context: ' +
+      JSON.stringify(context).slice(0, 1200)
+    );
+  }
+
+  function callOpenAICompat(p, prompt) {
+    var base = providerBase(p);
+    if (!base) return Promise.reject(new Error(p.id + ' missing base URL'));
+    var key = (llmConfig.keys[p.id] || '').trim();
+    var headers = {
+      'Content-Type': 'application/json',
+    };
+    // "local" / empty tokens are enable flags, not real bearer secrets
+    if (key && !/^(local|none|ollama|true|1)$/i.test(key)) {
+      headers.Authorization = 'Bearer ' + key;
+    }
+    if (p.id === 'openrouter') {
+      headers['HTTP-Referer'] = (typeof location !== 'undefined' && location.origin) || 'https://checkpoint-biafra.vercel.app';
+      headers['X-Title'] = 'Checkpoint Biafra · Inspector Nwosu';
+    }
+    return fetch(base + '/chat/completions', {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify({
+        model: providerModel(p),
+        messages: [
+          { role: 'system', content: 'Return only valid JSON for a checkpoint moral scenario.' },
+          { role: 'user', content: prompt },
+        ],
+        temperature: 0.8,
+      }),
+    }).then(function (r) {
+      if (!r.ok) {
+        return r.text().then(function (t) {
+          throw new Error(p.id + ' ' + r.status + ' ' + String(t).slice(0, 120));
+        });
+      }
+      return r.json();
+    }).then(function (data) {
+      var text =
+        (data.choices &&
+          data.choices[0] &&
+          data.choices[0].message &&
+          data.choices[0].message.content) ||
+        '';
+      var sc = extractJsonScenario(text);
+      if (!sc) throw new Error(p.id + ' bad json');
+      return sc;
+    });
+  }
+
+  function callGemini(p, prompt) {
+    var key = (llmConfig.keys.gemini || '').trim();
+    if (!key) return Promise.reject(new Error('gemini missing key'));
+    var model = providerModel(p) || 'gemini-2.0-flash';
+    var url =
+      'https://generativelanguage.googleapis.com/v1beta/models/' +
+      encodeURIComponent(model) +
+      ':generateContent?key=' +
+      encodeURIComponent(key);
+    return fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [
+          {
+            role: 'user',
+            parts: [
+              {
+                text:
+                  'Return only valid JSON for a checkpoint moral scenario.\n\n' + prompt,
+              },
+            ],
+          },
+        ],
+        generationConfig: { temperature: 0.8 },
+      }),
+    })
+      .then(function (r) {
+        if (!r.ok) {
+          return r.text().then(function (t) {
+            throw new Error('gemini ' + r.status + ' ' + String(t).slice(0, 120));
+          });
+        }
+        return r.json();
+      })
+      .then(function (data) {
+        var text =
+          (data.candidates &&
+            data.candidates[0] &&
+            data.candidates[0].content &&
+            data.candidates[0].content.parts &&
+            data.candidates[0].content.parts[0] &&
+            data.candidates[0].content.parts[0].text) ||
+          '';
+        var sc = extractJsonScenario(text);
+        if (!sc) throw new Error('gemini bad json');
+        return sc;
+      });
+  }
+
+  function callProvider(p, prompt) {
+    if (p.kind === 'gemini') return callGemini(p, prompt);
+    return callOpenAICompat(p, prompt);
   }
 
   function gameState() {
@@ -677,56 +980,39 @@
     appendLog('seed', inv.key);
   }
 
-  // ── Optional online brain (xAI) ──────────────────────────────
+  // ── Optional online brain (multi-provider fallback) ──────────
   function onlineInvent(context) {
-    var key = getApiKey();
-    if (!key) return Promise.resolve(null);
-    var prompt =
-      'You are Inspector Nwosu, supervisor at a 1967-70 Nigerian Civil War federal checkpoint game. ' +
-      'Doctrine goals: ' +
-      DOCTRINE.goals.join('; ') +
-      '. Forbidden: ' +
-      DOCTRINE.forbidden.join('; ') +
-      '. ' +
-      'Invent ONE short dramatic intervention as JSON only: {"title":"...","body":"...","choices":[{"label":"...","pay":0,"effect":{"loyalty":0}}]} ' +
-      'Period voice, household consequences, no modern tech. Context: ' +
-      JSON.stringify(context).slice(0, 1200);
+    var providers = configuredProviders();
+    if (!providers.length) return Promise.resolve(null);
+    var prompt = inventPrompt(context);
+    var errors = [];
 
-    return fetch('https://api.x.ai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + key,
-      },
-      body: JSON.stringify({
-        model: 'grok-4-1-fast-non-reasoning',
-        messages: [
-          { role: 'system', content: 'Return only valid JSON for a checkpoint moral scenario.' },
-          { role: 'user', content: prompt },
-        ],
-        temperature: 0.8,
-      }),
-    })
-      .then(function (r) {
-        if (!r.ok) throw new Error('api ' + r.status);
-        return r.json();
-      })
-      .then(function (data) {
-        var text =
-          (data.choices &&
-            data.choices[0] &&
-            data.choices[0].message &&
-            data.choices[0].message.content) ||
-          '';
-        var json = text.replace(/^```json\s*/i, '').replace(/```$/i, '').trim();
-        var sc = JSON.parse(json);
-        if (sc && sc.title && sc.choices) return sc;
-        return null;
-      })
-      .catch(function (e) {
-        appendLog('api_fail', String(e.message || e));
-        return null;
-      });
+    function tryAt(i) {
+      if (i >= providers.length) {
+        llmConfig.lastErr = errors.slice(-3).join(' | ') || 'all providers failed';
+        saveLlmConfig(llmConfig);
+        appendLog('api_fail', llmConfig.lastErr);
+        return Promise.resolve(null);
+      }
+      var p = providers[i];
+      appendLog('api_try', p.id + ' · ' + providerModel(p));
+      return callProvider(p, prompt)
+        .then(function (sc) {
+          llmConfig.lastOk = { id: p.id, model: providerModel(p), at: Date.now() };
+          llmConfig.lastErr = null;
+          saveLlmConfig(llmConfig);
+          appendLog('api_ok', p.id);
+          return sc;
+        })
+        .catch(function (e) {
+          var msg = String((e && e.message) || e);
+          errors.push(msg);
+          appendLog('api_fail', msg.slice(0, 140));
+          return tryAt(i + 1);
+        });
+    }
+
+    return tryAt(0);
   }
 
   function inventDayDramaOnlineAware(s) {
@@ -746,18 +1032,21 @@
 
     onlineInvent(ctx).then(function (sc) {
       if (sc) {
-        showInventedScenario(sc, 'online');
-        appendLog('invent_online', sc.title);
+        var src =
+          (llmConfig.lastOk && llmConfig.lastOk.id) || 'online';
+        showInventedScenario(sc, src);
+        appendLog('invent_online', src + ': ' + sc.title);
       } else {
-        inventDayDrama(s);
+        // Always use offline templates — do not re-enter online path
+        _inventDayDrama(s);
       }
     });
   }
 
-  // Override invent path when API key present
+  // Override invent path when any online provider is configured
   var _inventDayDrama = inventDayDrama;
   inventDayDrama = function (s) {
-    if (getApiKey()) inventDayDramaOnlineAware(s);
+    if (configuredProviders().length) inventDayDramaOnlineAware(s);
     else _inventDayDrama(s);
   };
 
@@ -857,6 +1146,95 @@
   }
 
   // ── UI Panel ─────────────────────────────────────────────────
+  function buildProviderFieldsHtml() {
+    var html = '';
+    for (var i = 0; i < DEFAULT_LLM_ORDER.length; i++) {
+      var id = DEFAULT_LLM_ORDER[i];
+      var p = LLM_PROVIDERS[id];
+      if (!p) continue;
+      html +=
+        '<div class="nwosu-prov" data-prov="' +
+        id +
+        '">' +
+        '<label class="nwosu-label">' +
+        escapeHtml(p.label) +
+        (p.hint ? ' · ' + escapeHtml(p.hint) : '') +
+        '</label>' +
+        '<input type="password" class="nwosu-input nwosu-key-in" data-key-for="' +
+        id +
+        '" placeholder="' +
+        escapeHtml(p.placeholder || 'key') +
+        ' · this browser only" autocomplete="off"/>' +
+        '<input type="text" class="nwosu-input nwosu-model-in" data-model-for="' +
+        id +
+        '" placeholder="model: ' +
+        escapeHtml(p.defaultModel || '') +
+        '" autocomplete="off"/>' +
+        '</div>';
+    }
+    html +=
+      '<label class="nwosu-label">Custom base URL (OpenAI-compat)</label>' +
+      '<input type="text" id="nwosu-custom-base" class="nwosu-input" placeholder="https://host/v1" autocomplete="off"/>' +
+      '<label class="nwosu-label">Ollama base (if not local default)</label>' +
+      '<input type="text" id="nwosu-ollama-base" class="nwosu-input" placeholder="http://127.0.0.1:11434/v1" autocomplete="off"/>';
+    return html;
+  }
+
+  function wireProviderFields() {
+    var keyIns = document.querySelectorAll('.nwosu-key-in');
+    for (var i = 0; i < keyIns.length; i++) {
+      (function (el) {
+        var id = el.getAttribute('data-key-for');
+        var existing = (llmConfig.keys[id] || '').trim();
+        el.value = existing ? '••••••••' : '';
+        el.onchange = function () {
+          var v = el.value.trim();
+          if (!v || v.indexOf('••') === 0) return;
+          llmConfig.keys[id] = v;
+          if (id === 'xai') {
+            try {
+              localStorage.setItem(KEY_API, v);
+            } catch (e) {}
+          }
+          saveLlmConfig(llmConfig);
+          appendLog('key', id + ' key saved locally');
+          refreshPanel();
+          el.value = '••••••••';
+        };
+      })(keyIns[i]);
+    }
+    var modelIns = document.querySelectorAll('.nwosu-model-in');
+    for (var j = 0; j < modelIns.length; j++) {
+      (function (el) {
+        var id = el.getAttribute('data-model-for');
+        el.value = llmConfig.models[id] || '';
+        el.onchange = function () {
+          var v = el.value.trim();
+          if (v) llmConfig.models[id] = v;
+          else delete llmConfig.models[id];
+          saveLlmConfig(llmConfig);
+          appendLog('model', id + ' → ' + (v || 'default'));
+        };
+      })(modelIns[j]);
+    }
+    var cb = document.getElementById('nwosu-custom-base');
+    if (cb) {
+      cb.value = llmConfig.customBase || '';
+      cb.onchange = function () {
+        llmConfig.customBase = cb.value.trim();
+        saveLlmConfig(llmConfig);
+      };
+    }
+    var ob = document.getElementById('nwosu-ollama-base');
+    if (ob) {
+      ob.value = llmConfig.ollamaBase || '';
+      ob.onchange = function () {
+        llmConfig.ollamaBase = ob.value.trim() || 'http://127.0.0.1:11434/v1';
+        saveLlmConfig(llmConfig);
+      };
+    }
+  }
+
   function ensurePanel() {
     if (document.getElementById('nwosu-root')) return;
     var root = document.createElement('div');
@@ -865,18 +1243,26 @@
       '<button type="button" id="nwosu-fab" class="nwosu-fab" title="Inspector Nwosu">NW</button>' +
       '<div id="nwosu-panel" class="nwosu-panel" hidden>' +
       '<div class="nwosu-panel-h">' +
-      '<div><strong>Inspector Nwosu</strong><span>Supervisor · adaptive</span></div>' +
+      '<div><strong>Inspector Nwosu</strong><span>Supervisor · multi-LLM</span></div>' +
       '<button type="button" id="nwosu-close" class="nwosu-x">✕</button>' +
       '</div>' +
       '<div class="nwosu-panel-b">' +
       '<p class="nwosu-doctrine">Goal: teach the human cost of 1967–70 through a checkpoint desk — memory, household, conscience.</p>' +
       '<label class="nwosu-row"><input type="checkbox" id="nwosu-on"/> Supervisor on</label>' +
       '<label class="nwosu-row"><input type="checkbox" id="nwosu-hist"/> History notes on EOD</label>' +
-      '<label class="nwosu-label">Optional xAI key (local only)</label>' +
-      '<input type="password" id="nwosu-key" class="nwosu-input" placeholder="xai-... stored in this browser only" autocomplete="off"/>' +
+      '<label class="nwosu-row"><input type="checkbox" id="nwosu-fallback" checked/> Fallback chain (try next LLM if one fails)</label>' +
+      '<p class="nwosu-hint">Keys stay in this browser only. Order: xAI → OpenRouter → Groq → Gemini → OpenAI → Ollama → custom. Offline templates always last.</p>' +
+      '<details class="nwosu-details" id="nwosu-llm-details">' +
+      '<summary>Online brains · API keys</summary>' +
+      '<div class="nwosu-llm-fields">' +
+      buildProviderFieldsHtml() +
+      '</div>' +
+      '<button type="button" id="nwosu-clear-keys" class="nwosu-btn nwosu-btn-ghost">Clear all keys</button>' +
+      '</details>' +
       '<div class="nwosu-actions">' +
       '<button type="button" id="nwosu-assess" class="nwosu-btn">Assess growth</button>' +
       '<button type="button" id="nwosu-invent" class="nwosu-btn">Invent scenario now</button>' +
+      '<button type="button" id="nwosu-probe" class="nwosu-btn nwosu-btn-ghost">Test LLMs</button>' +
       '</div>' +
       '<div id="nwosu-status" class="nwosu-status"></div>' +
       '<div id="nwosu-log" class="nwosu-log"></div>' +
@@ -902,13 +1288,27 @@
     hist.onchange = function () {
       localStorage.setItem(KEY_HIST, hist.checked ? '1' : '0');
     };
-    var keyIn = document.getElementById('nwosu-key');
-    keyIn.value = getApiKey() ? '••••••••' : '';
-    keyIn.onchange = function () {
-      if (keyIn.value && keyIn.value.indexOf('••') !== 0) {
-        localStorage.setItem(KEY_API, keyIn.value.trim());
-        appendLog('key', 'api key saved locally');
-      }
+    var fb = document.getElementById('nwosu-fallback');
+    fb.checked = llmConfig.fallback !== false;
+    fb.onchange = function () {
+      llmConfig.fallback = fb.checked;
+      saveLlmConfig(llmConfig);
+      appendLog('cfg', fb.checked ? 'fallback on' : 'fallback off (first only)');
+      refreshPanel();
+    };
+    wireProviderFields();
+    document.getElementById('nwosu-clear-keys').onclick = function () {
+      llmConfig.keys = {};
+      llmConfig.lastOk = null;
+      llmConfig.lastErr = null;
+      try {
+        localStorage.removeItem(KEY_API);
+      } catch (e) {}
+      saveLlmConfig(llmConfig);
+      wireProviderFields();
+      appendLog('key', 'all keys cleared');
+      refreshPanel();
+      speak('Online brains cleared. I still have paper templates.');
     };
     document.getElementById('nwosu-assess').onclick = function () {
       assessAndGrow();
@@ -923,6 +1323,57 @@
       session.lastInvent = 0;
       inventDayDrama(gameState());
     };
+    document.getElementById('nwosu-probe').onclick = function () {
+      probeProviders();
+    };
+  }
+
+  function probeProviders() {
+    var list = configuredProviders();
+    if (!list.length) {
+      speak('No online providers configured. Add a key or enable Ollama.');
+      appendLog('probe', 'none configured');
+      return;
+    }
+    speak('Probing ' + list.length + ' brain(s)…');
+    var prompt =
+      'Return only this JSON: {"title":"Probe","body":"ok","choices":[{"label":"OK","pay":0,"effect":{}}]}';
+    var i = 0;
+    function next() {
+      if (i >= list.length) {
+        refreshPanel();
+        speak('Probe finished. See NW log.');
+        return;
+      }
+      var p = list[i++];
+      callProvider(p, prompt)
+        .then(function () {
+          appendLog('probe_ok', p.id + ' · ' + providerModel(p));
+          next();
+        })
+        .catch(function (e) {
+          appendLog('probe_fail', p.id + ': ' + String((e && e.message) || e).slice(0, 100));
+          next();
+        });
+    }
+    next();
+  }
+
+  function brainStatusLine() {
+    var list = configuredProviders();
+    if (!list.length) return 'offline templates';
+    var names = list
+      .map(function (p) {
+        return p.id;
+      })
+      .join(' → ');
+    var last =
+      llmConfig.lastOk && llmConfig.lastOk.id
+        ? ' · last ok: ' + llmConfig.lastOk.id
+        : llmConfig.lastErr
+          ? ' · last err'
+          : '';
+    return names + last;
   }
 
   function refreshPanel() {
@@ -943,7 +1394,7 @@
       store.softDifficulty.toFixed(2) +
       '</b></div>' +
       '<div>Online brain: <b>' +
-      (getApiKey() ? 'key present' : 'offline templates') +
+      escapeHtml(brainStatusLine()) +
       '</b></div>' +
       (a
         ? '<div class="nwosu-last">Last assess: ' +
@@ -988,6 +1439,11 @@
     getStore: function () {
       return JSON.parse(JSON.stringify(store));
     },
+    getLlmConfig: function () {
+      return JSON.parse(JSON.stringify(llmConfig));
+    },
+    providers: LLM_PROVIDERS,
+    probe: probeProviders,
     applySafeUpgrade: applySafeUpgrade,
   };
 })();
