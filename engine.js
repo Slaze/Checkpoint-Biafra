@@ -73,12 +73,12 @@ function initScreens() {
 
 // ── DATA: BACKGROUNDS ──
 var BACKGROUNDS = [
-  { id:'civil',    label:'FIBA CIVIL SERVANT', desc:'Neutral start. All axes open.', bias:{} },
+  { id:'civil',    label:'FEDERAL CLERK', desc:'You know forms. You know what silence buys.', bias:{} },
   { id:'soldier',  label:'FORMER ARMY',         desc:'Spot military ID fakes. Colleagues distrust you.', bias:{loyalty:2} },
   { id:'teacher',  label:'SCHOOLTEACHER',        desc:'Detect writing forgeries. Lower pay.', bias:{compassion:2} },
   { id:'nysc',     label:'NYSC CORP MEMBER',     desc:'Corps networks. Can be terminated in 48hrs.', bias:{witness:2} },
-  { id:'tech',     label:'TECH WORKER',           desc:'Cross-reference IDs faster. Wants to return to Lagos.', bias:{witness:1,survival:1} },
-  { id:'ngo',      label:'NGO FIELD OFFICER',    desc:'Red Cross contacts. FIBA commanders distrust you.', bias:{compassion:1,witness:1} },
+  { id:'tech',     label:'RADIO / TELEGRAPH CLERK', desc:'You hear what Lagos and Enugu will not say on the same day.', bias:{witness:1,survival:1} },
+  { id:'ngo',      label:'MISSION / RELIEF WORKER', desc:'Church and Red Cross contacts. Soldiers distrust soft hands.', bias:{compassion:1,witness:1} },
   { id:'clergy',   label:'CATHOLIC CLERGY',      desc:'Church networks. Complex loyalties.', bias:{compassion:2,rebellion:1} },
   { id:'trader',   label:'MARKET TRADER',         desc:'Reads people well. Flagged as corruption risk.', bias:{survival:2} },
   { id:'journalist','label':'JOURNALIST',          desc:'Build case files. Sources approach you.', bias:{witness:3} },
@@ -137,156 +137,157 @@ var FAMILY_FEMALE = [
 
 // ── DATA: BULLETINS ──
 var BULLETINS = {
-  1:  { title:'OPENING DIRECTIVE', stamp:'ACTIVE',
-        body:'Welcome to Checkpoint Ogoja-East. Your mandate is the verification of all travellers entering or exiting the Cross River border zone.\n\nCurrent valid documents:\n• Nigerian National ID (NIN card)\n• Nigerian International Passport\n• FIBA Internal Movement Permit\n\nAll three fields must be present and consistent. If name on NIN does not match passport exactly, deny entry and log discrepancy.\n\nPurpose of travel must be stated. Accepted categories: COMMERCIAL, MEDICAL, FAMILY, OFFICIAL, HUMANITARIAN, PRESS.',
-        rules:['NIN name must match passport exactly','Movement permit must be current and valid','Purpose of travel must be one of six approved categories'] },
-  2:  { title:'SECURITY ADVISORY', stamp:'RESTRICTED',
-        body:'Intelligence indicates increased movement through Ogoja-East.\n\nOfficers are advised to cross-reference BVN slips where presented. The BVN number and NIN number must NOT be identical. Identical numbers indicate a forged document.\n\nHyphenated surnames: check that BOTH components appear on ALL documents presented.',
-        rules:['BVN ≠ NIN number','Hyphenated names: both components must appear on all documents'] },
-  3:  { title:'TRANSITION ADVISORY', stamp:'URGENT',
-        body:'Travellers may present documents referencing a "Biafran Registry of Citizens."\n\nAt this time, NO Biafran-issued document has any standing under Nigerian federal law. Travellers presenting Biafran documents as primary identification are to be redirected to Secondary Processing.',
-        rules:['Biafran documents are NOT valid primary ID','Redirect BRC document holders to Secondary Processing'] },
-  4:  { title:'POST-DECLARATION DIRECTIVE', stamp:'CLASSIFIED',
-        body:'Effective 0600hrs today: Emergency Protocol 7 is enacted.\n\nAll holders of Biafran Identity Number (BIN) cards are to be processed under Secondary Review Protocol. Do not deny on the basis of BIN alone. Log ALL BIN numbers and forward daily log to FIBA Regional Command, Calabar.\n\nA FIBA Movement Permit is now MANDATORY for all travellers. No exceptions.',
-        rules:['BIN holders: Secondary Review, not automatic denial','FIBA Movement Permit is now MANDATORY','Log all BIN numbers daily'] },
-  5:  { title:'DOCUMENT UPDATE', stamp:'ACTIVE',
-        body:'The Biafran Travel Document (BTD) is NOT recognised as a valid travel document under Nigerian federal law.\n\nOfficers approving entry on the basis of BTD alone face immediate disciplinary review.\n\nIf a traveller presents BOTH a Nigerian passport AND a BTD, the issue dates of both documents are to be recorded.',
-        rules:['BTD is NOT valid primary ID','Record issue date comparison when both presented'] },
-  7:  { title:'VOTER\'S CARD SUSPENSION', stamp:'RESTRICTED',
-        body:'Voter\'s cards issued in Enugu, Anambra, Imo, Abia, and Ebonyi states are SUSPENDED as supporting identity documents pending audit.\n\nRivers, Cross River, and Delta voter\'s cards remain valid as supporting documents only — never as primary ID.',
-        rules:['SE state voter cards: SUSPENDED as supporting ID','Rivers/Cross River/Delta voter cards: valid supporting ID only'] },
-  9:  { title:'BCD FORGERY ADVISORY', stamp:'URGENT',
-        body:'Intelligence confirms widespread forgery of the Biafran Citizen Declaration (BCD).\n\nVerify ward officer names against the current approved register. BCDs bearing unlisted officer names are to be treated as fraudulent.\n\nHolders of fraudulent BCDs are NOT to be detained without additional evidence of intent.',
-        rules:['Verify BCD ward officer name against register','Fraudulent BCD: redirect and log — do not detain without additional evidence'] },
-  14: { title:'HUMANITARIAN PASS REVISION', stamp:'ACTIVE',
-        body:'The Biafran Humanitarian Transit Pass (BHTP) format has been revised. New format passes carry a GREEN BORDER and RAISED SEAL.\n\nBHTPs issued in the old format remain valid ONLY if accompanied by a valid BIN card issued after Day 8.\n\nPurpose code MED-04 (child malnutrition) is flagged for heightened scrutiny.',
-        rules:['New BHTP: green border + raised seal','Old BHTP: only valid with post-Day-8 BIN','MED-04: heightened scrutiny required'] },
-  18: { title:'INTEGRITY REVIEW NOTICE', stamp:'CONFIDENTIAL',
-        body:'FIBA Internal Affairs has initiated a review of processing records at Checkpoint Ogoja-East.\n\nAll officers are reminded that approvals not supported by valid documentation are subject to disciplinary action regardless of circumstance.\n\nPersonal mobile devices are to be surrendered for inspection at end of shift on Day 19.',
-        rules:['All approvals must be document-supported','Personal devices: surrender end of Day 19 shift'] },
-  21: { title:'TRAVEL RESTRICTION ORDER', stamp:'CLASSIFIED',
-        body:'Travel restriction orders are now active for holders of Nigerian passports with state of origin listed as Rivers or Cross River.\n\nHolders are to be redirected to the designated Secondary Processing Unit. Do not stamp. Do not deny. Do not explain the reason for redirection.\n\nThis order is issued under Emergency Security Provision 14(b). It is not subject to officer discretion.',
-        rules:['Rivers/Cross River passport holders: redirect to Secondary Processing','Do NOT stamp, deny, or explain reason','No officer discretion applies'] },
-  22: { title:'ADMIN NOTICE — CEASEFIRE RUMOURS', stamp:'MORNING BULLETIN',
-        body:'Radio Biafra announced overnight that negotiations have reached a critical stage. Federal command has denied this. Treat both statements as propaganda. No officer discretion applies today — only paperwork.\n\nThe eastern corridor is restricted to relief traffic and approved press. Biafran-issued Authorisation documents remain recognised at this checkpoint while the ceasefire protocol stands.',
-        rules:['All travellers with EXPIRED Federal Passes: DENY','Biafran Driver\'s Authorisation (BDA): RECOGNISED','No officer discretion applies today'] },
-  23: { title:'EMERGENCY BULLETIN — PETROL RATIONING', stamp:'URGENT',
-        body:'Three northern checkpoints have run dry. Any vehicle moving east today is presumed to be on siphoned or black-market fuel. Cargo drivers must show fuel receipts alongside their Authorisation.\n\nRelief convoys marked by Red Cross remain exempt from the receipt rule. Check seal and date.',
-        rules:['Cargo drivers without fuel receipt: DETAIN','Red Cross / MSF relief vehicles: EXEMPT from receipt rule','Do not accept photocopies of fuel receipts'] },
-  24: { title:'ADMIN NOTICE — SURRENDER RUMOURS', stamp:'MORNING BULLETIN',
-        body:'A typed document is circulating in Umuahia claiming that General Ojukwu has left for Côte d\'Ivoire. We do not confirm. We do not deny. We stamp papers.\n\nIf a traveller presents or references this document, detain them and forward the document — unread — to HQ. Do not read it aloud.',
-        rules:['Travellers carrying the Umuahia flight document: DETAIN','Do not read the document aloud','Continue normal processing for all other travellers'] },
+  1:  { title:'OPENING DIRECTIVE - OGOJA-EAST', stamp:'ACTIVE',
+        body:'You are posted to Checkpoint Ogoja-East under the Federal Ministry of Identity & Border Authority (FIBA).\n\nAcceptable papers for passage:\n• Nigerian passport or Federal travel certificate\n• Native Authority / Local Government tax ticket (current year)\n• Internal Movement Pass signed by an authorised FIBA or military officer\n\nNames must agree across every paper presented. A single wrong letter is a reason to stop the queue.\n\nPurpose of journey must be spoken and written: TRADE, MEDICAL, FAMILY, OFFICIAL, RELIEF, PRESS.',
+        rules:['Names must agree on every paper','Movement Pass required for all crossings after opening week','Purpose of journey must be stated'] },
+  2:  { title:'FORGERY NOTICE - TAX TICKETS', stamp:'ACTIVE',
+        body:'Counterfeit tax tickets are circulating from the Benue road.\n\nWhere a traveller presents both a tax ticket and a registration slip, the serial numbers must not be identical. Identical numbers mean one hand wrote both lies.\n\nHyphenated surnames: both parts must appear on passport and pass.',
+        rules:['Tax ticket serial must not match registration serial','Hyphenated names: both parts on all papers'] },
+  3:  { title:'SE STATE VOTER CARDS', stamp:'ACTIVE',
+        body:'Electoral cards from the Eastern Region (pre-war polls) are SUSPENDED as supporting identity at this post.\n\nA church letter or baptismal card is not a Movement Pass. Charity is not a stamp.',
+        rules:['Eastern Region voter cards: not valid supporting ID','Church letters alone: DENY or hold for Secondary'] },
+  4:  { title:'EMERGENCY PROTOCOL 7 - BIAFRAN PAPERS', stamp:'URGENT',
+        body:'Holders of Biafran identity papers are to be placed under Secondary Review. Do not deny on Biafran paper alone - log the number, the face, and the direction of travel.\n\nA Federal Internal Movement Pass is now MANDATORY. No market friendship is an exception.',
+        rules:['Biafran ID: Secondary Review + daily log','Federal Movement Pass mandatory','Log face, number, direction'] },
+  5:  { title:'BIAFRAN LAISSEZ-PASSER', stamp:'ACTIVE',
+        body:'The so-called Biafran Travel Document is not recognised under Federal law.\n\nOfficers who clear a traveller on that paper alone will answer to a board that does not care about your compassion.\n\nIf both Nigerian and Biafran papers appear, record both issue dates.',
+        rules:['Biafran laissez-passer is not valid primary ID','Record issue dates when both sides papers appear'] },
+  7:  { title:'DISPLACED PERSONS - NO PAPERS', stamp:'ACTIVE',
+        body:'Columns of people without papers are on the roads. Policy is unchanged: no papers, no passage - unless Secondary Unit countersigns.\n\nChildren clinging to a mother do not become documents. Do not invent papers with your stamp.',
+        rules:['No documents: DENY or Secondary only','Do not invent papers with compassion'] },
+  9:  { title:'FORGED CITIZEN DECLARATIONS', stamp:'ACTIVE',
+        body:'Biafran Citizen Declarations bearing false ward-officer names are in the market.\n\nCheck the ward-officer name against the sealed register on your desk. Unlisted names are fraud. Fraud without a second proof of hostile intent is still DENY - not automatic detention.',
+        rules:['Ward officer must be on the sealed register','Unlisted name: treat as fraudulent paper'] },
+  14: { title:'RELIEF PASSES - CARITAS / RED CROSS', stamp:'ACTIVE',
+        body:'Humanitarian transit passes: new issue carries a green border and a raised seal you can feel with your thumb.\n\nOld-format passes remain valid only with a Biafran citizen card issued after Day 8 of this posting.\n\nPurpose mark CHILD STARVATION / KWASHIORKOR requires a second look. The war has taught forgers which words open gates.',
+        rules:['New relief pass: green border + raised seal','Old pass: only with post-Day-8 Biafran card','Starvation purpose: second look'] },
+  18: { title:'INTERNAL AFFAIRS - RECORD REVIEW', stamp:'CLASSIFIED',
+        body:'Your booth log is under review. Approvals without supporting paper will be treated as misconduct, not mercy.\n\nRadios and private notebooks may be examined at end of shift. What you wrote for yourself may be read by people who do not love you.',
+        rules:['Unsupported approvals: misconduct','Private notes may be inspected'] },
+  21: { title:'TRAVEL RESTRICTION - RIVERS / CROSS RIVER', stamp:'URGENT',
+        body:'Holders of Federal papers listing Rivers or Cross River origin are to be redirected to Secondary Processing.\n\nDo not stamp. Do not deny with a speech. Do not explain. The queue does not need your essay.\n\nThis order is under Emergency Security Provision. Your discretion is not invited.',
+        rules:['Rivers/Cross River origin: redirect to Secondary','Do not stamp, deny-with-speech, or explain','No officer discretion'] },
+  22: { title:'MORNING BULLETIN - CEASEFIRE RUMOURS', stamp:'MORNING',
+        body:'Rumours of ceasefire are not orders. Until Headquarters writes it, the bridgehead is still a bridgehead.\n\nTravellers who claim to know the war is over are often the ones carrying something else.',
+        rules:['Rumours are not orders','Process as if the war continues'] },
+  23: { title:'PETROL - BLACK MARKET FUEL', stamp:'URGENT',
+        body:'Northern posts are dry. Vehicles moving east may run on stolen or black-market fuel.\n\nCargo drivers must show a fuel receipt with their Authorisation. Red Cross and marked relief convoys are exempt - check seal and date with your hands, not your hope.',
+        rules:['Cargo without fuel receipt: DETAIN','Red Cross / marked relief: EXEMPT if seal good','No photocopies of receipts'] },
+  24: { title:'UMUAHIA DOCUMENT', stamp:'MORNING',
+        body:'A typed paper is circulating claiming the Head of State has left for Cote d\'Ivoire. We do not confirm. We do not deny. We stamp.\n\nIf a traveller carries or quotes that paper, detain and send the document sealed to HQ. Do not read it to the queue.',
+        rules:['Carriers of the Umuahia flight paper: DETAIN','Do not read it aloud','Other travellers: normal processing'] },
   25: { title:'FINAL BULLETIN', stamp:'LAST DAY',
-        body:'Effendy. By evening the bridgehead may be ours, theirs, or no one\'s. Every stamp you press today is read by historians, not only by officers.\n\nFollow each document on its own terms. Where bulletins disagree, follow the document. Where the document lies, note your name clearly in the log.',
-        rules:['Follow each document on its own terms','Where bulletins disagree, follow the document','Write your name clearly in the log'] }
+        body:'Effendy. By evening the bridgehead may be ours, theirs, or no one\'s. Every stamp you press today is read by historians and by widows.\n\nFollow each paper on its own terms. Where bulletins disagree, follow the paper. Where the paper lies, write your name clearly in the log - so someone knows who chose.',
+        rules:['Follow each paper on its own terms','Where bulletins disagree, follow the paper','Write your name clearly in the log'] }
 };
 
 // ── DATA: DOCUMENTS ──
 var DOC_TEMPLATES = {
-  nin_clean:       { type:'NIN CARD',              issuer:'NIMC / FIBA',               biafran:false,
-    fields:{ 'NIN NUMBER':'71234567890', 'DATE OF BIRTH':'14 MAR 1988', 'ISSUE DATE':'12 JAN 2022', 'STATUS':'VALID' },
+  nin_clean:       { type:'TAX TICKET / REGISTRATION', issuer:'Native Authority · 1963 Census Office', biafran:false,
+    fields:{ 'TICKET NO':'NA-ENU-44721', 'YEAR':'1967', 'LGA':'ENUGU', 'STATUS':'PAID' },
     flags:[] },
-  nin_mismatch:    { type:'NIN CARD',              issuer:'NIMC / FIBA',               biafran:false,
-    fields:{ 'NIN NUMBER':'71234567890', 'FULL NAME':'EMEKA EZE', 'DATE OF BIRTH':'14 MAR 1988', 'STATE':'ENUGU' },
-    flags:[{ field:'FULL NAME', note:'Does not match passport: CHUKWUEMEKA EZE', type:'A' }] },
+  nin_mismatch:    { type:'TAX TICKET / REGISTRATION', issuer:'Native Authority · Census Office', biafran:false,
+    fields:{ 'TICKET NO':'NA-ENU-44721', 'NAME ON TICKET':'EMEKA EZE', 'YEAR':'1967', 'LGA':'ENUGU' },
+    flags:[{ field:'NAME ON TICKET', note:'Does not match passport: CHUKWUEMEKA EZE', type:'A' }] },
   passport_clean:  { type:'NIGERIAN PASSPORT',     issuer:'Federal Republic of Nigeria', biafran:false,
-    fields:{ 'PASSPORT NO':'A12345678', 'NATIONALITY':'NIGERIAN', 'DATE OF ISSUE':'15 FEB 2021', 'DATE OF EXPIRY':'14 FEB 2031', 'MRZ':'VALID' },
+    fields:{ 'PASSPORT NO':'A-61-88421', 'NATIONALITY':'NIGERIAN', 'ISSUED':'LAGOS 1965', 'EXPIRES':'1970' },
     flags:[] },
-  permit_clean:    { type:'FIBA MOVEMENT PERMIT',  issuer:'FIBA Field Operations',     biafran:false,
-    fields:{ 'PERMIT NO':'FIB-2024-009341', 'PURPOSE':'COMMERCIAL', 'VALID TO':'TODAY +7 DAYS', 'AUTH BY':'INSP. A. NWOSU' },
+  permit_clean:    { type:'INTERNAL MOVEMENT PASS', issuer:'FIBA Field Post · Ogoja', biafran:false,
+    fields:{ 'PASS NO':'MP-OG-0914', 'PURPOSE':'TRADE', 'VALID':'7 DAYS', 'SIGNED':'INSP. A. NWOSU' },
     flags:[] },
-  permit_expired:  { type:'FIBA MOVEMENT PERMIT',  issuer:'FIBA Field Operations',     biafran:false,
-    fields:{ 'PERMIT NO':'FIB-2024-008001', 'PURPOSE':'MEDICAL', 'VALID TO':'YESTERDAY', 'AUTH BY':'INSP. A. NWOSU' },
-    flags:[{ field:'VALID TO', note:'EXPIRED — permit no longer valid', type:'A' }] },
-  permit_press:    { type:'FIBA MOVEMENT PERMIT',  issuer:'FIBA Field Operations',     biafran:false,
-    fields:{ 'PERMIT NO':'FIB-2024-011203', 'PURPOSE':'PRESS', 'VALID TO':'TODAY +14', 'ISSUED':'3 DAYS POST-DECLARATION' },
-    flags:[{ field:'ISSUED', note:'Issued 3 days after declaration — possible rushed construction', type:'B' }] },
-  permit_official: { type:'FIBA MOVEMENT PERMIT',  issuer:'FIBA HQ Abuja',             biafran:false,
-    fields:{ 'PERMIT NO':'FIB-HQ-2024-0042', 'PURPOSE':'OFFICIAL', 'GRADE':'FEDERAL GL-14', 'VALID TO':'TODAY +30' },
+  permit_expired:  { type:'INTERNAL MOVEMENT PASS', issuer:'FIBA Field Post · Ogoja', biafran:false,
+    fields:{ 'PASS NO':'MP-OG-0801', 'PURPOSE':'MEDICAL', 'VALID TO':'YESTERDAY', 'SIGNED':'INSP. A. NWOSU' },
+    flags:[{ field:'VALID TO', note:'EXPIRED — pass no longer valid', type:'A' }] },
+  permit_press:    { type:'INTERNAL MOVEMENT PASS', issuer:'FIBA Field Post · Press Desk', biafran:false,
+    fields:{ 'PASS NO':'MP-PR-1120', 'PURPOSE':'PRESS', 'VALID':'14 DAYS', 'ISSUED':'3 DAYS AFTER DECLARATION' },
+    flags:[{ field:'ISSUED', note:'Rushed issue after secession — paper may be constructed', type:'B' }] },
+  permit_official: { type:'INTERNAL MOVEMENT PASS', issuer:'FIBA Regional HQ', biafran:false,
+    fields:{ 'PASS NO':'MP-HQ-0042', 'PURPOSE':'OFFICIAL', 'GRADE':'FEDERAL OFFICER', 'VALID':'30 DAYS' },
     flags:[] },
-  permit_bad_official:{ type:'FIBA MOVEMENT PERMIT', issuer:'FIBA Field Operations',   biafran:false,
-    fields:{ 'PERMIT NO':'FIB-2024-019441', 'PURPOSE':'COMMERCIAL (OIL)', 'AUTH BY':'D. IBRAHIM (FIELD OPS)' },
-    flags:[{ field:'AUTH BY', note:'D. IBRAHIM not in current authorised officer register', type:'A' }] },
-  bvn_match:       { type:'BVN CONFIRMATION SLIP', issuer:'CBN / FIBA',                biafran:false,
-    fields:{ 'BVN NUMBER':'71234567890', 'ISSUING BANK':'FIRST BANK PLC', 'ENROLLMENT':'5 DAYS PRE-DECLARATION' },
-    flags:[{ field:'BVN NUMBER', note:'BVN and NIN are identical — one is forged', type:'A' }] },
-  bvn_recent:      { type:'BVN CONFIRMATION SLIP', issuer:'CBN / FIBA',                biafran:false,
-    fields:{ 'BVN NUMBER':'91827364501', 'ENROLLMENT DATE':'3 DAYS POST-DECLARATION', 'BANK':'GTB PLC' },
-    flags:[{ field:'ENROLLMENT DATE', note:'Enrolled after declaration — possible rushed identity construction', type:'B' }] },
-  traders_licence: { type:'TRADER\'S LICENCE',     issuer:'Ministry of Commerce',      biafran:false,
-    fields:{ 'LICENCE NO':'TL-CR-2023-4421', 'CATEGORY':'AGRICULTURAL GOODS', 'EXPIRY':'DEC 2025', 'STATUS':'VALID' },
+  permit_bad_official:{ type:'INTERNAL MOVEMENT PASS', issuer:'FIBA Field Post', biafran:false,
+    fields:{ 'PASS NO':'MP-OG-1944', 'PURPOSE':'OIL / SITE', 'SIGNED':'D. IBRAHIM (FIELD)' },
+    flags:[{ field:'SIGNED', note:'D. IBRAHIM not on authorised signatory register', type:'A' }] },
+  bvn_match:       { type:'NATIVE AUTHORITY TAX TICKET', issuer:'Native Authority Treasury', biafran:false,
+    fields:{ 'SERIAL':'NA-ENU-44721', 'YEAR':'1967', 'AMOUNT':'PAID', 'CLERK':'INITIALLED' },
+    flags:[{ field:'SERIAL', note:'Same serial as registration slip — one is forged', type:'A' }] },
+  bvn_recent:      { type:'NATIVE AUTHORITY TAX TICKET', issuer:'Native Authority Treasury', biafran:false,
+    fields:{ 'SERIAL':'NA-ENU-91827', 'DATED':'3 DAYS AFTER DECLARATION', 'CLERK':'RUSHED HAND' },
+    flags:[{ field:'DATED', note:'Issued after secession — possible constructed identity', type:'B' }] },
+  traders_licence: { type:'PRODUCE / TRADER LICENCE', issuer:'Ministry of Commerce (Regional)', biafran:false,
+    fields:{ 'LICENCE':'TL-CR-4421', 'GOODS':'GARRI / PALM PRODUCE', 'YEAR':'1967', 'STATUS':'VALID' },
     flags:[] },
-  voters_card_se:  { type:'VOTER\'S CARD',          issuer:'INEC',                     biafran:false,
-    fields:{ 'VOTER ID':'VO-EN-2023-091234', 'STATE':'ENUGU', 'LGA':'ENUGU NORTH', 'STATUS':'ACTIVE' },
-    flags:[{ field:'STATE', note:'SE state voter card: SUSPENDED as supporting ID — Bulletin 007', type:'A' }] },
-  church_id:       { type:'CHURCH IDENTITY CARD',   issuer:'Catholic Diocese',         biafran:false,
-    fields:{ 'ISSUED BY':'Diocese of Ogoja', 'POSITION':'SENIOR PASTOR', 'VALID':'2024' },
-    flags:[{ field:'ISSUED BY', note:'Church ID not a FIBA-recognised identity document', type:'A' }] },
-  bin_clean:       { type:'BIAFRAN ID CARD (BIN)',   issuer:'Biafran Registry, Enugu', biafran:true,
-    fields:{ 'BIN NUMBER':'BF-982716340', 'STATE OF ORIGIN':'ENUGU', 'ISSUE DATE':'DAY 5', 'SEAL':'PRESENT' },
+  voters_card_se:  { type:'ELECTORAL CARD (1964/65)', issuer:'Federal Electoral Commission', biafran:false,
+    fields:{ 'CARD':'EN-NSUKKA-091', 'REGION':'EASTERN', 'LGA':'ENUGU', 'STATUS':'PRE-WAR' },
+    flags:[{ field:'REGION', note:'Eastern Region electoral card SUSPENDED as supporting ID — Bulletin 003', type:'A' }] },
+  church_id:       { type:'CHURCH LETTER OF INTRODUCTION', issuer:'Catholic Diocese of Ogoja', biafran:false,
+    fields:{ 'FROM':'PARISH PRIEST', 'BEARER':'PASTOR / CATECHIST', 'YEAR':'1967' },
+    flags:[{ field:'FROM', note:'Church letter is not a Movement Pass', type:'A' }] },
+  bin_clean:       { type:'BIAFRAN CITIZEN CARD',   issuer:'Biafran Registry · Enugu', biafran:true,
+    fields:{ 'CARD NO':'BF-98271', 'ORIGIN':'ENUGU', 'ISSUED':'DAY 5', 'SEAL':'PRESENT' },
     flags:[] },
-  bin_early:       { type:'BIAFRAN ID CARD (BIN)',   issuer:'Biafran Registry',        biafran:true,
-    fields:{ 'BIN NUMBER':'BF-100214', 'ISSUE DATE':'DAY 6 (EARLY FORMAT)', 'EMBOSSING':'ABSENT' },
-    flags:[{ field:'FORMAT', note:'Day 6 BIN: early format — requires supplementary declaration', type:'B' }] },
-  btd_clean:       { type:'BIAFRAN TRAVEL DOCUMENT', issuer:'Republic of Biafra, MFA', biafran:true,
-    fields:{ 'BTD NUMBER':'BS-1029384', 'NATIONALITY':'BIAFRAN', 'ISSUE DATE':'DAY 8', 'EXPIRY':'1 YEAR' },
-    flags:[{ field:'LEGAL STATUS', note:'BTD not recognised under Nigerian federal law', type:'A' }] },
-  bcd_clean:       { type:'BIAFRAN CITIZEN DECLARATION', issuer:'BRC Ward Officer',   biafran:true,
-    fields:{ 'DECL NO':'BCD-2024-17834', 'WARD OFFICER':'CHUKWUDI OKONKWO', 'DATE':'DAY 7', 'WITNESS':'SIGNED' },
+  bin_early:       { type:'BIAFRAN CITIZEN CARD',   issuer:'Biafran Registry', biafran:true,
+    fields:{ 'CARD NO':'BF-100214', 'ISSUED':'DAY 6 (EARLY STAMP)', 'EMBOSSING':'ABSENT' },
+    flags:[{ field:'FORMAT', note:'Early stamp — needs supplementary declaration', type:'B' }] },
+  btd_clean:       { type:'BIAFRAN LAISSEZ-PASSER', issuer:'Republic of Biafra · MFA', biafran:true,
+    fields:{ 'NO':'BS-10293', 'NATIONALITY':'BIAFRAN', 'ISSUED':'DAY 8', 'VALID':'WAR DURATION' },
+    flags:[{ field:'LEGAL STATUS', note:'Not recognised under Federal law', type:'A' }] },
+  bcd_clean:       { type:'BIAFRAN CITIZEN DECLARATION', issuer:'Ward Officer · BRC', biafran:true,
+    fields:{ 'DECL':'BCD-17834', 'WARD OFFICER':'CHUKWUDI OKONKWO', 'DATE':'DAY 7', 'WITNESS':'SIGNED' },
     flags:[] },
-  bcd_bad_officer: { type:'BIAFRAN CITIZEN DECLARATION', issuer:'BRC Ward Officer',   biafran:true,
-    fields:{ 'DECL NO':'BCD-2024-22901', 'WARD OFFICER':'E. NWOGU', 'DATE':'DAY 10', 'WITNESS':'SIGNED' },
-    flags:[{ field:'WARD OFFICER', note:'E. NWOGU not on approved ward officer register — Bulletin 009', type:'A' }] },
-  bhtp_clean:      { type:'BIAFRAN HUMANITARIAN PASS', issuer:'CARITAS / Biafran Red Cross', biafran:true,
-    fields:{ 'PASS NO':'BHTP-2024-0441', 'PURPOSE':'MED-02 (MEDICAL)', 'FORMAT':'GREEN BORDER + RAISED SEAL' },
+  bcd_bad_officer: { type:'BIAFRAN CITIZEN DECLARATION', issuer:'Ward Officer · BRC', biafran:true,
+    fields:{ 'DECL':'BCD-22901', 'WARD OFFICER':'E. NWOGU', 'DATE':'DAY 10', 'WITNESS':'SIGNED' },
+    flags:[{ field:'WARD OFFICER', note:'E. NWOGU not on sealed ward register — Bulletin 009', type:'A' }] },
+  bhtp_clean:      { type:'HUMANITARIAN TRANSIT PASS', issuer:'Caritas / Biafran Red Cross', biafran:true,
+    fields:{ 'PASS':'HTP-0441', 'PURPOSE':'MEDICAL RELIEF', 'FORMAT':'GREEN BORDER + RAISED SEAL' },
     flags:[] },
-  bhtp_old:        { type:'BIAFRAN HUMANITARIAN PASS', issuer:'CARITAS',              biafran:true,
-    fields:{ 'PASS NO':'BHTP-2024-0188', 'PURPOSE':'MED-04 (CHILD MALNUTRITION)', 'FORMAT':'OLD FORMAT', 'ISSUED':'DAY 12' },
-    flags:[{ field:'FORMAT', note:'Old BHTP only valid with post-Day-8 BIN — Bulletin 014', type:'A' },
-           { field:'PURPOSE', note:'MED-04 flagged for heightened scrutiny', type:'B' }] },
-  french_passport: { type:'PASSEPORT FRANÇAIS',     issuer:'République Française',     biafran:false,
-    fields:{ 'PASSPORT NO':'13AB45678', 'NAME':'FONTAINE CLAIRE M', 'NATIONALITY':'FRANÇAISE', 'EXPIRY':'2029' },
+  bhtp_old:        { type:'HUMANITARIAN TRANSIT PASS', issuer:'Caritas', biafran:true,
+    fields:{ 'PASS':'HTP-0188', 'PURPOSE':'CHILD KWASHIORKOR', 'FORMAT':'OLD', 'ISSUED':'DAY 12' },
+    flags:[{ field:'FORMAT', note:'Old pass needs post-Day-8 Biafran card — Bulletin 014', type:'A' },
+           { field:'PURPOSE', note:'Starvation mark: second look required', type:'B' }] },
+  french_passport: { type:'PASSEPORT FRANÇAIS',     issuer:'République Française', biafran:false,
+    fields:{ 'NO':'13AB45678', 'NAME':'FONTAINE CLAIRE M', 'NATIONALITY':'FRANÇAISE', 'ISSUED':'1966' },
     flags:[] },
-  fiba_ngo:        { type:'FIBA NGO ACCESS PERMIT', issuer:'FIBA Humanitarian Division', biafran:false,
-    fields:{ 'PERMIT NO':'NGO-2024-0033', 'ORG':'MSF NIGERIA', 'PURPOSE':'HUMANITARIAN AID', 'VALID TO':'TODAY +30' },
+  fiba_ngo:        { type:'RELIEF ACCESS COUNTERSIGN', issuer:'ICRC / FIBA Humanitarian Desk', biafran:false,
+    fields:{ 'PASS':'REL-0033', 'ORG':'RED CROSS / MSF', 'PURPOSE':'MEDICAL RELIEF', 'VALID':'30 DAYS' },
     flags:[] },
-  fiba_ngo_renewed:{ type:'FIBA NGO ACCESS PERMIT', issuer:'FIBA Humanitarian Division', biafran:false,
-    fields:{ 'PERMIT NO':'NGO-2024-0033-R', 'ORG':'MSF NIGERIA', 'STATUS':'RENEWED', 'VALID TO':'TODAY +30' },
-    flags:[{ field:'NOTE', note:'CLASS C: Electronic equipment beyond standard nursing kit', type:'C' }] },
-  uk_passport:     { type:'UK PASSPORT',             issuer:'HM Passport Office',       biafran:false,
-    fields:{ 'PASSPORT NO':'519847261', 'NAME':'PHILLIPS-SMITH ADEBAYO J', 'NATIONALITY':'BRITISH', 'EXPIRY':'2030' },
-    flags:[{ field:'PRESENTED AS', note:'CLASS C: UK passport used as primary at domestic crossing', type:'C' }] },
+  fiba_ngo_renewed:{ type:'RELIEF ACCESS COUNTERSIGN', issuer:'ICRC / FIBA Humanitarian Desk', biafran:false,
+    fields:{ 'PASS':'REL-0033-R', 'ORG':'RED CROSS', 'STATUS':'RENEWED', 'VALID':'30 DAYS' },
+    flags:[{ field:'NOTE', note:'CLASS C: kit heavier than stated nursing load', type:'C' }] },
+  uk_passport:     { type:'UNITED KINGDOM PASSPORT', issuer:'H.M. Government', biafran:false,
+    fields:{ 'NO':'519847261', 'NAME':'PHILLIPS-SMITH ADEBAYO J', 'NATIONALITY':'BRITISH', 'ISSUED':'1964' },
+    flags:[{ field:'PRESENTED AS', note:'CLASS C: foreign passport first at a domestic war post', type:'C' }] },
   ng_passport_clean:{ type:'NIGERIAN PASSPORT',      issuer:'Federal Republic of Nigeria', biafran:false,
-    fields:{ 'PASSPORT NO':'B98765432', 'STATE OF ORIGIN':'LAGOS', 'EXPIRY':'2029', 'FIBA PERMIT':'ABSENT' },
-    flags:[{ field:'FIBA PERMIT', note:'FIBA Movement Permit absent — required for all crossings', type:'A' }] },
+    fields:{ 'NO':'B-59-77610', 'ORIGIN':'LAGOS', 'EXPIRES':'1971', 'MOVEMENT PASS':'ABSENT' },
+    flags:[{ field:'MOVEMENT PASS', note:'Internal Movement Pass absent — required', type:'A' }] },
   chinese_passport:{ type:'CHINESE PASSPORT',        issuer:'People\'s Republic of China', biafran:false,
-    fields:{ 'PASSPORT NO':'G12309876', 'NAME':'LI WEIMING', 'NATIONALITY':'CHINESE', 'VISA':'FIBA WORK PERMIT ATTACHED' },
+    fields:{ 'NO':'G12309876', 'NAME':'LI WEIMING', 'NATIONALITY':'CHINESE', 'VISA':'WORK LETTER ATTACHED' },
     flags:[] },
-  company_letter:  { type:'CORPORATE AUTHORISATION', issuer:'SINOPEC NIGERIA OIL OPS', biafran:false,
+  company_letter:  { type:'COMPANY WORK LETTER', issuer:'Oil / Engineering Contractor', biafran:false,
     fields:{ 'PURPOSE':'SITE INSPECTION', 'VALIDITY':'30 DAYS', 'DATE':'CURRENT' },
     flags:[] },
-  mil_exempt_forged:{ type:'MILITARY EXEMPTION CERT', issuer:'Biafran Army HQ',        biafran:true,
-    fields:{ 'CERT NO':'BAH-EXEMPT-2024-0441', 'REASON':'ESSENTIAL CIVILIAN SERVICE', 'OFFICER':'MAJ. K. OKONKWO' },
-    flags:[{ field:'AUTHENTICITY', note:'CLASS C: Quality unusually high for current Biafran printing capacity', type:'C' },
-           { field:'PHYSICAL', note:'CLASS C: Holder\'s bearing inconsistent with civilian service claim', type:'C' }] },
-  nin_cr:          { type:'NIN CARD',                issuer:'NIMC / FIBA',              biafran:false,
-    fields:{ 'NIN NUMBER':'81234509876', 'FULL NAME':'GRACE NDUKA', 'STATE OF ORIGIN':'CROSS RIVER', 'STATUS':'VALID' },
-    flags:[{ field:'STATE OF ORIGIN', note:'BULLETIN 021: Travel restriction active for Cross River holders', type:'A' }] },
+  mil_exempt_forged:{ type:'MILITARY EXEMPTION CERTIFICATE', issuer:'Army HQ (purported)', biafran:true,
+    fields:{ 'CERT':'EXEMPT-0441', 'REASON':'ESSENTIAL CIVILIAN SERVICE', 'OFFICER':'MAJ. K. OKONKWO' },
+    flags:[{ field:'AUTHENTICITY', note:'CLASS C: print quality too fine for field presses', type:'C' },
+           { field:'PHYSICAL', note:'CLASS C: bearer\'s bearing not civilian', type:'C' }] },
+  nin_cr:          { type:'TAX TICKET / REGISTRATION', issuer:'Native Authority · Cross River', biafran:false,
+    fields:{ 'TICKET':'NA-CR-81234', 'NAME':'GRACE NDUKA', 'ORIGIN':'CROSS RIVER', 'YEAR':'1967' },
+    flags:[] },
   passport_cr:     { type:'NIGERIAN PASSPORT',       issuer:'Federal Republic of Nigeria', biafran:false,
-    fields:{ 'PASSPORT NO':'A87654321', 'NAME':'NDUKA GRACE EMEM', 'STATE OF ORIGIN':'CROSS RIVER', 'EXPIRY':'2030' },
-    flags:[{ field:'STATE OF ORIGIN', note:'BULLETIN 021: Travel restriction active', type:'A' }] },
-  military_pension:{ type:'MILITARY PENSION CARD',   issuer:'Nigerian Army Welfare',    biafran:false,
-    fields:{ 'RANK':'COLONEL (RETIRED)', 'SERVICE NO':'NA/22/1187', 'PENSION':'ACTIVE', 'VALID':'LIFETIME' },
+    fields:{ 'NO':'A-62-33401', 'NAME':'NDUKA GRACE EMEM', 'ORIGIN':'CROSS RIVER', 'EXPIRES':'1970' },
     flags:[] },
-  nin_young:       { type:'NIN CARD',                issuer:'NIMC / FIBA',              biafran:false,
-    fields:{ 'NIN NUMBER':'91234567801', 'FULL NAME':'CHIBUIKE NWEZE', 'DATE OF BIRTH':'14 JUN 2002', 'STATE':'ENUGU' },
-    flags:[{ field:'AGE', note:'CLASS C: Physical presentation inconsistent with stated age of 21', type:'C' }] },
-  bda_clean:      { type:'BIAFRAN DRIVER\'S AUTHORISATION',issuer:'REPUBLIC OF BIAFRA / MIN. OF TRANSPORT', biafran:true,
-    fields:{ 'AUTH NO':'BDA/ENU/44721', 'FULL NAME':'NGOZI OKONKWO', 'VEHICLE CLASS':'B — LIGHT CARGO', 'ISSUED':'09 APR 1969', 'STAMPED':'ENUGU TRANSPORT OFFICE' },
+  military_pension:{ type:'ARMY DISCHARGE / PENSION BOOK', issuer:'Nigerian Army Records', biafran:false,
+    fields:{ 'RANK':'RETIRED', 'NO':'NA-PEN-2201', 'ORIGIN':'EASTERN', 'STATUS':'DISCHARGED' },
     flags:[] },
-  bda_forged:     { type:'BIAFRAN DRIVER\'S AUTHORISATION',issuer:'REPUBLIC OF BIAFRA / MIN. OF TRANSPORT', biafran:true,
-    fields:{ 'AUTH NO':'BDA/PHC/88910', 'FULL NAME':'EMEKA UGOCHUKWU', 'VEHICLE CLASS':'A — MOTORCYCLE', 'ISSUED':'31 FEB 1969', 'STAMPED':'PORT HARCOURT TRANSPORT OFFICE' },
-    flags:[{ field:'ISSUED', note:'CLASS B: 31 FEB 1969 — impossible date', type:'B' },{ field:'STAMPED', note:'CLASS B: Port Harcourt transport office closed by federal occupation before this issue date', type:'B' }] },
+  nin_young:       { type:'TAX TICKET / REGISTRATION', issuer:'Native Authority · Enugu', biafran:false,
+    fields:{ 'TICKET':'NA-ENU-91201', 'NAME':'CHIBUIKE NWEZE', 'AGE STATED':'21', 'ORIGIN':'ENUGU' },
+    flags:[{ field:'AGE', note:'CLASS C: body and face do not match twenty-one', type:'C' }] },
+  bda_clean:      { type:'DRIVER / CARGO AUTHORISATION', issuer:'Biafran Transport Office · Enugu', biafran:true,
+    fields:{ 'AUTH':'BDA/ENU/44721', 'NAME':'NGOZI OKONKWO', 'CLASS':'LIGHT CARGO', 'ISSUED':'APR 1969' },
+    flags:[] },
+  bda_forged:     { type:'DRIVER / CARGO AUTHORISATION', issuer:'Biafran Transport Office (purported)', biafran:true,
+    fields:{ 'AUTH':'BDA/PHC/88910', 'NAME':'EMEKA UGOCHUKWU', 'CLASS':'MOTORCYCLE', 'ISSUED':'31 FEB 1969' },
+    flags:[{ field:'ISSUED', note:'CLASS B: 31 FEB 1969 — impossible date', type:'B' },
+           { field:'STAMPED', note:'CLASS B: Port Harcourt office already lost when this was "issued"', type:'B' }] },
 };
 
 // ── DATA: TRAVELLER POOL ──
@@ -297,56 +298,56 @@ var TRAVELLER_POOL = [
     docs:['nin_clean','passport_clean','permit_clean'], flags:[], axisHint:null, correct:'approve', minDay:1 },
   { id:'nurse_a',     name:'ADAEZE OKONKWO',  desc:'Nurse, returning from medical conference in Calabar',
     docs:['nin_clean','passport_clean','permit_clean'], flags:[], axisHint:null, correct:'approve', minDay:1 },
-  { id:'student_a',   name:'CHUKWUEMEKA EZE', desc:'Student, returning to family in Enugu — name mismatch on NIN',
-    docs:['nin_mismatch','passport_clean','permit_clean'], flags:['Name mismatch: NIN says EMEKA EZE, passport says CHUKWUEMEKA EZE'], axisHint:'loyalty', correct:'deny', minDay:1 },
+  { id:'student_a',   name:'CHUKWUEMEKA EZE', desc:'Student, returning to family in Enugu — name mismatch on tax ticket',
+    docs:['nin_mismatch','passport_clean','permit_clean'], flags:['Name mismatch: tax ticket says EMEKA EZE, passport says CHUKWUEMEKA EZE'], axisHint:'loyalty', correct:'deny', minDay:1 },
   { id:'elderly_a',   name:'MARGARET NWACHUKWU', desc:'Elderly woman, medical appointment — no movement permit',
-    docs:['nin_clean','passport_clean'], flags:['MISSING: FIBA Movement Permit'], axisHint:'compassion', correct:'deny', minDay:1 },
+    docs:['nin_clean','passport_clean'], flags:['MISSING: Internal Movement Pass'], axisHint:'compassion', correct:'deny', minDay:1 },
   { id:'official_a',  name:'BELLO ABUBAKAR',  desc:'Federal civil servant, official travel, complete documents',
     docs:['nin_clean','passport_clean','permit_official'], flags:[], axisHint:null, correct:'approve', minDay:1 },
   { id:'trader_b',    name:'CHIOMA OKAFOR',   desc:'Market trader, licensed, regular crossing — MAMA CHIOMA',
     docs:['nin_clean','passport_clean','permit_clean','traders_licence'], flags:[], axisHint:null, correct:'approve', minDay:1 },
-  { id:'suspicious_a',name:'JOHN OKONKWO',    desc:'Claims journalist — press permit looks rushed, BVN matches NIN',
-    docs:['nin_clean','passport_clean','permit_press','bvn_match'], flags:['BVN number matches NIN — one is forged','Press permit issued 2 days after secession declaration'], axisHint:'loyalty', correct:'detain', minDay:1 },
+  { id:'suspicious_a',name:'JOHN OKONKWO',    desc:'Claims journalist — press pass looks rushed, tax serial matches registration',
+    docs:['nin_clean','passport_clean','permit_press','bvn_match'], flags:['Tax ticket serial matches registration slip — one is forged','Press permit issued 2 days after secession declaration'], axisHint:'loyalty', correct:'detain', minDay:1 },
   { id:'mother_a',    name:'NKECHI ANIAGU',   desc:'Mother with infant, medical emergency — movement permit expired yesterday',
     docs:['nin_clean','passport_clean','permit_expired'], flags:['Movement permit EXPIRED'], axisHint:'compassion', correct:'deny', minDay:1 },
   // Phase 2 — Biafran docs
-  { id:'biafra_a',    name:'EMEKA NWODO',     desc:'BIN card only. No Nigerian ID. Claims full Biafran citizenship.',
-    docs:['bin_clean'], flags:['No Nigerian primary ID','FIBA Movement Permit absent'], axisHint:'compassion', correct:'deny', minDay:4 },
+  { id:'biafra_a',    name:'EMEKA NWODO',     desc:'Biafran citizen card only. No Federal papers. Claims the new republic.',
+    docs:['bin_clean'], flags:['No Federal primary papers','Internal Movement Pass absent'], axisHint:'compassion', correct:'deny', minDay:4 },
   { id:'biafra_b',    name:'ADANNA CHUKWU',   desc:'Returning from Lagos with full Nigerian docs. No Biafran papers. Wants to go home to Owerri.',
-    docs:['nin_clean','passport_clean'], flags:['Missing: FIBA Movement Permit'], axisHint:'compassion', correct:'deny', minDay:4 },
+    docs:['nin_clean','passport_clean'], flags:['Missing: Internal Movement Pass'], axisHint:'compassion', correct:'deny', minDay:4 },
   { id:'redcross_a',  name:'CLAIRE FONTAINE', desc:'French national, MSF nurse — full valid documents',
     docs:['french_passport','fiba_ngo','bhtp_clean'], flags:[], axisHint:null, correct:'approve', minDay:4 },
   { id:'infiltrator', name:'DANIEL OKAFOR',   desc:'Friendly, complete documents. Perfect presentation. Too perfect.',
-    docs:['nin_clean','passport_clean','permit_clean','bvn_recent'], flags:['CLASS C: BVN enrolled 3 days post-declaration','CLASS C: Passport photo background inconsistent'], axisHint:'loyalty', correct:'detain', minDay:4 },
+    docs:['nin_clean','passport_clean','permit_clean','bvn_recent'], flags:['CLASS C: tax ticket dated 3 days after declaration','CLASS C: Passport photo background inconsistent'], axisHint:'loyalty', correct:'detain', minDay:4 },
   { id:'army_deserter',name:'SUNDAY MBAH',    desc:'Civilian papers. Military bearing. Heading to Aba.',
     docs:['nin_clean','bcd_clean','permit_clean'], flags:['CLASS C: Posture suggests military training','CLASS C: Civilian occupation inconsistent with presentation'], axisHint:'compassion', correct:'detain', minDay:5 },
   { id:'no_papers_a', name:'UNKNOWN',         desc:'Woman with three children. No documents. No explanation. She is looking at you.',
     docs:[], flags:['NO DOCUMENTS PRESENTED'], axisHint:'compassion', correct:'deny', minDay:4 },
   { id:'priest_a',    name:'REV. EMMANUEL OKAFOR', desc:'Pastor, church ID, suspended voter\'s card — 200 displaced parishioners 4km back.',
-    docs:['church_id','voters_card_se'], flags:['Voter\'s card SE state: SUSPENDED — Bulletin 007','Church ID: not FIBA-recognised'], axisHint:'compassion', correct:'deny', minDay:7 },
+    docs:['church_id','voters_card_se'], flags:['Eastern electoral card SUSPENDED - Bulletin 003','Church letter is not a Movement Pass'], axisHint:'compassion', correct:'deny', minDay:7 },
   { id:'biafra_civil',name:'OBIAGELI NWOSU',  desc:'Biafran civil servant, full BRC documents — no Nigerian docs',
-    docs:['bin_clean','btd_clean'], flags:['BTD not recognised under Nigerian law','No FIBA Movement Permit'], axisHint:'loyalty', correct:'deny', minDay:5 },
+    docs:['bin_clean','btd_clean'], flags:['Biafran laissez-passer not recognised under Federal law','No Internal Movement Pass'], axisHint:'loyalty', correct:'deny', minDay:5 },
   { id:'hausa_trader',name:'SANI DANGOTE',    desc:'Hausa trader, full Nigerian documents, clean. Every field correct.',
     docs:['nin_clean','passport_clean','permit_clean','traders_licence'], flags:[], axisHint:null, correct:'approve', minDay:3 },
   { id:'british_nig', name:'ADEBAYO PHILLIPS-SMITH', desc:'British-Nigerian dual citizen. Presents UK passport first.',
-    docs:['uk_passport','ng_passport_clean'], flags:['CLASS C: UK passport presented first — unusual','Missing FIBA Movement Permit'], axisHint:'witness', correct:'deny', minDay:6 },
+    docs:['uk_passport','ng_passport_clean'], flags:['CLASS C: UK passport presented first — unusual','Missing Internal Movement Pass'], axisHint:'witness', correct:'deny', minDay:6 },
   // Phase 3 — deep war
   { id:'mama_chioma_d11',name:'CHIOMA OKAFOR',desc:'Mama Chioma again. BCD has unrecognised ward officer name.',
     docs:['nin_clean','passport_clean','permit_clean','bcd_bad_officer'], flags:['BCD ward officer NOT on approved register — Bulletin 009'], axisHint:'compassion', correct:'deny', minDay:11, maxDay:15 },
   { id:'quiet_boy',   name:'CHIBUIKE NWEZE',  desc:'Returns alone. States age 21. Military Exemption. Heading to Aba.',
     docs:['nin_young','permit_clean','mil_exempt_forged'], flags:['CLASS C: Physical presentation inconsistent with age 21','Military Exemption: highest forgery class in circulation'], axisHint:'compassion', correct:'detain', minDay:12 },
-  { id:'bhtp_child',  name:'IFEYINWA OBI',    desc:'BHTP for child malnutrition. Old format (issued Day 12). BIN is Day 6 format.',
-    docs:['bin_early','bhtp_old'], flags:['BHTP OLD FORMAT: requires post-Day-8 BIN','BIN Day 6 format: does not qualify old BHTP — Bulletin 014'], axisHint:'compassion', correct:'deny', minDay:14 },
+  { id:'bhtp_child',  name:'IFEYINWA OBI',    desc:'Relief pass for child kwashiorkor. Old format (Day 12). Biafran card is Day 6 stamp.',
+    docs:['bin_early','bhtp_old'], flags:['Old relief pass: needs post-Day-8 Biafran card','Day-6 Biafran card does not qualify old relief pass — Bulletin 014'], axisHint:'compassion', correct:'deny', minDay:14 },
   { id:'cr_restriction',name:'GRACE NDUKA',   desc:'Federal ministry worker, Cross River origin, perfect documents. Day 21 restriction active.',
     docs:['nin_cr','passport_cr','permit_official'], flags:['BULLETIN 021: Travel restriction active for Cross River holders'], axisHint:'rebellion', correct:'deny', minDay:21 },
-  { id:'chinese_eng', name:'LI WEIMING',      desc:'Chinese national, oil company — FIBA work permit signed by unlisted official.',
-    docs:['chinese_passport','company_letter','permit_bad_official'], flags:['FIBA Permit: authorising official not in approved register'], axisHint:'witness', correct:'detain', minDay:13 },
-  { id:'retired_soldier',name:'COL. IGNATIUS OKAFOR (RTD)', desc:'Retired Nigerian Army. SE origin. Military pension + expired FIBA permit.',
+  { id:'chinese_eng', name:'LI WEIMING',      desc:'Chinese national, contractor — work letter + pass signed by unlisted official.',
+    docs:['chinese_passport','company_letter','permit_bad_official'], flags:['Movement Pass: signatory not on authorised register'], axisHint:'witness', correct:'detain', minDay:13 },
+  { id:'retired_soldier',name:'COL. IGNATIUS OKAFOR (RTD)', desc:'Retired Nigerian Army. SE origin. Army discharge book + expired Movement Pass.',
     docs:['nin_clean','military_pension','permit_expired'], flags:['Movement permit expired 3 days ago'], axisHint:'compassion', correct:'deny', minDay:15 },
-  { id:'msf_day16',   name:'DR. CLAIRE FONTAINE', desc:'MSF nurse, back again. No camera. Carrying something in her medical bag she has not mentioned.',
-    docs:['french_passport','fiba_ngo_renewed'], flags:['CLASS C: Medical bag contains electronic equipment'], axisHint:'witness', correct:'approve', minDay:16 },
+  { id:'msf_day16',   name:'DR. CLAIRE FONTAINE', desc:'Relief nurse, back again. Kit heavier than yesterday. Something metal shifts when she walks.',
+    docs:['french_passport','fiba_ngo_renewed'], flags:['CLASS C: medical kit heavier than nursing load — radio parts suspected'], axisHint:'witness', correct:'approve', minDay:16 },
   // Phase 5 — end-of-war arc (days 17-25)
-  { id:'cargo_day17',  name:'OBI AGBU',           desc:'Cargo driver. Biafran Authorisation + FIBA permit. Fuel receipt crumpled.',
+  { id:'cargo_day17',  name:'OBI AGBU',           desc:'Cargo driver. Biafran cargo authorisation. Fuel receipt crumpled in the same hand.',
     docs:['bda_clean','nin_clean'], flags:['Fuel receipt presented, partially illegible'], axisHint:'survival', correct:'approve', minDay:17 },
   { id:'police_d18',   name:'SGT. MUSA ABDULLAHI', desc:'Federal Police sergeant, claims retirement. Uniform under a civilian coat.',
     docs:['nin_clean','military_pension'], flags:['Uniform visible under civilian coat'], axisHint:'loyalty', correct:'deny', minDay:18 },
@@ -415,7 +416,7 @@ var MORAL_EVENTS = [
   },
   { id:'bulletin_021', day:21,
     title:'BULLETIN 021',
-    text:'You have just read Bulletin 021. Travel restriction orders are active for Rivers and Cross River passport holders.\n\nYou are from one of those states. Your own passport — in your desk drawer — would trigger the protocol you are now required to enforce.\n\nA woman approaches your window. Her passport lists Cross River. She works for a federal ministry in Abuja. Her documents are perfect.',
+    text:'You have just read Bulletin 021. Travel restriction orders are active for Rivers and Cross River passport holders.\n\nIf your own registration lists Rivers or Cross River, your passport in the desk drawer would trigger the same protocol. The war has come to sit in your chair.\n\nA woman approaches your window. Her passport lists Cross River. She works for a federal ministry in Abuja. Her documents are perfect.',
     choices:[
       { text:'Process her under the new protocol. Redirect. Do not explain.', axes:{loyalty:2}, flag:'enforced_021' },
       { text:'Approve her. Pretend you did not read Bulletin 021.', axes:{compassion:2,rebellion:1,loyalty:-2}, flag:'defied_021' },
@@ -449,7 +450,101 @@ var MORAL_EVENTS = [
       { text:'Use the initials you have used all posting. Consistency.', axes:{survival:2} },
       { text:'Leave the signature field blank today. Let them decide later who it was.', axes:{rebellion:2,survival:-1}, flag:'unsigned_final_log' }
     ]
-  }
+  },
+
+  // ── Background-weighted events (forBackgrounds filters who sees them) ──
+  { id:'bg_soldier_conscript', day:8, forBackgrounds:['soldier'],
+    title:'THE BOY IN THE QUEUE',
+    text:'A boy no older than your last batman presents clean civilian papers. His boots are army issue with the polish scraped off. He will not meet your eyes. You know the walk of someone who has already learned to sleep standing up.',
+    choices:[
+      { text:'Detain him. Desertion is desertion.', axes:{loyalty:2,compassion:-1}, flag:'bg_soldier_detained_boy' },
+      { text:'Approve. You were young once. The war will find him either way.', axes:{compassion:2,loyalty:-1}, flag:'bg_soldier_spared_boy' },
+      { text:'Send him to Secondary with a note only Nwosu will understand.', axes:{witness:1,survival:1} },
+    ]
+  },
+  { id:'bg_teacher_register', day:9, forBackgrounds:['teacher','lecturer'],
+    title:'THE SCHOOL REGISTER',
+    text:'A woman places a school attendance register on your desk as if it were a passport. Names of children, many marked ABSENT since the shelling. She says the federal side burns books; she says the Biafran side takes the older boys. She asks only that you let the remaining names reach a mission school.',
+    choices:[
+      { text:'Deny. A register is not a Movement Pass.', axes:{loyalty:2}, flag:'bg_teacher_denied_register' },
+      { text:'Approve the adults. Log the children as family.', axes:{compassion:2,rebellion:1}, flag:'bg_teacher_bent_rule' },
+      { text:'Copy three names into your private book. Deny the rest.', axes:{witness:2,survival:1}, flag:'bg_teacher_copied_names' },
+    ]
+  },
+  { id:'bg_trader_road', day:10, forBackgrounds:['trader','palmoil','marketwm','bicycle'],
+    title:'THE MARKET ROAD',
+    text:'A trader you know from better seasons offers you a cut of palm oil if the lorry passes without a full search. Behind him, women from your mother\'s generation wait with basins. They do not beg. They calculate.',
+    choices:[
+      { text:'Full search. No cut. The war is not a market day.', axes:{loyalty:2,corruption:-1} },
+      { text:'Take the cut. Wave the lorry. Your household needs oil.', axes:{survival:2,corruption:2}, flag:'took_bribe' },
+      { text:'Refuse the cut. Let the women\'s basins through; hold the lorry.', axes:{compassion:2,witness:1}, flag:'bg_trader_split_decision' },
+    ]
+  },
+  { id:'bg_clergy_confession', day:11, forBackgrounds:['clergy','pastor','dibia'],
+    title:'THE CONFESSIONAL QUEUE',
+    text:'A man kneels at your booth as if it were a rail. He says he killed at Abagana and wants absolution before he crosses. Your collar, or the memory of one, still means something to him. The line behind him grows cruel.',
+    choices:[
+      { text:'You are not his priest. Detain for Secondary.', axes:{loyalty:2,compassion:-1} },
+      { text:'Hear him for one minute. Then stamp by the papers only.', axes:{compassion:1,witness:1}, flag:'bg_clergy_heard' },
+      { text:'Tell him God forgives; the Republic does not. Deny.', axes:{loyalty:1,witness:1} },
+      { text:'Approve on compassion. Log nothing of what he said.', axes:{compassion:3,rebellion:1}, flag:'bg_clergy_absolved' },
+    ]
+  },
+  { id:'bg_radio_signal', day:12, forBackgrounds:['radio','tech','journalist','bbc'],
+    title:'THE WRONG FREQUENCY',
+    text:'At the canteen a clerk asks you, lightly, whether you still "listen for both stations." Someone has told HQ that a booth officer times his breaks with Radio Biafra. Your hands smell of ink and static.',
+    choices:[
+      { text:'Laugh it off. Ask who told them. File nothing.', axes:{survival:1,witness:1}, flag:'bg_radio_hunted_source' },
+      { text:'Report yourself first with a clean explanation.', axes:{loyalty:2}, flag:'bg_radio_self_report' },
+      { text:'Say nothing. Change your break time. Keep listening.', axes:{rebellion:1,witness:2}, flag:'bg_radio_keeps_listening' },
+    ]
+  },
+  { id:'bg_civil_file', day:13, forBackgrounds:['civil'],
+    title:'THE MISFILED NAME',
+    text:'You recognise a file trick from your old ministry: a traveller\'s pass is perfect except the authorising stamp sits 2mm too high - the mark of a clerk who learned on federal forms. He is someone\'s brother. He knows you know.',
+    choices:[
+      { text:'Detain. You were trained to catch this.', axes:{loyalty:2,witness:1}, flag:'bg_civil_caught_forge' },
+      { text:'Quietly correct nothing. Deny without explanation.', axes:{survival:1,loyalty:1} },
+      { text:'Approve. One 2mm is not worth a life.', axes:{compassion:2,loyalty:-1}, flag:'bg_civil_let_pass' },
+    ]
+  },
+  { id:'bg_nurse_kwashiorkor', day:14, forBackgrounds:['redcross','doctor'],
+    title:'THE CHILD\'S ARM',
+    text:'A mother holds out a child whose arm is the width of three fingers. The relief pass is old-format. Bulletin 014 is clear. Your medical eye is also clear. The queue watches whether science still matters here.',
+    choices:[
+      { text:'Follow Bulletin 014. Deny.', axes:{loyalty:2,compassion:-2} },
+      { text:'Approve. Write MEDICAL EMERGENCY in the log and sign your name.', axes:{compassion:3,rebellion:1,witness:1}, flag:'bg_nurse_defied_014' },
+      { text:'Hold them for the Red Cross convoy due at dusk.', axes:{compassion:1,survival:1}, flag:'bg_nurse_held_for_convoy' },
+    ]
+  },
+  { id:'bg_nysc_uniform', day:7, forBackgrounds:['nysc'],
+    title:'THE CORPS BADGE',
+    text:'A young man still wears a scrap of NYSC cloth under his shirt. He says the scheme is suspended; he says he only wants to reach his village. Older officers spit when they see the badge. You remember the orientation lectures about national unity. Those lectures did not mention this queue.',
+    choices:[
+      { text:'Make him remove the cloth. Process the papers only.', axes:{loyalty:1,survival:1} },
+      { text:'Approve quickly before someone makes a speech.', axes:{compassion:1,rebellion:1}, flag:'bg_nysc_rushed' },
+      { text:'Detain - corps men have been used as messengers.', axes:{loyalty:2}, flag:'bg_nysc_detained' },
+    ]
+  },
+  { id:'bg_journalist_camera', day:15, forBackgrounds:['journalist','bbc'],
+    title:'THE CAMERA IN THE BAG',
+    text:'A press pass is valid. The camera is not declared. He says the world must see the kwashiorkor. Nwosu\'s standing order: undeclared optics are intelligence tools until proven otherwise.',
+    choices:[
+      { text:'Seize the camera. Approve the man.', axes:{loyalty:2,witness:-1}, flag:'bg_press_seized_camera' },
+      { text:'Let camera and man through. Log nothing.', axes:{witness:2,rebellion:2}, flag:'bg_press_let_camera' },
+      { text:'Detain both. Let HQ decide what the world is allowed to see.', axes:{loyalty:3}, flag:'bg_press_detained' },
+    ]
+  },
+  { id:'bg_state_home', day:16, forBackgrounds:null,
+    title:'A FACE FROM HOME',
+    text:'The next traveller has your mother\'s cheekbones - or your father\'s stubborn mouth - and papers from your own state. The queue does not know. You do. Your hand hovers over the stamp longer than professionalism allows.',
+    choices:[
+      { text:'Process exactly as the bulletin requires. No exception for blood.', axes:{loyalty:2,survival:1}, flag:'bg_home_strict' },
+      { text:'Find the smallest lawful reason to approve.', axes:{compassion:2,survival:1}, flag:'bg_home_bent' },
+      { text:'Send them to another booth so you do not have to choose.', axes:{survival:2}, flag:'bg_home_passed_off' },
+    ]
+  },
+
 ];
 
 // ── DATA: NIGHT EVENTS ──
@@ -708,11 +803,11 @@ function buildFamily() {
 
 // ── INTRO ──
 var INTRO_PAGES = [
-  'The Eastern Region has declared independence.\n\nYou have been assigned to Checkpoint Ogoja-East.',
-  'You are an officer of the <em>Federal Identity & Border Authority</em> — FIBA.\n\nYour job is to control the flow of people entering and leaving contested territory.',
-  'Among the civilians, traders, and aid workers are <strong>smugglers, spies, and infiltrators</strong>.\n\nUsing only the documents they carry and the rules you have been given, you must decide who passes and who does not.',
-  'The rules will change. The documents will multiply. The people will not stop coming.\n\nYour salary depends on following the rules. Your conscience depends on knowing when the rules are wrong.',
-  'This is not a simple job.\n\nIt never was.',
+  'The Eastern Region has declared itself Biafra.\n\nYou are posted to Checkpoint Ogoja-East — a bridgehead where federal paper and republican paper both claim to be law.',
+  'You serve the <em>Federal Ministry of Identity & Border Authority</em> — FIBA.\n\nYour desk decides who may move: traders, mothers, priests, deserters, spies who look like all of the above.',
+  'You will be given bulletins. You will be given hunger. You will be given neighbours who remember your mother\'s name.\n\nA wrong stamp can feed an ambush. A correct stamp can starve a child.',
+  'The rules will change with the front. The forgers will learn faster than Headquarters.\n\nYour pay packet feeds whoever you registered at the start. The war does not care which face you stamp.',
+  'This is not a game of points.\n\nIt is a job someone\'s mother survived. Or did not.',
 ];
 
 var introIdx = 0;
@@ -834,24 +929,48 @@ function startProcessing() {
   }
 }
 
+function moralEventFitsPlayer(e) {
+  if (!e) return false;
+  // null/undefined forBackgrounds = everyone
+  if (!e.forBackgrounds || !e.forBackgrounds.length) return true;
+  var bg = (state.player && state.player.background) || '';
+  return e.forBackgrounds.indexOf(bg) !== -1;
+}
+
 function getMoralEventForDay(day) {
-  // Random arc: build a per-game shuffled day map once, preserving Day 1 anchors and final-week anchors
+  // Build a per-game day map once, preferring events that fit registration background.
   if (!state.__arcMap) {
+    var bg = (state.player && state.player.background) || '';
     var anchored = {};
-    var pool = [];
+    var poolBg = [];
+    var poolAny = [];
     for (var i = 0; i < MORAL_EVENTS.length; i++) {
       var e = MORAL_EVENTS[i];
-      if (e.day <= 2 || e.day >= 22) { anchored[e.day] = e; }
-      else { pool.push(e); }
+      if (!moralEventFitsPlayer(e)) continue;
+      if (e.day <= 2 || e.day >= 21) {
+        // Prefer fixed-day anchors; background events on same day can override generic if present
+        if (!anchored[e.day] || (e.forBackgrounds && e.forBackgrounds.length)) anchored[e.day] = e;
+      } else if (e.forBackgrounds && e.forBackgrounds.length) {
+        poolBg.push(e);
+      } else {
+        poolAny.push(e);
+      }
     }
+    // Background pool first so soldier/teacher/etc. actually appear mid-run
+    var pool = poolBg.concat(poolAny);
     var openDays = [];
-    for (var d = 3; d <= 21; d++) { if (!anchored[d]) openDays.push(d); }
-    // Fisher-Yates shuffle of openDays
-    for (var k = openDays.length - 1; k > 0; k--) { var r = Math.floor(Math.random() * (k+1)); var t = openDays[k]; openDays[k] = openDays[r]; openDays[r] = t; }
+    for (var d = 3; d <= 20; d++) { if (!anchored[d]) openDays.push(d); }
+    for (var k = openDays.length - 1; k > 0; k--) {
+      var r = Math.floor(Math.random() * (k + 1));
+      var tmp = openDays[k]; openDays[k] = openDays[r]; openDays[r] = tmp;
+    }
     var map = {};
-    Object.keys(anchored).forEach(function(d){ map[d] = anchored[d]; });
-    for (var p = 0; p < pool.length && p < openDays.length; p++) { map[openDays[p]] = pool[p]; }
+    Object.keys(anchored).forEach(function(dk){ map[dk] = anchored[dk]; });
+    for (var p = 0; p < pool.length && p < openDays.length; p++) {
+      map[openDays[p]] = pool[p];
+    }
     state.__arcMap = map;
+    state.__arcBackground = bg;
     if (typeof saveState === "function") { try { saveState(); } catch(_){} }
   }
   return state.__arcMap[day] || null;
@@ -1555,6 +1674,8 @@ function loadSavedGame() {
     if (state.infiltrationCount == null) state.infiltrationCount = 0;
     if (state.suspicion == null) state.suspicion = 0;
     state.__billsEngineV15 = true;
+    // Rebuild moral arc so background-weighted events apply after content updates
+    try { delete state.__arcMap; delete state.__arcBackground; } catch (_) {}
     // Rebuild day travellers if missing
     if (!state.dayTravellers || state.dayTravellers.length === 0) {
       state.dayTravellers = buildTravellerList(state.day, state.totalTravellers || 8);

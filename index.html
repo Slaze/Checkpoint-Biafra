@@ -16,7 +16,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=IM+Fell+English:ital@0;1&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=1.5">
+<link rel="stylesheet" href="styles.css?v=1.6">
 </head>
 <body>
 
@@ -45,7 +45,7 @@
     <br>
     <button class="btn-secondary" id="btn-gallery" style="margin-top:8px">CASE FILES</button>
   </div>
-  <div class="splash-version">v1.5 · CHECKPOINT BIAFRA</div>
+  <div class="splash-version">v1.6 · CHECKPOINT BIAFRA</div>
 </div>
 
 <!-- CHARACTER CREATION -->
@@ -237,7 +237,7 @@
   <div class="stamp-mark" id="stamp-mark"></div>
 </div>
 
-<script src="engine.js?v=1.5" defer></script>
+<script src="engine.js?v=1.6" defer></script>
 <div id="install-caveat" role="dialog" aria-modal="true">
   <div class="caveat-box">
     <h1>ADD TO HOME SCREEN</h1>
@@ -368,7 +368,7 @@
       cBus.gain.exponentialRampToValueAtTime(0.0001, t0 + 6);
       freqs.forEach(function(f, i){
         var o = ctx.createOscillator(); o.type = "triangle"; o.frequency.value = f * (1 + i * 0.003);
-        var g = ctx.createGain(); g.gain.value = 1 / (i + 1.5);
+        var g = ctx.createGain(); g.gain.value = 1 / (i + 1.6);
         o.connect(g); g.connect(cBus);
         o.start(t0); o.stop(t0 + 6);
       });
@@ -380,7 +380,7 @@
   }
 
   function pause(){ if(master){ master.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.5); } }
-  function resume(){ if(master){ master.gain.linearRampToValueAtTime(0.22, ctx.currentTime + 1.5); } }
+  function resume(){ if(master){ master.gain.linearRampToValueAtTime(0.22, ctx.currentTime + 1.6); } }
 
   function onGesture(){
     if(started) return;
@@ -788,6 +788,6 @@ tryHookDecide();
   if(document.body) mo.observe(document.body,{childList:true,subtree:false});
 })();</script>
 
-<script src="patch.js?v=1.5" defer></script>
+<script src="patch.js?v=1.6" defer></script>
 </body>
 </html>
