@@ -1839,7 +1839,7 @@ function init() {
   // Service Worker registration for iOS PWA offline support.
   // Bump CACHE_NAME in sw.js whenever shipping asset changes (network-first + versioned cache).
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=1.5').catch(function(){});
+    navigator.serviceWorker.register('./sw.js?v=1.7').catch(function(){});
   }
 }
 

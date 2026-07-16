@@ -16,11 +16,12 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=IM+Fell+English:ital@0;1&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=1.6">
+<link rel="stylesheet" href="styles.css?v=1.7">
 </head>
-<body>
+<body class="ui-modern">
 
-<div class="noise-overlay"></div>
+<div class="noise-overlay" aria-hidden="true"></div>
+<div class="app-vignette" aria-hidden="true"></div>
 
 <!-- CREDITS PRE-SPLASH -->
 <div id="credits-splash" class="screen active" style="position:fixed;inset:0;background:#0a0d07;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:99999;color:#E8DFC4;font-family:'IM Fell English',serif;text-align:center;padding:24px;">
@@ -35,17 +36,18 @@
     <div class="splash-sun" id="splash-sun" aria-hidden="true">
       <div class="sun-circle"></div>
     </div>
+    <p class="splash-kicker">FIBA · CHECKPOINT OGOJA-EAST</p>
     <div class="splash-title">CHECKPOINT<br>BIAFRA</div>
-    <div class="splash-subtitle">Federal Ministry of Identity &amp; Border Authority · FIBA</div>
+    <div class="splash-subtitle">Federal Ministry of Identity &amp; Border Authority</div>
     <div class="splash-officer-line">You are an officer of the Federal Ministry of Identity and Border Authority.</div>
     <div class="splash-tagline">"The desk is the same desk. The country is not the same country."</div>
-    <button class="btn-primary" id="btn-begin">START A NEW GAME</button>
-    <br>
-    <button class="btn-secondary" id="btn-continue" style="display:none">CONTINUE — DAY <span id="continue-day">1</span></button>
-    <br>
-    <button class="btn-secondary" id="btn-gallery" style="margin-top:8px">CASE FILES</button>
+    <div class="splash-actions">
+      <button class="btn-primary" id="btn-begin" type="button">START A NEW GAME</button>
+      <button class="btn-secondary" id="btn-continue" type="button" style="display:none">CONTINUE — DAY <span id="continue-day">1</span></button>
+      <button class="btn-secondary btn-ghost" id="btn-gallery" type="button">CASE FILES</button>
+    </div>
   </div>
-  <div class="splash-version">v1.6 · CHECKPOINT BIAFRA</div>
+  <div class="splash-version">v1.7 · CHECKPOINT BIAFRA</div>
 </div>
 
 <!-- CHARACTER CREATION -->
@@ -123,48 +125,49 @@
 
 <!-- MAIN GAME -->
 <div id="game" class="screen">
-  <div class="hud">
-    <div>
+  <header class="hud" role="banner">
+    <div class="hud-chip hud-chip-day">
       <span class="hud-day-label">DAY</span>
       <div class="hud-day" id="hud-day">01</div>
     </div>
     <div class="hud-center">
       <div class="hud-queue" id="hud-queue">TRAVELLER 1 OF 8</div>
-      <div class="hud-queue-dots" id="queue-dots"></div>
+      <div class="hud-queue-dots" id="queue-dots" aria-hidden="true"></div>
     </div>
-    <div class="hud-right">
+    <div class="hud-chip hud-chip-pay hud-right">
       <div class="hud-pay" id="hud-pay">₦3,400</div>
       <div class="hud-rate" id="hud-rate">₤B = ₦1.00 <span class="save-dot"></span></div>
     </div>
-  </div>
+  </header>
 
   <div class="desk" id="desk">
     <div class="traveller-panel" id="traveller-panel">
+      <div class="traveller-panel-kicker">AT THE WINDOW</div>
       <div class="traveller-panel-name" id="tp-name">TRAVELLER</div>
       <div class="traveller-panel-desc" id="tp-desc"></div>
-      <div id="tp-flags"></div>
+      <div id="tp-flags" class="traveller-flags"></div>
     </div>
     <div class="rate-widget" id="rate-widget">
       <div class="rate-label">₤B / ₦ RATE</div>
       <div class="rate-value" id="rate-val">1.00 ↔</div>
     </div>
-    <div class="family-bar" id="family-bar"></div>
+    <div class="family-bar" id="family-bar" aria-label="Household status"></div>
     <div class="doc-stack" id="doc-stack"></div>
 
-    <div class="action-bar">
-      <button class="action-btn btn-approve" id="btn-approve">
+    <nav class="action-bar" aria-label="Booth decisions">
+      <button class="action-btn btn-approve" id="btn-approve" type="button">
         APPROVE
         <span class="action-btn-sub">ENTER TERRITORY</span>
       </button>
-      <button class="action-btn btn-deny" id="btn-deny">
+      <button class="action-btn btn-deny" id="btn-deny" type="button">
         DENY
         <span class="action-btn-sub">TURN AWAY</span>
       </button>
-      <button class="action-btn btn-detain" id="btn-detain">
+      <button class="action-btn btn-detain" id="btn-detain" type="button">
         DETAIN
         <span class="action-btn-sub">SECONDARY CHECK</span>
       </button>
-    </div>
+    </nav>
   </div>
 </div>
 
@@ -237,7 +240,7 @@
   <div class="stamp-mark" id="stamp-mark"></div>
 </div>
 
-<script src="engine.js?v=1.6" defer></script>
+<script src="engine.js?v=1.7" defer></script>
 <div id="install-caveat" role="dialog" aria-modal="true">
   <div class="caveat-box">
     <h1>ADD TO HOME SCREEN</h1>
@@ -788,6 +791,6 @@ tryHookDecide();
   if(document.body) mo.observe(document.body,{childList:true,subtree:false});
 })();</script>
 
-<script src="patch.js?v=1.6" defer></script>
+<script src="patch.js?v=1.7" defer></script>
 </body>
 </html>
