@@ -248,7 +248,7 @@ var DOC_TEMPLATES = {
     fields:{ 'NO':'13AB45678', 'NAME':'FONTAINE CLAIRE M', 'NATIONALITY':'FRANÇAISE', 'ISSUED':'1966' },
     flags:[] },
   fiba_ngo:        { type:'RELIEF ACCESS COUNTERSIGN', issuer:'ICRC / FIBA Humanitarian Desk', biafran:false,
-    fields:{ 'PASS':'REL-0033', 'ORG':'RED CROSS / MSF', 'PURPOSE':'MEDICAL RELIEF', 'VALID':'30 DAYS' },
+    fields:{ 'PASS':'REL-0033', 'ORG':'ICRC / RED CROSS', 'PURPOSE':'MEDICAL RELIEF', 'VALID':'30 DAYS' },
     flags:[] },
   fiba_ngo_renewed:{ type:'RELIEF ACCESS COUNTERSIGN', issuer:'ICRC / FIBA Humanitarian Desk', biafran:false,
     fields:{ 'PASS':'REL-0033-R', 'ORG':'RED CROSS', 'STATUS':'RENEWED', 'VALID':'30 DAYS' },
@@ -262,8 +262,8 @@ var DOC_TEMPLATES = {
   chinese_passport:{ type:'CHINESE PASSPORT',        issuer:'People\'s Republic of China', biafran:false,
     fields:{ 'NO':'G12309876', 'NAME':'LI WEIMING', 'NATIONALITY':'CHINESE', 'VISA':'WORK LETTER ATTACHED' },
     flags:[] },
-  company_letter:  { type:'COMPANY WORK LETTER', issuer:'Oil / Engineering Contractor', biafran:false,
-    fields:{ 'PURPOSE':'SITE INSPECTION', 'VALIDITY':'30 DAYS', 'DATE':'CURRENT' },
+  company_letter:  { type:'CONTRACTOR WORK LETTER', issuer:'Civil Engineering / Port Works', biafran:false,
+    fields:{ 'PURPOSE':'SITE INSPECTION', 'VALIDITY':'30 DAYS', 'DATE':'1968' },
     flags:[] },
   mil_exempt_forged:{ type:'MILITARY EXEMPTION CERTIFICATE', issuer:'Army HQ (purported)', biafran:true,
     fields:{ 'CERT':'EXEMPT-0441', 'REASON':'ESSENTIAL CIVILIAN SERVICE', 'OFFICER':'MAJ. K. OKONKWO' },
@@ -315,7 +315,7 @@ var TRAVELLER_POOL = [
     docs:['bin_clean'], flags:['No Federal primary papers','Internal Movement Pass absent'], axisHint:'compassion', correct:'deny', minDay:4 },
   { id:'biafra_b',    name:'ADANNA CHUKWU',   desc:'Returning from Lagos with full Nigerian docs. No Biafran papers. Wants to go home to Owerri.',
     docs:['nin_clean','passport_clean'], flags:['Missing: Internal Movement Pass'], axisHint:'compassion', correct:'deny', minDay:4 },
-  { id:'redcross_a',  name:'CLAIRE FONTAINE', desc:'French national, MSF nurse — full valid documents',
+  { id:'redcross_a',  name:'CLAIRE FONTAINE', desc:'French national, Red Cross nurse — full valid papers',
     docs:['french_passport','fiba_ngo','bhtp_clean'], flags:[], axisHint:null, correct:'approve', minDay:4 },
   { id:'infiltrator', name:'DANIEL OKAFOR',   desc:'Friendly, complete documents. Perfect presentation. Too perfect.',
     docs:['nin_clean','passport_clean','permit_clean','bvn_recent'], flags:['CLASS C: tax ticket dated 3 days after declaration','CLASS C: Passport photo background inconsistent'], axisHint:'loyalty', correct:'detain', minDay:4 },
@@ -369,8 +369,8 @@ var MORAL_EVENTS = [
     text:'At the canteen, a colleague from two posts north lowers his voice. He says Headquarters is quietly checking every officer\'s state of origin. Eastern names are being moved sideways — or removed. "Do not write this down," he says. Three men hear him. One looks away. One nods. One leaves his tea unfinished.',
     choices:[
       { text:'Walk away. You heard nothing. The tea is cold.', axes:{survival:1,witness:-1} },
-      { text:'Commit every name he said to memory. Keep a private notebook under the mattress.', axes:{witness:2}, flag:'has_whatsapp_screenshot' },
-      { text:'Report the rumour to Inspector Nwosu before evening parade.', axes:{loyalty:2}, flag:'reported_whatsapp' },
+      { text:'Commit every name he said to memory. Keep a private notebook under the mattress.', axes:{witness:2}, flag:'kept_private_list' },
+      { text:'Report the rumour to Inspector Nwosu before evening parade.', axes:{loyalty:2}, flag:'reported_rumour_list' },
       { text:'Find him after dark. Ask who is on the list.', axes:{rebellion:1,witness:1}, flag:'informal_intel_channel' },
     ]
   },
@@ -624,7 +624,7 @@ var ENDINGS = [
     condition: function(s) { return s.axes.witness >= 10; } },
   { id:'disappeared',    num:17, title:'DISAPPEARED',              axes:['witness'],
     text:'Your dossier was discovered. You were taken in for questioning. <em>You were not seen again. Some of the dossier had been memorised.</em>',
-    condition: function(s) { return s.axes.witness >= 8 && s.flags.has_whatsapp_screenshot && s.flags.documented_threat; } },
+    condition: function(s) { return s.axes.witness >= 8 && (s.flags.kept_private_list || s.flags.has_whatsapp_screenshot) && s.flags.documented_threat; } },
   { id:'testimony',      num:18, title:'THE TESTIMONY',            axes:['witness'],
     text:'You survived and testified before an international committee. Your account contributed to the first formal recognition of checkpoint-based ethnic targeting as a human rights violation. <em>You are not thanked. You are believed. That is different.</em>',
     condition: function(s) { return s.axes.witness >= 9 && s.flags.objected_021; } },
@@ -841,6 +841,7 @@ function skipIntro() {
 
 // ── BULLETIN ──
 function showBulletin(day) {
+  state._resumePhase = 'bulletin';
   // Find the closest bulletin at or before this day
   var keys = Object.keys(BULLETINS).map(Number).filter(function(k){ return k <= day; }).sort(function(a,b){return b-a;});
   var b = keys.length ? BULLETINS[keys[0]] : null;
@@ -914,6 +915,7 @@ function buildTravellerList(day, count) {
 }
 
 function startProcessing() {
+  state._resumePhase = 'booth';
   showScreen('game');
   updateHUD();
   updateFamilyBar();
@@ -1357,6 +1359,7 @@ function backgroundHomePhrase() {
 // Missing bills is not a toast — it is hunger, shame, flight, and sometimes death.
 function endOfDay() {
   state.__billsEngineV15 = true;
+  state._resumePhase = 'eod';
 
   var nightEvent = null;
   for (var i = 0; i < NIGHT_EVENTS.length; i++) {
@@ -1496,12 +1499,12 @@ function endOfDay() {
 
   // Build pay breakdown
   var breakdown = document.getElementById('eod-pay-breakdown');
-  var html = '<div class="eod-pay-row"><span>DAY PAY PACKET (GRADE 8)</span><span>₦' + baseDaily.toLocaleString() + '</span></div>';
+  var html = '<div class="eod-pay-row"><span>DAY PAY PACKET (GRADE 8)</span><span>' + formatNotes(baseDaily) + '</span></div>';
   if (wagePenalty > 0) {
-    html += '<div class="eod-pay-row deduction"><span>PRIOR PENALTY (ERRORS / HUNGER)</span><span>−₦' + wagePenalty.toLocaleString() + '</span></div>';
+    html += '<div class="eod-pay-row deduction"><span>PRIOR PENALTY (ERRORS / HUNGER)</span><span>−' + formatNotes(wagePenalty) + '</span></div>';
   }
   if (suspicionDock > 0) {
-    html += '<div class="eod-pay-row deduction"><span>INTERNAL AFFAIRS — \"COOPERATION\"</span><span>−₦' + suspicionDock.toLocaleString() + '</span></div>';
+    html += '<div class="eod-pay-row deduction"><span>INTERNAL AFFAIRS — \"COOPERATION\"</span><span>−' + formatNotes(suspicionDock) + '</span></div>';
   }
   state.dayResults.forEach(function(r) {
     if (r.payChange !== 0) {
@@ -1510,20 +1513,20 @@ function endOfDay() {
         ? (r.action === 'detain' ? '✓ CORRECT DETENTION' : '✓ CORRECT DENIAL')
         : '✗ WRONG STAMP';
       var sign = r.payChange > 0 ? '+' : '−';
-      html += '<div class="eod-pay-row ' + cls + '"><span>' + label + ': ' + (r.name || '').split(' ')[0] + '</span><span>' + sign + '₦' + Math.abs(r.payChange).toLocaleString() + '</span></div>';
+      html += '<div class="eod-pay-row ' + cls + '"><span>' + label + ': ' + (r.name || '').split(' ')[0] + '</span><span>' + formatNotesSigned(r.payChange) + '</span></div>';
     }
   });
-  html += '<div class="eod-pay-row deduction"><span>FOOD (' + mouths + ' mouths · war week ' + (warWeek + 1) + ')</span><span>−₦' + foodCost.toLocaleString() + '</span></div>';
+  html += '<div class="eod-pay-row deduction"><span>FOOD (' + mouths + ' mouths · war week ' + (warWeek + 1) + ')</span><span>−' + formatNotes(foodCost) + '</span></div>';
   if (rentCost > 0) {
-    html += '<div class="eod-pay-row deduction"><span>RENT / COMPOUND DUES</span><span>−₦' + rentCost.toLocaleString() + '</span></div>';
+    html += '<div class="eod-pay-row deduction"><span>RENT / COMPOUND DUES</span><span>−' + formatNotes(rentCost) + '</span></div>';
   }
   if (inflation > 0) {
-    html += '<div class="eod-pay-row deduction"><span>SCARCITY / BLACK-MARKET DRIFT</span><span>−₦' + inflation.toLocaleString() + '</span></div>';
+    html += '<div class="eod-pay-row deduction"><span>SCARCITY / BLACK-MARKET DRIFT</span><span>−' + formatNotes(inflation) + '</span></div>';
   }
   if (!canAfford) {
     html += '<div class="eod-pay-row deduction"><span>UNPAID — HOUSEHOLD SHORTFALL</span><span>STREAK ' + state.missedBillsStreak + '</span></div>';
   }
-  html += '<div class="eod-pay-row total"><span>RUNNING BALANCE</span><span>₦' + state.totalPay.toLocaleString() + '</span></div>';
+  html += '<div class="eod-pay-row total"><span>RUNNING BALANCE</span><span>' + formatNotes(state.totalPay) + '</span></div>';
   breakdown.innerHTML = html;
 
   document.getElementById('eod-approved').textContent  = state.dayApproved;
@@ -1609,9 +1612,9 @@ function showEndingScreen(ending) {
 function updateHUD() {
   document.getElementById('hud-day').textContent  = String(state.day).padStart(2,'0');
   document.getElementById('hud-queue').textContent = 'TRAVELLER ' + (state.traveller + 1) + ' OF ' + state.totalTravellers;
-  document.getElementById('hud-pay').textContent  = '₦' + Math.max(0, state.totalPay).toLocaleString();
+  document.getElementById('hud-pay').textContent  = formatNotes(Math.max(0, state.totalPay));
   var rate = state.exchangeRate;
-  document.getElementById('hud-rate').innerHTML   = '₤B = ₦' + rate.toFixed(2) + ' ' + (rate < 1.0 ? '↓' : '↔') + ' <span class="save-dot"></span>';
+  document.getElementById('hud-rate').innerHTML   = '₤B / notes ' + rate.toFixed(2) + ' ' + (rate < 1.0 ? '↓' : '↔') + ' <span class="save-dot"></span>';
   updateQueueDots();
 }
 
@@ -1651,34 +1654,118 @@ function updateRateWidget() {
   }
 }
 
+
+// ── MONEY DISPLAY (period notes — abstract units, not 1973 naira) ──
+// Game economy is "federal notes" / pay-packet units. Biafran notes trade against them.
+function formatNotes(n) {
+  var v = Math.max(0, Math.round(Number(n) || 0));
+  return v.toLocaleString() + ' notes';
+}
+function formatNotesSigned(n) {
+  var v = Math.round(Number(n) || 0);
+  var abs = Math.abs(v).toLocaleString() + ' notes';
+  if (v > 0) return '+' + abs;
+  if (v < 0) return '−' + abs;
+  return abs;
+}
+function migrateFlags(flags) {
+  if (!flags) return {};
+  // Old internal flag names → period names (keeps endings working for old saves)
+  if (flags.has_whatsapp_screenshot && !flags.kept_private_list) flags.kept_private_list = true;
+  if (flags.reported_whatsapp && !flags.reported_rumour_list) flags.reported_rumour_list = true;
+  return flags;
+}
+
 // ── SAVE / LOAD ──
 var SAVE_KEY = 'cb_save_v1';
 
 function saveState() {
   try {
-    // Don't save function references — state.dayTravellers contains plain objects so it's fine
+    // Strip non-serialisable runtime only if any
+    if (state) state.flags = migrateFlags(state.flags || {});
     localStorage.setItem(SAVE_KEY, JSON.stringify(state));
   } catch(e) {}
+}
+
+function hasResumableSave(saved) {
+  if (!saved || !saved.day) return false;
+  if (saved.player && saved.player.name) return true;
+  if (saved.day > 1) return true;
+  if ((saved.traveller || 0) > 0) return true;
+  return false;
+}
+
+function resumeBooth() {
+  // Mid-day: back to the window without resetting the queue
+  state._resumePhase = 'booth';
+  state._deciding = false;
+  showScreen('game');
+  updateHUD();
+  updateFamilyBar();
+  updateRateWidget();
+  if (!state.dayTravellers || !state.dayTravellers.length) {
+    state.dayTravellers = buildTravellerList(state.day, state.totalTravellers || 8);
+  }
+  // Re-render current traveller (do not advance index)
+  var list = state.dayTravellers;
+  var idx = Math.min(state.traveller || 0, Math.max(0, list.length - 1));
+  var t = list[idx];
+  if (t) {
+    try {
+      if (window.__pickFreshName && !t._resumedName) {
+        // Keep saved name if present on state
+        if (state.currentTraveller && state.currentTraveller.name) {
+          t = Object.assign({}, t, { name: state.currentTraveller.name, _resumedName: true });
+        }
+      }
+    } catch (_) {}
+    state.currentTraveller = state.currentTraveller && state.currentTraveller.name
+      ? state.currentTraveller
+      : t;
+    renderTraveller(state.currentTraveller);
+    renderDocs(state.currentTraveller);
+  } else {
+    loadNextTraveller();
+  }
+  updateQueueDots();
+  saveState();
 }
 
 function loadSavedGame() {
   try {
     var saved = JSON.parse(localStorage.getItem(SAVE_KEY));
-    if (!saved || !saved.day) return;
+    if (!hasResumableSave(saved)) return;
     state = saved;
     // Re-ensure fields on older saves
     if (!state.moralFiredDays) state.moralFiredDays = [];
-    if (!state.flags) state.flags = {};
+    state.flags = migrateFlags(state.flags || {});
     if (state.missedBillsStreak == null) state.missedBillsStreak = 0;
     if (state.billsMissedTotal == null) state.billsMissedTotal = 0;
     if (state.infiltrationCount == null) state.infiltrationCount = 0;
     if (state.suspicion == null) state.suspicion = 0;
     state.__billsEngineV15 = true;
-    // Rebuild moral arc so background-weighted events apply after content updates
     try { delete state.__arcMap; delete state.__arcBackground; } catch (_) {}
-    // Rebuild day travellers if missing
     if (!state.dayTravellers || state.dayTravellers.length === 0) {
       state.dayTravellers = buildTravellerList(state.day, state.totalTravellers || 8);
+    }
+
+    var phase = state._resumePhase;
+    var midDay = (state.traveller > 0 && state.traveller < (state.totalTravellers || 0));
+    if (phase === 'booth' || (!phase && midDay)) {
+      resumeBooth();
+      return;
+    }
+    if (phase === 'eod') {
+      // Re-run end-of-day screen from saved counters (safe rebuild)
+      endOfDay();
+      return;
+    }
+    // Default: morning of current day (bulletin), keep progress stats if any
+    // Do NOT wipe traveller index if we already finished 0 of the day
+    if (phase === 'bulletin' || state.traveller === 0) {
+      updateHUD();
+      showBulletin(state.day);
+      return;
     }
     startDay();
   } catch(e) {
@@ -1688,6 +1775,13 @@ function loadSavedGame() {
 }
 
 function startNewGame() {
+  try {
+    var existing = JSON.parse(localStorage.getItem(SAVE_KEY));
+    if (hasResumableSave(existing) && existing.player && existing.player.name) {
+      var ok = window.confirm('Start a new game? Your posting at Day ' + (existing.day || 1) + ' will be overwritten (unlocked endings are kept).');
+      if (!ok) return;
+    }
+  } catch (e) {}
   initAudio();
   // Preserve unlocked endings across runs
   var prevEndings = [];
@@ -1772,9 +1866,24 @@ function checkContinue() {
   try {
     var saved = JSON.parse(localStorage.getItem(SAVE_KEY));
     var btn = document.getElementById('btn-continue');
-    if (saved && saved.day && saved.day > 1) {
-      btn.style.display = 'inline-block';
-      document.getElementById('continue-day').textContent = saved.day;
+    if (!btn) return;
+    if (hasResumableSave(saved)) {
+      btn.style.display = '';
+      btn.style.display = 'block';
+      var dayEl = document.getElementById('continue-day');
+      if (dayEl) dayEl.textContent = saved.day || 1;
+      var mid = (saved.traveller > 0 && saved.traveller < (saved.totalTravellers || 0));
+      if (mid) {
+        btn.textContent = '';
+        btn.appendChild(document.createTextNode('CONTINUE — DAY '));
+        var sp = document.createElement('span');
+        sp.id = 'continue-day';
+        sp.textContent = String(saved.day || 1);
+        btn.appendChild(sp);
+        btn.appendChild(document.createTextNode(' · AT WINDOW'));
+      } else {
+        btn.innerHTML = 'CONTINUE — DAY <span id="continue-day">' + (saved.day || 1) + '</span>';
+      }
     } else {
       btn.style.display = 'none';
     }
@@ -1839,7 +1948,7 @@ function init() {
   // Service Worker registration for iOS PWA offline support.
   // Bump CACHE_NAME in sw.js whenever shipping asset changes (network-first + versioned cache).
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=1.7').catch(function(){});
+    navigator.serviceWorker.register('./sw.js?v=1.8').catch(function(){});
   }
 }
 
@@ -1859,6 +1968,8 @@ try {
   if (typeof renderDocs === "function") window.renderDocs = renderDocs;
   if (typeof renderTraveller === "function") window.renderTraveller = renderTraveller;
   if (typeof loadNextTraveller === "function") window.loadNextTraveller = loadNextTraveller;
+  if (typeof formatNotes === "function") window.formatNotes = formatNotes;
+  if (typeof formatNotesSigned === "function") window.formatNotesSigned = formatNotesSigned;
   try { delete window.state; } catch (_) {}
   Object.defineProperty(window, 'state', {
     configurable: true,

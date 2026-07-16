@@ -16,7 +16,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=IM+Fell+English:ital@0;1&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=1.7">
+<link rel="stylesheet" href="styles.css?v=1.8">
 </head>
 <body class="ui-modern">
 
@@ -47,7 +47,7 @@
       <button class="btn-secondary btn-ghost" id="btn-gallery" type="button">CASE FILES</button>
     </div>
   </div>
-  <div class="splash-version">v1.7 · CHECKPOINT BIAFRA</div>
+  <div class="splash-version">v1.8 · CHECKPOINT BIAFRA</div>
 </div>
 
 <!-- CHARACTER CREATION -->
@@ -135,8 +135,8 @@
       <div class="hud-queue-dots" id="queue-dots" aria-hidden="true"></div>
     </div>
     <div class="hud-chip hud-chip-pay hud-right">
-      <div class="hud-pay" id="hud-pay">₦3,400</div>
-      <div class="hud-rate" id="hud-rate">₤B = ₦1.00 <span class="save-dot"></span></div>
+      <div class="hud-pay" id="hud-pay">3,400 notes</div>
+      <div class="hud-rate" id="hud-rate">₤B / notes 1.00 <span class="save-dot"></span></div>
     </div>
   </header>
 
@@ -148,7 +148,7 @@
       <div id="tp-flags" class="traveller-flags"></div>
     </div>
     <div class="rate-widget" id="rate-widget">
-      <div class="rate-label">₤B / ₦ RATE</div>
+      <div class="rate-label">₤B / NOTES</div>
       <div class="rate-value" id="rate-val">1.00 ↔</div>
     </div>
     <div class="family-bar" id="family-bar" aria-label="Household status"></div>
@@ -240,7 +240,7 @@
   <div class="stamp-mark" id="stamp-mark"></div>
 </div>
 
-<script src="engine.js?v=1.7" defer></script>
+<script src="engine.js?v=1.8" defer></script>
 <div id="install-caveat" role="dialog" aria-modal="true">
   <div class="caveat-box">
     <h1>ADD TO HOME SCREEN</h1>
@@ -557,7 +557,7 @@ window.__recordTravellerDecision=function(name,decision,errors){if(!name)return;
 window.__getReturningNote=function(name){var h=window.__travellerHistory[name];if(!h)return null;var note="Last seen Day "+h.day+": "+h.decision.toUpperCase();if(h.errors&&h.errors.length){note+=" — flagged for "+h.errors.join(", ")+".";}return note;};
 function scanSuspicious(){var papers=document.querySelectorAll(".doc, .paper, .document, .traveller-doc, [data-doc]");var keys=["EXPIRED","FORGED","MISMATCH","SUSPENDED","INVALID","UNREGISTERED","ALTERED"];papers.forEach(function(p){var t=(p.textContent||"").toUpperCase();var hit=keys.some(function(k){return t.indexOf(k)>=0;});if(hit&&!p.querySelector(".susp-badge")){var b=document.createElement("span");b.className="susp-badge";b.textContent="⚠ DOUBLE-CHECK";p.appendChild(b);}});}
 setInterval(scanSuspicious,800);
-window.__todayValue=function(shillings){var ngnPerShilling=2200;var n=Math.round(shillings*ngnPerShilling);return "≈ ₦"+n.toLocaleString()+" today";};
+window.__todayValue=function(shillings){var n=Math.round(shillings);return "≈ "+n.toLocaleString()+" notes (period units)";};
 function deficitWatch(){if(!window.state)return;var pay=window.state.totalPay;if(typeof pay!=="number")return;if(pay<0&&!window.__deficitWarned){window.__deficitWarned=true;var msg=document.createElement("div");msg.className="deficit-warning";msg.innerHTML="<b>YOU ARE IN DEFICIT.</b><br>If this continues, your family will lose rent and food. Children may be sent away. Your assignment may be revoked. <span class=\"deficit-sub\">Long-term deficit erodes loyalty meters and can trigger eviction endings.</span>";document.body.appendChild(msg);setTimeout(function(){if(msg.parentNode)msg.parentNode.removeChild(msg);},9000);}}
 setInterval(deficitWatch,1500);
 function fullNameUp(){var els=document.querySelectorAll(".eod-error-name, .processing-error-name, [data-error-name]");els.forEach(function(e){var n=e.textContent;if(n&&!e.dataset.expanded){e.dataset.expanded="1";if(n.split(" ").length<2){e.textContent=n+" "+(window.__pickFreshName?window.__pickFreshName().split(" ")[1]:"Onuoha");}}});}
@@ -585,7 +585,7 @@ window.__triggerSpyReveal=function(){if(!window.__cleared.length)return null;var
 window.__showBreakingNews=function(){var r=window.__triggerSpyReveal();if(!r)return;var box=document.createElement("div");box.className="breaking-news";box.innerHTML=r.html+"<div class=\"bn-sub\">Your stamp is in the file. The file is in the war.</div>";document.body.appendChild(box);setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},9500);};
 window.__lastBreakingDay=-1;function maybeBreaking(){if(!window.state||!window.state.day)return;if(window.state.day<=2)return;if(window.state.day===window.__lastBreakingDay)return;if(Math.random()<0.32){window.__lastBreakingDay=window.state.day;window.__showBreakingNews();}}setInterval(maybeBreaking,12000);
 window.__disciplinaryEvents=[{id:"ia-summons",title:"INTERNAL AFFAIRS SUMMONS",body:"You will report to Block C tomorrow at first bell. Bring your stamp log.",cost:5},{id:"pay-docked",title:"WAGE DOCKED",body:"Two days of pay are held pending investigation. Your supervisor signed without looking up.",cost:8},{id:"transfer-threat",title:"TRANSFER ORDER — PROVISIONAL",body:"You may be reassigned to Aba Junction within seventy-two hours. Aba is closer to the front.",cost:0},{id:"family-watch",title:"FAMILY UNDER OBSERVATION",body:"State Security has logged your home address. Your wife noticed the same car twice.",cost:0},{id:"treason-letter",title:"TREASON CHARGE — NOTICE",body:"A complaint was filed under section 11. Your name is on the typed sheet. There is no signature yet.",cost:0}];
-window.__triggerDisciplinary=function(){var arr=window.__disciplinaryEvents;var e=arr[Math.floor(Math.random()*arr.length)];if(window.state&&typeof window.state.totalPay==="number"&&e.cost){window.state.totalPay-=e.cost;}var box=document.createElement("div");box.className="disciplinary-card";box.innerHTML="<div class=\"dc-title\">"+e.title+"</div><div class=\"dc-body\">"+e.body+"</div>"+(e.cost?"<div class=\"dc-cost\">−₦"+e.cost+" deducted</div>":"<div class=\"dc-cost\">No fine — yet.</div>");document.body.appendChild(box);setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},10000);return e;};
+window.__triggerDisciplinary=function(){var arr=window.__disciplinaryEvents;var e=arr[Math.floor(Math.random()*arr.length)];if(window.state&&typeof window.state.totalPay==="number"&&e.cost){window.state.totalPay-=e.cost;}var box=document.createElement("div");box.className="disciplinary-card";box.innerHTML="<div class=\"dc-title\">"+e.title+"</div><div class=\"dc-body\">"+e.body+"</div>"+(e.cost?"<div class=\"dc-cost\">−"+e.cost+" notes deducted</div>":"<div class=\"dc-cost\">No fine — yet.</div>");document.body.appendChild(box);setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},10000);return e;};
 window.__targetTravellersPerDay=function(){return 20+Math.floor(Math.random()*11);};
 window.__shouldShowDecisionEvent=function(){return Math.random()<0.18;};
 window.__pickNwosu=function(){return window.__nwosuLines[Math.floor(Math.random()*window.__nwosuLines.length)];};
@@ -661,7 +661,7 @@ window.__sideEvents=[
 window.__sideEventChance=0.16; // ~1 in 6 travellers triggers a side-event
 window.__sideEventCooldown=0;
 window.__pickSideEvent=function(){var p=window.__sideEvents;return p[Math.floor(Math.random()*p.length)];};
-window.__showSideEvent=function(){var ev=window.__pickSideEvent();var box=document.createElement("div");box.className="side-event-card";var html="<div class=\"se-tag\">DECISION REQUIRED</div><div class=\"se-title\">"+ev.title+"</div><div class=\"se-body\">"+ev.body+"</div><div class=\"se-choices\">";ev.choices.forEach(function(c,i){html+="<button data-i=\""+i+"\" class=\"se-btn\">"+c.label+"</button>";});html+="</div>";box.innerHTML=html;document.body.appendChild(box);box.querySelectorAll(".se-btn").forEach(function(b){b.addEventListener("click",function(){var ix=parseInt(b.dataset.i,10);var eff=ev.choices[ix].effect||{};var pay=ev.choices[ix].pay||0;if(window.state&&window.state.axes){Object.keys(eff).forEach(function(k){window.state.axes[k]=(window.state.axes[k]||0)+eff[k];});}if(window.state&&typeof window.state.totalPay==="number"&&pay){window.state.totalPay+=pay;if(typeof window.updateHUD==="function")try{window.updateHUD();}catch(_){}var t=document.createElement("div");t.className="pay-flash";t.textContent=(pay>0?"+":"")+"₦"+pay.toLocaleString();document.body.appendChild(t);setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},2000);}box.classList.add("se-fade");setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},400);});});};
+window.__showSideEvent=function(){var ev=window.__pickSideEvent();var box=document.createElement("div");box.className="side-event-card";var html="<div class=\"se-tag\">DECISION REQUIRED</div><div class=\"se-title\">"+ev.title+"</div><div class=\"se-body\">"+ev.body+"</div><div class=\"se-choices\">";ev.choices.forEach(function(c,i){html+="<button data-i=\""+i+"\" class=\"se-btn\">"+c.label+"</button>";});html+="</div>";box.innerHTML=html;document.body.appendChild(box);box.querySelectorAll(".se-btn").forEach(function(b){b.addEventListener("click",function(){var ix=parseInt(b.dataset.i,10);var eff=ev.choices[ix].effect||{};var pay=ev.choices[ix].pay||0;if(window.state&&window.state.axes){Object.keys(eff).forEach(function(k){window.state.axes[k]=(window.state.axes[k]||0)+eff[k];});}if(window.state&&typeof window.state.totalPay==="number"&&pay){window.state.totalPay+=pay;if(typeof window.updateHUD==="function")try{window.updateHUD();}catch(_){}var t=document.createElement("div");t.className="pay-flash";t.textContent=(pay>0?"+":"")+(window.formatNotesSigned?window.formatNotesSigned(pay):((pay>0?"+":"")+Math.abs(pay)+" notes"));document.body.appendChild(t);setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},2000);}box.classList.add("se-fade");setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},400);});});};
 function tryHookLoad(){if(typeof window.loadNextTraveller!=="function"){setTimeout(tryHookLoad,500);return;}if(window.__loadHooked)return;window.__loadHooked=true;var orig=window.loadNextTraveller;window.loadNextTraveller=function(){var trav=(window.state&&window.state.traveller)||0;if(window.__sideEventCooldown>0){window.__sideEventCooldown--;}else if(trav>2 && Math.random()<window.__sideEventChance){window.__sideEventCooldown=2;window.__showSideEvent();}return orig.apply(this,arguments);};}
 tryHookLoad();
 })();</script>
@@ -710,7 +710,7 @@ window.__triggerQuery = function(){
   box.innerHTML = "<div class=\"q-tag\">"+ev.tag+"</div>"+
     "<div class=\"q-title\">"+ev.title+"</div>"+
     "<div class=\"q-body\">"+bodyText+"</div>"+
-    (ev.cost?"<div class=\"q-cost\">\u2212\u20A6"+ev.cost.toLocaleString()+" deducted from wage</div>":"<div class=\"q-cost\">No fine \u2014 yet.</div>");
+    (ev.cost?"<div class=\"q-cost\">−"+ev.cost.toLocaleString()+" notes deducted from wage</div>":"<div class=\"q-cost\">No fine \u2014 yet.</div>");
   document.body.appendChild(box);
   setTimeout(function(){ if(box.parentNode) box.parentNode.removeChild(box); }, 11000);
   return ev;
@@ -791,6 +791,6 @@ tryHookDecide();
   if(document.body) mo.observe(document.body,{childList:true,subtree:false});
 })();</script>
 
-<script src="patch.js?v=1.7" defer></script>
+<script src="patch.js?v=1.8" defer></script>
 </body>
 </html>
