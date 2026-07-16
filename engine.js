@@ -1249,17 +1249,18 @@ function endOfDay() {
   var mouths = Math.max(1, livingFamily().length + (pressure > 3 ? 1 : 0));
 
   // Inflation: war week by week, not a rounding error
+  // Tuned so careful mid-size households can eat; large households + errors still break bones.
   var warWeek = Math.floor((state.day - 1) / 7);
-  var foodPerMouth = 1200 + warWeek * 350 + Math.floor(state.day * 40);
+  var foodPerMouth = 900 + warWeek * 280 + Math.floor(state.day * 35);
   var foodCost = mouths * foodPerMouth;
-  // Extended household / many children: school-garri, medicine, "settling" soldiers at the gate
-  foodCost += pressure * 400;
-  var rentCost = 2200 + warWeek * 500 + pressure * 250;
+  // Extended household / many children: garri, medicine, "settling" men at the gate
+  foodCost += pressure * 320;
+  var rentCost = 1800 + warWeek * 420 + pressure * 200;
   // Block rent if already evicted / gone household
   if (state.flags.evicted || state.flags.family_collapsed) rentCost = 0;
 
   var totalExpenses = foodCost + rentCost;
-  var baseDaily = 5200;
+  var baseDaily = 6800;
   // Errors already cut totalPay during the day; grade pay still arrives
   var wagePenalty = state.wagePenaltyNextDay || 0;
   state.wagePenaltyNextDay = 0;
