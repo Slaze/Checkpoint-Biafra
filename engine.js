@@ -1036,11 +1036,18 @@ function renderTraveller(t) {
 
 function renderDocs(t) {
   var stack = document.getElementById('doc-stack');
+  var pov = document.getElementById('doc-pov');
   stack.innerHTML = '';
+  if (pov) {
+    pov.classList.remove('docs-present', 'docs-empty');
+    // reflow for present animation
+    void pov.offsetWidth;
+  }
 
   if (!t.docs || t.docs.length === 0) {
+    if (pov) pov.classList.add('docs-empty', 'docs-present');
     var noDoc = document.createElement('div');
-    noDoc.className = 'doc-card doc-suspicious';
+    noDoc.className = 'doc-card doc-suspicious doc-card-empty';
     noDoc.style.width = '200px';
     noDoc.style.textAlign = 'center';
     noDoc.style.padding = '20px';
@@ -1048,6 +1055,8 @@ function renderDocs(t) {
     stack.appendChild(noDoc);
     return;
   }
+
+  if (pov) pov.classList.add('docs-present');
 
   t.docs.forEach(function(docId, idx) {
     var doc = DOC_TEMPLATES[docId];
@@ -1058,9 +1067,11 @@ function renderDocs(t) {
     card.className = 'doc-card' +
       (doc.biafran ? ' doc-biafran' : '') +
       (hasViolation ? ' doc-suspicious' : '');
-    if (idx === 1) card.style.transform = 'rotate(-1.5deg)';
-    if (idx === 2) card.style.transform = 'rotate(0.8deg)';
-    if (idx === 3) card.style.transform = 'rotate(-2deg)';
+    card.style.setProperty('--doc-i', String(idx));
+    // Light 3D fan on the desk (CSS reads --doc-tilt)
+    var tilts = ['rotateY(8deg) rotateX(6deg) rotateZ(-2deg)', 'rotateY(-4deg) rotateX(8deg) rotateZ(1.5deg)', 'rotateY(10deg) rotateX(5deg) rotateZ(-1deg)', 'rotateY(-8deg) rotateX(7deg) rotateZ(2deg)'];
+    card.style.setProperty('--doc-tilt', tilts[idx % tilts.length]);
+    card.style.animationDelay = (idx * 0.07) + 's';
 
     // Build fields HTML
     var fieldsHtml = '';
@@ -1151,11 +1162,15 @@ function openDocModal(docId, traveller) {
     modalFlags.innerHTML = '';
   }
 
-  document.getElementById('doc-modal').classList.add('open');
+  var modal = document.getElementById('doc-modal');
+  modal.classList.add('open', 'doc-holding');
+  document.body.classList.add('doc-inspecting');
 }
 
 function closeModal() {
-  document.getElementById('doc-modal').classList.remove('open');
+  var modal = document.getElementById('doc-modal');
+  modal.classList.remove('open', 'doc-holding');
+  document.body.classList.remove('doc-inspecting');
 }
 
 
@@ -1204,7 +1219,7 @@ function rememberFlag(flag) {
   if (map[flag]) pushMemory(map[flag]);
 }
 
-// ── AXIS / PAY BALANCE (v1.12) ──
+// ── AXIS / PAY BALANCE (v1.13) ──
 // Soft-cap axes so 25 days of correct stamps do not produce loyalty 300+.
 // Endings still use thresholds ~7–15; cap 20 keeps them meaningful.
 var AXIS_SOFT = 12;
@@ -2181,6 +2196,27 @@ function wireButtons() {
   });
 }
 
+
+function wireDocPovTilt() {
+  var stage = document.getElementById('doc-pov-stage');
+  var pov = document.getElementById('doc-pov');
+  if (!stage || !pov || pov._tiltWired) return;
+  pov._tiltWired = true;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (window.matchMedia && window.matchMedia('(hover: none)').matches) return;
+  stage.addEventListener('pointermove', function(e) {
+    var r = stage.getBoundingClientRect();
+    var x = (e.clientX - r.left) / r.width - 0.5;
+    var y = (e.clientY - r.top) / r.height - 0.5;
+    stage.style.setProperty('--pov-rx', (-y * 7).toFixed(2) + 'deg');
+    stage.style.setProperty('--pov-ry', (x * 10).toFixed(2) + 'deg');
+  });
+  stage.addEventListener('pointerleave', function() {
+    stage.style.setProperty('--pov-rx', '0deg');
+    stage.style.setProperty('--pov-ry', '0deg');
+  });
+}
+
 // ── INIT ──
 function init() {
   initScreens();
@@ -2190,6 +2226,7 @@ function init() {
   populateBgOptions();
   populateFamilyOptions();
   wireButtons();
+  wireDocPovTilt();
   checkContinue();
   // Show splash (credits-splash owns first paint; still mark splash ready)
   var splashEl = document.getElementById('splash');

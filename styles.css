@@ -2170,3 +2170,269 @@ button:focus-visible,
   border-radius: 999px;
   clip-path: none !important;
 }
+
+/* ═══ v1.13 DESK POV — hands + light CSS 3D documents ═══ */
+.doc-pov {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 72px;
+  top: 38%;
+  z-index: 4;
+  pointer-events: none;
+  perspective: 900px;
+  perspective-origin: 50% 70%;
+  overflow: visible;
+}
+.doc-pov.docs-present { pointer-events: auto; }
+
+.doc-pov-stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--pov-rx, 4deg)) rotateY(var(--pov-ry, 0deg));
+  transition: transform 0.25s ease-out;
+  padding-bottom: 28px;
+}
+
+/* Override old absolute stack positioning inside POV */
+.doc-pov .doc-stack {
+  position: relative !important;
+  bottom: auto !important;
+  left: auto !important;
+  right: auto !important;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 8px 16px 20px;
+  justify-content: center;
+  align-items: flex-end;
+  width: 100%;
+  transform-style: preserve-3d;
+  z-index: 3;
+}
+
+.doc-pov .doc-card {
+  width: 138px;
+  min-height: 92px;
+  transform: var(--doc-tilt, rotateX(6deg)) translateZ(0);
+  transform-style: preserve-3d;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.35) inset,
+    0 10px 18px rgba(0,0,0,0.35),
+    0 2px 0 rgba(0,0,0,0.2);
+  border-radius: 3px 3px 2px 2px;
+  animation: docSlideIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  background:
+    linear-gradient(165deg, #f7efd8 0%, var(--paper) 40%, #e8dcc0 100%);
+}
+.doc-pov .doc-card:nth-child(n) {
+  /* tilt from --doc-tilt; hover lifts toward camera */
+}
+.doc-pov .doc-card:hover,
+.doc-pov .doc-card.lifted {
+  transform: rotateX(2deg) rotateY(0deg) translateY(-10px) translateZ(28px) scale(1.06) !important;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.45) inset,
+    0 18px 32px rgba(0,0,0,0.45);
+  z-index: 12;
+}
+
+@keyframes docSlideIn {
+  from {
+    opacity: 0;
+    transform: var(--doc-tilt, rotateX(6deg)) translateY(40px) translateZ(-40px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: var(--doc-tilt, rotateX(6deg)) translateY(0) translateZ(0) scale(1);
+  }
+}
+
+/* Hands — first person, bottom corners, holding the papers */
+.pov-hand {
+  position: absolute;
+  bottom: -8px;
+  width: min(42vw, 160px);
+  height: min(48vw, 180px);
+  z-index: 6;
+  pointer-events: none;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4));
+  opacity: 0;
+  transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.doc-pov.docs-present .pov-hand {
+  opacity: 0.92;
+}
+.pov-hand-left {
+  left: -4%;
+  transform: translateY(24px) rotate(-8deg);
+}
+.pov-hand-right {
+  right: -4%;
+  transform: translateY(24px) rotate(8deg);
+}
+.doc-pov.docs-present .pov-hand-left {
+  transform: translateY(0) rotate(-6deg);
+}
+.doc-pov.docs-present .pov-hand-right {
+  transform: translateY(0) rotate(6deg);
+}
+
+.pov-hand-svg { width: 100%; height: 100%; display: block; }
+.hand-skin {
+  fill: #c4a07a;
+  stroke: #8a6a48;
+  stroke-width: 1.2;
+}
+.hand-line {
+  fill: none;
+  stroke: rgba(90, 60, 40, 0.35);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+/* Shirt cuffs under hands */
+.pov-cuff {
+  position: absolute;
+  bottom: 0;
+  width: 22%;
+  height: 28px;
+  background: linear-gradient(180deg, #2c3e1f 0%, #1a2610 100%);
+  border-top: 2px solid rgba(212,160,23,0.35);
+  opacity: 0;
+  z-index: 5;
+  pointer-events: none;
+  transition: opacity 0.35s;
+}
+.doc-pov.docs-present .pov-cuff { opacity: 0.85; }
+.pov-cuff-left {
+  left: 2%;
+  border-radius: 4px 12px 0 0;
+  transform: skewX(-8deg);
+}
+.pov-cuff-right {
+  right: 2%;
+  border-radius: 12px 4px 0 0;
+  transform: skewX(8deg);
+}
+
+/* Empty docs: hands open, no grip */
+.doc-pov.docs-empty .pov-hand-left { transform: translateY(8px) rotate(-12deg); opacity: 0.55; }
+.doc-pov.docs-empty .pov-hand-right { transform: translateY(8px) rotate(12deg); opacity: 0.55; }
+
+/* Modal held-paper POV */
+.doc-inspector-pov {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  perspective: 1000px;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.modal-overlay.open {
+  align-items: flex-end;
+  background: rgba(0,0,0,0.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.modal-overlay .doc-inspector {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  max-width: 480px;
+  transform: rotateX(8deg) translateY(0);
+  transform-origin: center bottom;
+  animation: paperHoldIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.4) inset,
+    0 -4px 0 rgba(0,0,0,0.06) inset,
+    0 24px 48px rgba(0,0,0,0.5);
+  border-radius: 4px 4px 2px 2px;
+  background:
+    linear-gradient(180deg, #faf3e0 0%, var(--paper) 55%, #e6d9b8 100%);
+}
+
+@keyframes paperHoldIn {
+  from { opacity: 0; transform: rotateX(18deg) translateY(60px) scale(0.94); }
+  to { opacity: 1; transform: rotateX(8deg) translateY(0) scale(1); }
+}
+
+.pov-hand-modal-left,
+.pov-hand-modal-right {
+  position: absolute;
+  bottom: 0;
+  width: min(38vw, 140px);
+  height: min(42vw, 160px);
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0.95;
+  filter: drop-shadow(0 8px 12px rgba(0,0,0,0.45));
+}
+.pov-hand-modal-left {
+  left: -2%;
+  transform: rotate(-10deg) translateY(10px);
+  animation: handRise 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.pov-hand-modal-right {
+  right: -2%;
+  transform: rotate(10deg) translateY(10px);
+  animation: handRise 0.45s 0.05s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes handRise {
+  from { opacity: 0; transform: translateY(40px) rotate(0deg); }
+  to { opacity: 0.95; }
+}
+
+.doc-hold-hint {
+  margin: 14px 0 0;
+  font-family: "IM Fell English", serif;
+  font-style: italic;
+  font-size: 13px;
+  color: rgba(26,26,24,0.55);
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+/* Desk depth boost when inspecting */
+body.doc-inspecting .desk::after {
+  background: radial-gradient(ellipse at center, transparent 20%, rgba(0,0,0,0.55) 100%);
+}
+body.doc-inspecting .action-bar {
+  opacity: 0.35;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+
+/* Traveller silhouette slightly more 3D presence */
+.traveller-silhouette {
+  filter: drop-shadow(0 8px 12px rgba(0,0,0,0.45));
+  transform: translateX(-50%) translateZ(0);
+}
+
+@media (min-width: 720px) {
+  .doc-pov { top: 32%; bottom: 80px; }
+  .doc-pov .doc-card { width: 150px; min-height: 100px; }
+  .pov-hand { width: 150px; height: 170px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .doc-pov .doc-card,
+  .modal-overlay .doc-inspector,
+  .pov-hand-modal-left,
+  .pov-hand-modal-right {
+    animation: none !important;
+  }
+  .doc-pov-stage { transition: none !important; }
+  .doc-pov .doc-card { transform: none !important; }
+}
+
+/* Fix right hand: use mirrored path already — ensure not double flipped */
+.pov-hand-right .pov-hand-svg { transform: none; }

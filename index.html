@@ -16,7 +16,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=IM+Fell+English:ital@0;1&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=1.12">
+<link rel="stylesheet" href="styles.css?v=1.13">
 </head>
 <body class="ui-modern">
 
@@ -47,7 +47,7 @@
       <button class="btn-secondary btn-ghost" id="btn-gallery" type="button">CASE FILES</button>
     </div>
   </div>
-  <div class="splash-version">v1.12 · CHECKPOINT BIAFRA</div>
+  <div class="splash-version">v1.13 · CHECKPOINT BIAFRA</div>
 </div>
 
 <!-- CHARACTER CREATION -->
@@ -152,7 +152,27 @@
       <div class="rate-value" id="rate-val">1.00 ↔</div>
     </div>
     <div class="family-bar" id="family-bar" aria-label="Household status"></div>
-    <div class="doc-stack" id="doc-stack"></div>
+
+    <!-- First-person document presentation (hands + light CSS 3D) -->
+    <div class="doc-pov" id="doc-pov" aria-label="Documents on the desk">
+      <div class="doc-pov-stage" id="doc-pov-stage">
+        <div class="doc-stack" id="doc-stack"></div>
+      </div>
+      <div class="pov-hand pov-hand-left" aria-hidden="true">
+        <svg viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg" class="pov-hand-svg">
+          <path class="hand-skin" d="M28 158 C18 120 22 88 38 72 C42 50 52 38 62 42 C58 28 68 18 78 28 C82 14 96 16 98 32 C108 30 116 42 112 56 C118 62 118 78 108 88 L104 150 C70 162 40 160 28 158Z"/>
+          <path class="hand-line" d="M48 95 C55 88 70 90 78 98 M55 110 C62 104 75 106 82 114"/>
+        </svg>
+      </div>
+      <div class="pov-hand pov-hand-right" aria-hidden="true">
+        <svg viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg" class="pov-hand-svg">
+          <path class="hand-skin" d="M92 158 C102 120 98 88 82 72 C78 50 68 38 58 42 C62 28 52 18 42 28 C38 14 24 16 22 32 C12 30 4 42 8 56 C2 62 2 78 12 88 L16 150 C50 162 80 160 92 158Z"/>
+          <path class="hand-line" d="M72 95 C65 88 50 90 42 98 M65 110 C58 104 45 106 38 114"/>
+        </svg>
+      </div>
+      <div class="pov-cuff pov-cuff-left" aria-hidden="true"></div>
+      <div class="pov-cuff pov-cuff-right" aria-hidden="true"></div>
+    </div>
 
     <nav class="action-bar" aria-label="Booth decisions">
       <button class="action-btn btn-approve" id="btn-approve" type="button">
@@ -221,18 +241,31 @@
   </div>
 </div>
 
-<!-- Document Inspector Modal -->
+<!-- Document Inspector Modal — held-paper POV -->
 <div class="modal-overlay" id="doc-modal">
-  <div class="doc-inspector">
-    <div class="doc-inspector-header">
-      <div>
-        <div class="doc-inspector-title" id="modal-title">DOCUMENT</div>
-        <div class="doc-inspector-issuer" id="modal-issuer">Issuing authority</div>
-      </div>
-      <button class="doc-close" id="btn-close-modal">✕</button>
+  <div class="doc-inspector-pov">
+    <div class="pov-hand pov-hand-modal-left" aria-hidden="true">
+      <svg viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg" class="pov-hand-svg">
+        <path class="hand-skin" d="M28 158 C18 120 22 88 38 72 C42 50 52 38 62 42 C58 28 68 18 78 28 C82 14 96 16 98 32 C108 30 116 42 112 56 C118 62 118 78 108 88 L104 150 C70 162 40 160 28 158Z"/>
+      </svg>
     </div>
-    <div id="modal-fields"></div>
-    <div id="modal-flags" style="margin-top:12px"></div>
+    <div class="doc-inspector">
+      <div class="doc-inspector-header">
+        <div>
+          <div class="doc-inspector-title" id="modal-title">DOCUMENT</div>
+          <div class="doc-inspector-issuer" id="modal-issuer">Issuing authority</div>
+        </div>
+        <button class="doc-close" id="btn-close-modal" type="button" aria-label="Close document">✕</button>
+      </div>
+      <div id="modal-fields"></div>
+      <div id="modal-flags" style="margin-top:12px"></div>
+      <p class="doc-hold-hint">Your hands. Their papers. Look carefully.</p>
+    </div>
+    <div class="pov-hand pov-hand-modal-right" aria-hidden="true">
+      <svg viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg" class="pov-hand-svg">
+        <path class="hand-skin" d="M92 158 C102 120 98 88 82 72 C78 50 68 38 58 42 C62 28 52 18 42 28 C38 14 24 16 22 32 C12 30 4 42 8 56 C2 62 2 78 12 88 L16 150 C50 162 80 160 92 158Z"/>
+      </svg>
+    </div>
   </div>
 </div>
 
@@ -241,7 +274,7 @@
   <div class="stamp-mark" id="stamp-mark"></div>
 </div>
 
-<script src="engine.js?v=1.12" defer></script>
+<script src="engine.js?v=1.13" defer></script>
 <div id="install-caveat" role="dialog" aria-modal="true">
   <div class="caveat-box">
     <h1>ADD TO HOME SCREEN</h1>
@@ -792,6 +825,6 @@ tryHookDecide();
   if(document.body) mo.observe(document.body,{childList:true,subtree:false});
 })();</script>
 
-<script src="patch.js?v=1.12" defer></script>
+<script src="patch.js?v=1.13" defer></script>
 </body>
 </html>
