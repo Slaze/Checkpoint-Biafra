@@ -4,17 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#2C3E1F">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Checkpoint Biafra">
 <meta name="description" content="A border checkpoint game set during the Biafran secession.">
 <title>CHECKPOINT BIAFRA</title>
 <link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png" type="image/png">
 <!-- Apple touch icon for PWA home screen -->
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=IM+Fell+English:ital@0;1&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=1.4">
 </head>
 <body>
 
@@ -43,7 +45,7 @@
     <br>
     <button class="btn-secondary" id="btn-gallery" style="margin-top:8px">CASE FILES</button>
   </div>
-  <div class="splash-version">v1.2 · CHECKPOINT BIAFRA</div>
+  <div class="splash-version">v1.4 · CHECKPOINT BIAFRA</div>
 </div>
 
 <!-- CHARACTER CREATION -->
@@ -235,7 +237,7 @@
   <div class="stamp-mark" id="stamp-mark"></div>
 </div>
 
-<script src="engine.js" defer></script>
+<script src="engine.js?v=1.4" defer></script>
 <div id="install-caveat" role="dialog" aria-modal="true">
   <div class="caveat-box">
     <h1>ADD TO HOME SCREEN</h1>
@@ -467,7 +469,7 @@
   else { hookBegin(); hookCC(); }
 })();
 </script>
-<script>(function(){function setPhase(p){var b=document.body;b.classList.remove("phase-splash","phase-charcreate","phase-bulletin","phase-booth","phase-day-end","phase-ending","phase-allow-hints");b.classList.add("phase-"+p);if(p==="splash"||p==="bulletin"||p==="charcreate"){b.classList.add("phase-allow-hints");}}window.__setPhase=setPhase;function detect(){var ids=["splash","char-create","intro","bulletin","game","day-end","ending"];for(var i=0;i<ids.length;i++){var el=document.getElementById(ids[i]);if(el&&el.classList.contains("active")){var map={"splash":"splash","char-create":"charcreate","intro":"bulletin","bulletin":"bulletin","game":"booth","day-end":"day-end","ending":"ending"};setPhase(map[ids[i]]);return;}}}var mo=new MutationObserver(detect);document.addEventListener("DOMContentLoaded",function(){detect();document.querySelectorAll(".screen").forEach(function(s){mo.observe(s,{attributes:true,attributeFilter:["class"]});});});setInterval(detect,500);})();</script>
+<script>(function(){function setPhase(p){var b=document.body;b.classList.remove("phase-splash","phase-charcreate","phase-bulletin","phase-booth","phase-day-end","phase-ending","phase-allow-hints");b.classList.add("phase-"+p);if(p==="splash"||p==="bulletin"||p==="charcreate"){b.classList.add("phase-allow-hints");}}window.__setPhase=setPhase;function detect(){/* Screen IDs must match engine.js SCREENS / index.html */var ids=["splash","char-create","intro","bulletin-screen","game","eod-report","ending"];for(var i=0;i<ids.length;i++){var el=document.getElementById(ids[i]);if(el&&(el.classList.contains("active")||el.style.display==="flex")){var map={"splash":"splash","char-create":"charcreate","intro":"bulletin","bulletin-screen":"bulletin","game":"booth","eod-report":"day-end","ending":"ending"};setPhase(map[ids[i]]);return;}}}var mo=new MutationObserver(detect);document.addEventListener("DOMContentLoaded",function(){detect();document.querySelectorAll(".screen").forEach(function(s){mo.observe(s,{attributes:true,attributeFilter:["class","style"]});});});setInterval(detect,500);})();</script>
 <script>(function(){
 var POOLS_FIRST = {
   igbo: {
@@ -786,6 +788,6 @@ tryHookDecide();
   if(document.body) mo.observe(document.body,{childList:true,subtree:false});
 })();</script>
 
-<script src="patch.js" defer></script>
+<script src="patch.js?v=1.4" defer></script>
 </body>
 </html>

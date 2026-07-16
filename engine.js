@@ -38,11 +38,15 @@ var SCREENS = ['splash','char-create','intro','bulletin-screen','game','moral-ev
 function showScreen(id) {
   SCREENS.forEach(function(s) {
     var el = document.getElementById(s);
-    if (el) el.style.display = 'none';
+    if (el) {
+      el.style.display = 'none';
+      el.classList.remove('active');
+    }
   });
   var target = document.getElementById(id);
   if (target) {
     target.style.display = 'flex';
+    target.classList.add('active');
     // Scroll to top on iOS
     target.scrollTop = 0;
   }
@@ -1000,12 +1004,15 @@ function closeModal() {
 
 // ── DECISIONS ──
 function decide(action) {
+  // Guard against double-taps during stamp animation (each stamp advances traveller)
+  if (state._deciding) return;
+  var t = state.currentTraveller;
+  if (!t) return;
+  state._deciding = true;
+
   if (!audioCtx) initAudio();
   playStamp(action);
   showStamp(action);
-
-  var t = state.currentTraveller;
-  if (!t) return;
 
   var correct = t.correct === action;
   var payChange = 0;
@@ -1036,6 +1043,7 @@ function decide(action) {
 
   setTimeout(function() {
     clearStamp();
+    state._deciding = false;
     // Check if a moral event should fire at mid-day
     var midpoint = Math.floor(state.totalTravellers / 2);
     var morEvent = getMoralEventForDay(state.day);
@@ -1435,12 +1443,17 @@ function init() {
   populateFamilyOptions();
   wireButtons();
   checkContinue();
-  // Show splash
-  document.getElementById('splash').style.display = 'flex';
+  // Show splash (credits-splash owns first paint; still mark splash ready)
+  var splashEl = document.getElementById('splash');
+  if (splashEl) {
+    splashEl.style.display = 'flex';
+    splashEl.classList.add('active');
+  }
 
-  // Service Worker registration for iOS PWA offline support
+  // Service Worker registration for iOS PWA offline support.
+  // Bump CACHE_NAME in sw.js whenever shipping asset changes (network-first + versioned cache).
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').catch(function(){});
+    navigator.serviceWorker.register('./sw.js?v=1.4').catch(function(){});
   }
 }
 
@@ -1451,14 +1464,24 @@ if (document.readyState === 'loading') {
   init();
 }
 
-// expose engine to window for runtime animation hooks
+// expose engine to window for runtime animation hooks / patches
+// window.state must stay live: `state = freshState()` rebinds the local var;
+// a one-shot assignment left patches talking to a dead empty object.
 try {
   if (typeof decide === "function") window.decide = decide;
   if (typeof updateHUD === "function") window.updateHUD = updateHUD;
   if (typeof renderDocs === "function") window.renderDocs = renderDocs;
   if (typeof renderTraveller === "function") window.renderTraveller = renderTraveller;
-  if (typeof state !== "undefined") window.state = state;
   if (typeof loadNextTraveller === "function") window.loadNextTraveller = loadNextTraveller;
-} catch(_){}
+  try { delete window.state; } catch (_) {}
+  Object.defineProperty(window, 'state', {
+    configurable: true,
+    enumerable: true,
+    get: function () { return state; },
+    set: function (v) { state = v; }
+  });
+} catch(_){
+  try { window.state = state; } catch(__){}
+}
 
 })();
