@@ -26,6 +26,16 @@ function freshState() {
     flags: {},
     dayTravellers: [],    // ← FIX: store the day's traveller list
     moralFiredDays: [],   // ← FIX: track which days have fired moral events
+    // Wartime household ledger (single source of truth — patch must not double-charge)
+    __billsEngineV15: true,
+    missedBillsStreak: 0,
+    billsMissedTotal: 0,
+    billsPaidTotal: 0,
+    wagePenaltyNextDay: 0,
+    infiltrationCount: 0,
+    suspicion: 0,
+    familyPressure: 0,
+    lastBillReport: null,
   };
 }
 
@@ -353,44 +363,44 @@ var TRAVELLER_POOL = [
 // ── DATA: MORAL EVENTS ──
 // Store as array of objects — NO JSON.stringify in onclick to avoid iOS parsing bugs
 var MORAL_EVENTS = [
-  { id:'whatsapp', day:5,
-    title:'THE WHATSAPP MESSAGE',
-    text:'During your lunch break, the checkpoint staff WhatsApp group receives a message from a colleague two postings north: "They\'re sending a team to audit everyone\'s state of origin. Anyone from SE states is being quietly reassigned. Don\'t write this down." Three colleagues read it and say nothing. One screenshots it. You don\'t know who.',
+  { id:'whisper_list', day:5,
+    title:'THE LIST THAT MUST NOT BE WRITTEN',
+    text:'At the canteen, a colleague from two posts north lowers his voice. He says Headquarters is quietly checking every officer\'s state of origin. Eastern names are being moved sideways — or removed. "Do not write this down," he says. Three men hear him. One looks away. One nods. One leaves his tea unfinished.',
     choices:[
-      { text:'Delete the app. Never saw it.', axes:{survival:1,witness:-1} },
-      { text:'Screenshot it yourself. Save to your private file.', axes:{witness:2}, flag:'has_whatsapp_screenshot' },
-      { text:'Forward it to your supervising officer.', axes:{loyalty:2}, flag:'reported_whatsapp' },
-      { text:'Call the colleague who sent it. Find out what they know.', axes:{rebellion:1,witness:1}, flag:'informal_intel_channel' },
+      { text:'Walk away. You heard nothing. The tea is cold.', axes:{survival:1,witness:-1} },
+      { text:'Commit every name he said to memory. Keep a private notebook under the mattress.', axes:{witness:2}, flag:'has_whatsapp_screenshot' },
+      { text:'Report the rumour to Inspector Nwosu before evening parade.', axes:{loyalty:2}, flag:'reported_whatsapp' },
+      { text:'Find him after dark. Ask who is on the list.', axes:{rebellion:1,witness:1}, flag:'informal_intel_channel' },
     ]
   },
   { id:'bribe', day:6,
     title:'THE ENVELOPE',
-    text:'A man in a good agbada places his documents on your desk. Everything checks out. As he retrieves his papers, a folded envelope remains. Inside, without looking, you can tell it is money. More than a week\'s pay. He does not look at you. He is already looking at the gate.',
+    text:'A man in a good agbada places his documents on your desk. Everything checks out. As he retrieves his papers, a folded envelope remains. Inside, without looking, you can tell it is money — more than a week\'s pay packet, enough rice for a household. He does not look at you. He is already looking at the gate. Outside, the queue is watching how long you take.',
     choices:[
       { text:'Return the envelope without opening it. Log nothing.', axes:{loyalty:1,survival:-1} },
-      { text:'Keep it. Say nothing.', axes:{survival:2,loyalty:-1}, flag:'took_bribe' },
-      { text:'Detain him for attempted bribery.', axes:{loyalty:2}, flag:'reported_bribe' },
-      { text:'Keep it. Then anonymously report the incident.', axes:{witness:1,survival:1,rebellion:1} },
+      { text:'Keep it. Say nothing. Your family has not eaten well.', axes:{survival:2,loyalty:-1}, flag:'took_bribe' },
+      { text:'Detain him for attempted bribery. Let the queue see the stamp.', axes:{loyalty:2}, flag:'reported_bribe' },
+      { text:'Keep it. Later, send an unsigned note to Internal Affairs.', axes:{witness:1,survival:1,rebellion:1} },
     ]
   },
   { id:'telegram', day:13,
-    title:'THE NOTIFICATION',
-    text:'Your phone vibrates during the lunch break. A message from a neighbour back home — not family. They say federal security operatives have been asking about people with government jobs from your area. They say to be careful. They say your family is fine. The message ends there.',
+    title:'THE BOY AT THE GATE',
+    text:'A barefoot boy from your home town finds you at the canteen. He will not sit. He says men in plain clothes have been asking after government workers from your street — names, postings, who sends money home. He says your people are "fine for now." He will not take food. He runs before you can ask which men.',
     choices:[
-      { text:'Delete the message. Tell no one. Keep working.', axes:{survival:1,witness:-1} },
-      { text:'Request emergency leave to find your family.', axes:{compassion:2}, flag:'leave_requested' },
-      { text:'Pass the information to a trusted contact outside FIBA.', axes:{rebellion:1,witness:1}, flag:'external_intel_shared' },
-      { text:'Keep working. Screenshot the message and add it to your file.', axes:{witness:2}, flag:'documented_threat' },
+      { text:'Tell no one. Finish the shift. The boy may be wrong.', axes:{survival:1,witness:-1} },
+      { text:'Request emergency leave to go home before the road closes.', axes:{compassion:2}, flag:'leave_requested' },
+      { text:'Pass the warning to a priest or market woman who can move without a permit.', axes:{rebellion:1,witness:1}, flag:'external_intel_shared' },
+      { text:'Write it in your private book with the date. Keep working.', axes:{witness:2}, flag:'documented_threat' },
     ]
   },
   { id:'generator', day:16,
     title:'THE GENERATOR',
-    text:'The generator fails at 2pm. Your tablet is dead. Your digital cross-reference system is offline. You have paper records only.\n\nA man arrives with a BIN card that looks correct, a BTD that looks correct, and a BHTP that looks correct. You cannot verify any of them digitally. He has been waiting in line for four hours. His child is with him. Your supervisor has gone to find fuel.\n\nYou are alone at the window.',
+    text:'The generator fails at 2pm. The light dies. The electric fan stops. Your paper register is all you have — no radio confirmation from Headquarters, no typed cross-check.\n\nA man arrives with papers that look correct in poor light. He has been waiting four hours. His child sleeps against his leg. Your supervisor has gone to find kerosene.\n\nYou are alone at the window. The queue can smell the sweat.',
     choices:[
-      { text:'Approve him. You cannot hold him in this heat with a child.', axes:{compassion:2,loyalty:-1}, flag:'generator_approved' },
-      { text:'Deny him. Without verification, you cannot confirm anything.', axes:{loyalty:2,compassion:-1}, flag:'generator_denied' },
-      { text:'Ask him to wait. Hold the position until supervisor returns.', axes:{}, flag:'generator_held' },
-      { text:'Manually check against paper register. Takes 40 minutes.', axes:{loyalty:1,witness:1}, flag:'generator_manual' },
+      { text:'Approve him. You cannot hold a child in this heat on a maybe.', axes:{compassion:2,loyalty:-1}, flag:'generator_approved' },
+      { text:'Deny him. Without confirmation, a maybe is a risk to the post.', axes:{loyalty:2,compassion:-1}, flag:'generator_denied' },
+      { text:'Make him wait. Hold the line until the supervisor returns.', axes:{}, flag:'generator_held' },
+      { text:'Check every line of the paper register by lamp. Forty minutes. The queue will hate you.', axes:{loyalty:1,witness:1}, flag:'generator_manual' },
     ]
   },
   { id:'confession', day:22,
@@ -443,18 +453,28 @@ var MORAL_EVENTS = [
 ];
 
 // ── DATA: NIGHT EVENTS ──
+// Period voice: radio, runners, landlord, church bell, road rumour — not phones.
 var NIGHT_EVENTS = [
-  { day:1,  text:'You sleep in the staff bunkhouse. The generator hums. Through the thin wall, you can hear someone\'s phone playing news at low volume. You cannot make out the words. Just the urgency of the announcer\'s voice.' },
-  { day:3,  text:'The radio plays Ojukwu\'s declaration again at midnight. Someone in the compound has been playing it on repeat. By 3am it has stopped. You do not know if that person chose to stop, or if something made them.' },
-  { day:5,  text:'Inspector Nwosu knocks on your door at 9pm. She says nothing for a moment. Then she says: "Read every bulletin twice. The first time you think you understand it. The second time you see what it doesn\'t say." She leaves.' },
-  { day:8,  text:'Your phone has six unread messages. All from family. You read them in order. The oldest asks how the posting is going. The newest just says your name, followed by a question mark.' },
-  { day:12, text:'You dream of your desk. In the dream the documents are blank. Everyone who comes to the window is carrying blank documents. You stamp them anyway. APPROVE. APPROVE. APPROVE. You wake up before you know if you were right to.' },
-  { day:15, text:'A new officer arrived today. She asked you what Checkpoint Ogoja-East is like. You told her it was manageable. She asked what the people were like. You realised you had been thinking of them as cases.' },
-  { day:19, text:'The exchange rate notification arrived at 6am. ₤B is now worth ₦0.35. You did not react. You remember when that number was 1.00. You remember it clearly but it feels like someone else\'s memory.' },
-  { day:22, text:'You count the days remaining. You think about what you would do differently. You cannot identify a specific decision. You can only identify a feeling — that the decision that mattered most was one you made without realising it was a decision.' },
-  { day:23, text:'The petrol in the generator runs out at 1am. For two hours you sit in the dark with Inspector Nwosu. She does not speak. You hear, in the distance, something that is either thunder or the line near Awka.' },
-  { day:24, text:'You dream of the typed document you didn\'t read. In the dream you read it, and you cannot unread it. You wake up unsure which half of the dream is the mercy.' },
-  { day:25, text:'The last night. The generator is silent by choice now — fuel is being saved. Outside the window, you see headlights moving east, then stopping, then moving east again. Nobody goes west tonight.' }
+  { day:1,  text:'You sleep in the staff bunkhouse. The generator coughs. Through the thin wall a radio plays the news too low to understand — only the urgency in the announcer\'s throat. Someone turns it off when an officer walks past.' },
+  { day:2,  text:'At the latrine, two clerks argue in whispers about whether Enugu will hold. When they see you they speak of football. The war has already taught them which rooms allow honesty.' },
+  { day:3,  text:'Someone in the compound plays Ojukwu\'s declaration on a battered radio after lights-out. By 3am it has stopped. You do not know if the battery died, or if a hand found the dial.' },
+  { day:4,  text:'A market woman sells you roasted corn and will not take full price. "Officer," she says, "eat. Tomorrow the road may close." She does not smile when she says it.' },
+  { day:5,  text:'Inspector Nwosu knocks at 9pm. She stands in the doorway without entering. "Read every bulletin twice. The first time you think you understand it. The second time you see what it does not say." She leaves before you answer.' },
+  { day:6,  text:'You hear that a courier was stopped at Ayangba with letters sewn into a shirt lining. Nobody says whose letters. Everybody checks their own pockets before sleep.' },
+  { day:7,  text:'Church bells at an odd hour. No service is listed. In the morning the priest will say it was a funeral. He will not say whose.' },
+  { day:8,  text:'A runner from home brings three letters and a rumour. The oldest letter asks how the posting is going. The newest is only your name and a question mark, in a hand that shakes.' },
+  { day:9,  text:'Bay 4 is empty at dawn. The chair is pushed in. The stamp pad is dry. Nobody says the missing officer\'s name at breakfast. Saying a name makes a hole official.' },
+  { day:10, text:'You dream of stamping blank paper. APPROVE. APPROVE. APPROVE. You wake with your wrist sore and the taste of ink that is not there.' },
+  { day:12, text:'The landlord\'s boy stands at the compound gate after dark. He does not ask for money. He only looks at your window long enough for you to understand the visit is the message.' },
+  { day:14, text:'Radio Lagos and Radio Biafra contradict each other on the same battle. Men at the canteen choose which lie they prefer and call it patriotism.' },
+  { day:15, text:'A new officer asks what Ogoja-East is like. You say manageable. She asks what the people are like. You realise you have been counting them as cases, not as names their mothers gave them.' },
+  { day:17, text:'You hear of a coup rumour inside a rumour — officers arresting officers, lists rewritten overnight. By morning it is "indiscipline." By evening it is forgotten on purpose.' },
+  { day:19, text:'The exchange chalked on the wall at dawn: your notes buy less rice than yesterday. Nobody gasps. Hunger has taught the face not to perform surprise.' },
+  { day:21, text:'A woman waits outside the post with a photograph. She asks if you have seen this face in the queue. You have stamped a hundred faces. You cannot honestly say yes or no. She thanks you anyway, which is worse.' },
+  { day:22, text:'You count the days left and cannot find the decision that mattered most. Only a feeling: that it was made while you thought you were only doing paperwork.' },
+  { day:23, text:'Fuel finishes at 1am. You sit in the dark with Nwosu. Far off — thunder, or the line near Awka. Neither of you asks which. Naming it would make it closer.' },
+  { day:24, text:'You dream of the page you did not read. In the dream you read it. You wake unsure which half of the dream was mercy.' },
+  { day:25, text:'Last night. Fuel is saved on purpose. Headlights move east, stop, move east again. Nobody goes west. The war has a direction even when the maps lie.' }
 ];
 
 // ── DATA: ENDINGS ──
@@ -543,6 +563,16 @@ var ENDINGS = [
   { id:'bulletin_021_ending', num:28, title:'BULLETIN 021',        axes:['witness','rebellion'],
     text:'Your formal objection to Bulletin 021 was dismissed. But it was logged. In the years that followed, a constitutional lawyer used it as evidence. The case is ongoing. Your name appears in the legal record. <em>You are still alive. You are watching.</em>',
     condition: function(s) { return !!s.flags.objected_021; } },
+  // Household / suspicion endings (registration + bills + booth conduct)
+  { id:'empty_pot',      num:29, title:'THE EMPTY POT',           axes:['survival'],
+    text:'You served the desk. The desk did not feed the house. When the war ended you still had a stamp hand and no one left who waited for your footsteps. <em>History keeps the bulletins. It misplaces the children.</em>',
+    condition: function(s) { return (s.billsMissedTotal || 0) >= 4 || !!s.flags.family_collapsed; } },
+  { id:'collaborator_dawn', num:30, title:'SHOT AT DAWN',         axes:['loyalty','corruption'],
+    text:'The breaches at your window formed a pattern. A tribunal does not need proof the way a mother needs rice — it needs a name. Yours was convenient. <em>They shoot collaborators at dawn so the queue can see what a stamp costs.</em>',
+    condition: function(s) { return !!s.flags.suspected_collaborator && (s.infiltrationCount || 0) >= 5; } },
+  { id:'landlord_war',   num:31, title:'THE LANDLORD\'S WAR',      axes:['survival'],
+    text:'You survived the federal line and the Biafran line. You did not survive the third army: rent. Eviction is a quieter weapon than artillery. <em>Your mother would have recognised the knock.</em>',
+    condition: function(s) { return !!s.flags.evicted && (s.billsMissedTotal || 0) >= 3; } },
 ];
 
 // ── AUDIO ──
@@ -1003,6 +1033,24 @@ function closeModal() {
 }
 
 // ── DECISIONS ──
+function travellerLooksForged(t) {
+  if (!t) return false;
+  if (t.correct === 'detain' || t.correct === 'deny') {
+    // Wrongly approving a should-detain/deny is the classic infiltration path
+    return true;
+  }
+  var flags = t.flags;
+  if (!flags) return false;
+  if (Array.isArray(flags)) {
+    return flags.some(function (f) {
+      var s = (typeof f === 'string' ? f : (f && (f.note || f.field || ''))) + '';
+      return /forged|fake|fraud|mismatch|unlisted|counterfeit|false/i.test(s);
+    });
+  }
+  if (flags.forged) return true;
+  return false;
+}
+
 function decide(action) {
   // Guard against double-taps during stamp animation (each stamp advances traveller)
   if (state._deciding) return;
@@ -1020,10 +1068,27 @@ function decide(action) {
   else if (action === 'deny') state.dayDenied++;
   else if (action === 'detain') state.dayDetained++;
 
-  if (correct && action === 'detain') payChange = 600;
-  else if (!correct) payChange = -1200;
+  // Wartime pay: correct detention is noticed; errors are expensive (family eats the difference)
+  if (correct && action === 'detain') payChange = 800;
+  else if (correct && action === 'deny') payChange = 100;
+  else if (!correct) payChange = -1800;
 
   state.totalPay += payChange;
+
+  // Espionage / infiltration: wave through someone who should not pass
+  if (!correct && action === 'approve' && travellerLooksForged(t)) {
+    state.infiltrationCount = (state.infiltrationCount || 0) + 1;
+    state.suspicion = (state.suspicion || 0) + 2;
+    state.flags.last_infiltration_name = t.name || 'Unknown';
+    if (state.infiltrationCount >= 3) state.flags.pattern_of_breaches = true;
+    if (state.infiltrationCount >= 5) state.flags.suspected_collaborator = true;
+  }
+  // Over-detention of clean civilians breeds fear and quiet hatred
+  if (!correct && action === 'detain') {
+    state.suspicion = (state.suspicion || 0) + 1;
+    state.axes.loyalty = (state.axes.loyalty || 0) + 0; // no free loyalty for cruelty
+    state.flags.harsh_booth = true;
+  }
 
   // Axis changes
   if (t.axisHint === 'compassion') {
@@ -1040,6 +1105,7 @@ function decide(action) {
 
   state.dayResults.push({ name: t.name, action: action, correct: correct, payChange: payChange });
   state.traveller++;
+  try { saveState(); } catch (_) {}
 
   setTimeout(function() {
     clearStamp();
@@ -1115,53 +1181,227 @@ function chooseMoral(choice) {
   setTimeout(function() { loadNextTraveller(); }, 300);
 }
 
+// ── HOUSEHOLD PRESSURE (from registration) ──
+function getFamilyPressure() {
+  var id = state.player && state.player.family;
+  var pools = [FAMILY_MALE, FAMILY_FEMALE];
+  for (var p = 0; p < pools.length; p++) {
+    for (var i = 0; i < pools[p].length; i++) {
+      if (pools[p][i].id === id) return pools[p][i].pressure || 0;
+    }
+  }
+  return state.family ? Math.max(0, state.family.length - 1) : 0;
+}
+
+function livingFamily() {
+  return (state.family || []).filter(function (f) {
+    return f.status !== 'gone' && f.status !== 'dead';
+  });
+}
+
+function pickLivingMember(preferRoles) {
+  var living = livingFamily();
+  if (!living.length) return null;
+  if (preferRoles && preferRoles.length) {
+    for (var r = 0; r < preferRoles.length; r++) {
+      for (var i = 0; i < living.length; i++) {
+        if (living[i].role === preferRoles[r]) return living[i];
+      }
+    }
+  }
+  return living[living.length - 1];
+}
+
+function backgroundHomePhrase() {
+  var bg = (state.player && state.player.background) || '';
+  var st = (state.player && state.player.state) || 'home';
+  var map = {
+    civil: 'the civil-service compound',
+    soldier: 'the barracks widow lines',
+    teacher: 'the school staff quarters',
+    nysc: 'the corps lodge',
+    tech: 'the room you took near the exchange',
+    ngo: 'the mission house',
+    clergy: 'the parish room',
+    trader: 'the market stall room',
+    journalist: 'the press hostel',
+    pastor: 'the church boy\'s room',
+    redcross: 'the dressing station',
+    lecturer: 'the faculty bungalow that is no longer standing',
+    railway: 'the railway quarters',
+  };
+  return (map[bg] || 'the house') + ' in ' + st;
+}
+
 // ── END OF DAY ──
+// Single wartime ledger: pay packet → food → rent → consequences.
+// Missing bills is not a toast — it is hunger, shame, flight, and sometimes death.
 function endOfDay() {
+  state.__billsEngineV15 = true;
+
   var nightEvent = null;
   for (var i = 0; i < NIGHT_EVENTS.length; i++) {
     if (NIGHT_EVENTS[i].day === state.day) { nightEvent = NIGHT_EVENTS[i]; break; }
   }
 
-  var familySize = state.family.length;
-  var foodCost = familySize * 1500;
-  var rentCost = 2800;
+  var pressure = getFamilyPressure();
+  state.familyPressure = pressure;
+  var mouths = Math.max(1, livingFamily().length + (pressure > 3 ? 1 : 0));
+
+  // Inflation: war week by week, not a rounding error
+  var warWeek = Math.floor((state.day - 1) / 7);
+  var foodPerMouth = 1200 + warWeek * 350 + Math.floor(state.day * 40);
+  var foodCost = mouths * foodPerMouth;
+  // Extended household / many children: school-garri, medicine, "settling" soldiers at the gate
+  foodCost += pressure * 400;
+  var rentCost = 2200 + warWeek * 500 + pressure * 250;
+  // Block rent if already evicted / gone household
+  if (state.flags.evicted || state.flags.family_collapsed) rentCost = 0;
+
   var totalExpenses = foodCost + rentCost;
-  var baseDaily = 5500;
+  var baseDaily = 5200;
+  // Errors already cut totalPay during the day; grade pay still arrives
+  var wagePenalty = state.wagePenaltyNextDay || 0;
+  state.wagePenaltyNextDay = 0;
+  if (wagePenalty > 0) baseDaily = Math.max(0, baseDaily - wagePenalty);
 
-  // Add base pay
-  state.totalPay += baseDaily;
-  var canAfford = state.totalPay >= totalExpenses;
-
-  if (!canAfford) {
-    state.family.forEach(function(f) { if (f.status === 'ok') f.status = 'hungry'; });
-    state.axes.survival = Math.max(0, state.axes.survival - 1);
-  } else {
-    state.totalPay -= totalExpenses;
-    state.family.forEach(function(f) { if (f.status === 'hungry') f.status = 'ok'; });
+  // Suspicion: Internal Affairs quietly docks "cooperation"
+  var suspicionDock = 0;
+  if ((state.suspicion || 0) >= 6) {
+    suspicionDock = 800 + (state.suspicion - 5) * 200;
   }
 
-  // Inflation Day 13+
+  state.totalPay += baseDaily;
+  if (suspicionDock > 0) state.totalPay -= suspicionDock;
+
+  var canAfford = state.totalPay >= totalExpenses;
+  var familyReport = '';
+  var crisisNote = '';
+
+  if (canAfford) {
+    state.totalPay -= totalExpenses;
+    state.billsPaidTotal = (state.billsPaidTotal || 0) + 1;
+    // Recovery is slow — one good night does not erase a week of hunger
+    if ((state.missedBillsStreak || 0) > 0) {
+      state.missedBillsStreak = Math.max(0, state.missedBillsStreak - 1);
+      familyReport = 'You paid food and rent. The pot has something in it. The landlord counted twice and left. Hunger still sits in the corners of the house like a visitor who was not fully shown out.';
+      livingFamily().forEach(function (f) {
+        if (f.status === 'hungry') f.status = 'ok';
+        else if (f.status === 'ill') f.status = 'hungry';
+      });
+    } else {
+      livingFamily().forEach(function (f) {
+        if (f.status === 'hungry' || f.status === 'ill') f.status = 'ok';
+      });
+      familyReport = 'Rice. Palm oil. The rent envelope was full enough. For one night the house sounds like a house, not a waiting room. Tomorrow the queue begins again.';
+    }
+  } else {
+    // Cannot meet the day — war does not negotiate
+    state.missedBillsStreak = (state.missedBillsStreak || 0) + 1;
+    state.billsMissedTotal = (state.billsMissedTotal || 0) + 1;
+    state.axes.survival = Math.max(0, (state.axes.survival || 0) - 1);
+    state.axes.compassion = Math.max(0, (state.axes.compassion || 0) - (pressure >= 3 ? 1 : 0));
+
+    // Drain whatever is left — empty pockets are the story
+    state.totalPay = 0;
+
+    var streak = state.missedBillsStreak;
+    var member;
+
+    if (streak === 1) {
+      livingFamily().forEach(function (f) { f.status = 'hungry'; });
+      familyReport = 'The pot is empty before night prayer. You scrape the bottom as if scrapings were a plan. Nobody accuses you. Accusation would require energy. At ' + backgroundHomePhrase() + ', sleep is thinner than the mat.';
+      crisisNote = 'FIRST MISS — HUNGER';
+    } else if (streak === 2) {
+      livingFamily().forEach(function (f) { f.status = f.status === 'gone' ? 'gone' : 'hungry'; });
+      member = pickLivingMember(['child', 'partner', 'parent', 'self']);
+      if (member) member.status = 'ill';
+      state.wagePenaltyNextDay = 1500;
+      state.axes.survival = Math.max(0, state.axes.survival - 1);
+      familyReport = 'Second night without a full pot. Someone is fever-warm. The neighbour\'s pot lid is louder than kindness. You promise the market tomorrow. Promises are the currency of people who have spent their pay packet on stamps for strangers.';
+      crisisNote = 'SECOND MISS — ILLNESS · WAGE PENALTY TOMORROW';
+    } else if (streak === 3) {
+      member = pickLivingMember(['child', 'parent', 'partner']);
+      if (member && member.role !== 'self') {
+        member.status = 'gone';
+        state.flags.child_or_dependant_sent_away = true;
+        familyReport = 'You send ' + (member.role === 'child' ? 'the child' : 'one of your people') + ' to the village before the road is cut. There is no ceremony — only a bundle and a look that will outlive the war. The house is quieter. Quiet is not peace.';
+      } else {
+        livingFamily().forEach(function (f) { f.status = 'ill'; });
+        familyReport = 'There is no one left to send away and nowhere safe to send them. The walls know your name. So does hunger.';
+      }
+      state.axes.survival = Math.max(0, state.axes.survival - 2);
+      state.suspicion = (state.suspicion || 0) + 1;
+      crisisNote = 'THIRD MISS — SOMEONE LEAVES THE HOUSE';
+    } else if (streak === 4) {
+      member = pickLivingMember(['partner', 'parent', 'child', 'self']);
+      if (member) {
+        member.status = 'dead';
+        state.flags.family_death = true;
+      }
+      state.axes.survival = Math.max(0, state.axes.survival - 2);
+      state.axes.loyalty = Math.max(0, (state.axes.loyalty || 0) - 1);
+      state.axes.rebellion = (state.axes.rebellion || 0) + 1;
+      familyReport = 'A preventable death is still a death. There is no tribunal for empty pots — only a grave that will not wait for your leave form. You stamp papers in the morning with a hand that knows what paper cannot buy.';
+      crisisNote = 'FOURTH MISS — DEATH IN THE HOUSE';
+    } else {
+      state.flags.family_collapsed = true;
+      state.flags.evicted = true;
+      livingFamily().forEach(function (f) { if (f.status !== 'dead') f.status = 'gone'; });
+      state.axes.survival = Math.max(0, state.axes.survival - 3);
+      familyReport = 'The landlord does not knock. He arrives with two men and the kind of patience that has already decided. Your things fit in less than you believed. You are still an officer at dawn. At night you are a person without a door.';
+      crisisNote = 'HOUSEHOLD COLLAPSED — EVICTION';
+      // Soft-lock toward bitter endings
+      state.flags.must_face_ruin = true;
+    }
+  }
+
+  // Extra inflation bleed on top of scaled food/rent (scarce goods)
   var inflation = 0;
-  if (state.day >= 13) {
-    inflation = Math.floor((state.day - 12) * 50);
-    state.totalPay -= inflation;
+  if (state.day >= 10) {
+    inflation = Math.floor((state.day - 9) * 120);
+    state.totalPay = Math.max(0, state.totalPay - inflation);
   }
   if (state.totalPay < 0) state.totalPay = 0;
 
+  // Infiltration after-action: the war remembers careless stamps
+  var intelLine = '';
+  if ((state.infiltrationCount || 0) > 0 && state.dayResults.some(function (r) { return !r.correct && r.action === 'approve'; })) {
+    intelLine = 'A sealed note reaches the post after dark: a face you cleared was seen again where no civilian should walk. Suspicion at the booth: ' + (state.suspicion || 0) + '. Breaches logged: ' + state.infiltrationCount + '.';
+    if (state.flags.suspected_collaborator) {
+      intelLine += ' Someone has written the word collaborator in a margin that is not yours.';
+      state.axes.loyalty = Math.max(0, (state.axes.loyalty || 0) - 1);
+    }
+  }
+
   // Build pay breakdown
   var breakdown = document.getElementById('eod-pay-breakdown');
-  var html = '<div class="eod-pay-row"><span>BASE PAY (GRADE 8)</span><span>₦' + baseDaily.toLocaleString() + '</span></div>';
+  var html = '<div class="eod-pay-row"><span>DAY PAY PACKET (GRADE 8)</span><span>₦' + baseDaily.toLocaleString() + '</span></div>';
+  if (wagePenalty > 0) {
+    html += '<div class="eod-pay-row deduction"><span>PRIOR PENALTY (ERRORS / HUNGER)</span><span>−₦' + wagePenalty.toLocaleString() + '</span></div>';
+  }
+  if (suspicionDock > 0) {
+    html += '<div class="eod-pay-row deduction"><span>INTERNAL AFFAIRS — \"COOPERATION\"</span><span>−₦' + suspicionDock.toLocaleString() + '</span></div>';
+  }
   state.dayResults.forEach(function(r) {
     if (r.payChange !== 0) {
       var cls = r.payChange > 0 ? 'bonus' : 'deduction';
-      var label = r.correct ? '✓ CORRECT DETENTION' : '✗ PROCESSING ERROR';
-      var sign = r.payChange > 0 ? '+' : '';
-      html += '<div class="eod-pay-row ' + cls + '"><span>' + label + ': ' + r.name.split(' ')[0] + '</span><span>' + sign + '₦' + Math.abs(r.payChange).toLocaleString() + '</span></div>';
+      var label = r.correct
+        ? (r.action === 'detain' ? '✓ CORRECT DETENTION' : '✓ CORRECT DENIAL')
+        : '✗ WRONG STAMP';
+      var sign = r.payChange > 0 ? '+' : '−';
+      html += '<div class="eod-pay-row ' + cls + '"><span>' + label + ': ' + (r.name || '').split(' ')[0] + '</span><span>' + sign + '₦' + Math.abs(r.payChange).toLocaleString() + '</span></div>';
     }
   });
-  html += '<div class="eod-pay-row deduction"><span>FOOD & RENT (' + familySize + ' persons)</span><span>-₦' + totalExpenses.toLocaleString() + '</span></div>';
+  html += '<div class="eod-pay-row deduction"><span>FOOD (' + mouths + ' mouths · war week ' + (warWeek + 1) + ')</span><span>−₦' + foodCost.toLocaleString() + '</span></div>';
+  if (rentCost > 0) {
+    html += '<div class="eod-pay-row deduction"><span>RENT / COMPOUND DUES</span><span>−₦' + rentCost.toLocaleString() + '</span></div>';
+  }
   if (inflation > 0) {
-    html += '<div class="eod-pay-row deduction"><span>INFLATION ADJUSTMENT</span><span>-₦' + inflation + '</span></div>';
+    html += '<div class="eod-pay-row deduction"><span>SCARCITY / BLACK-MARKET DRIFT</span><span>−₦' + inflation.toLocaleString() + '</span></div>';
+  }
+  if (!canAfford) {
+    html += '<div class="eod-pay-row deduction"><span>UNPAID — HOUSEHOLD SHORTFALL</span><span>STREAK ' + state.missedBillsStreak + '</span></div>';
   }
   html += '<div class="eod-pay-row total"><span>RUNNING BALANCE</span><span>₦' + state.totalPay.toLocaleString() + '</span></div>';
   breakdown.innerHTML = html;
@@ -1172,15 +1412,23 @@ function endOfDay() {
   document.getElementById('eod-title').textContent     = 'DAY ' + state.day + ' COMPLETE';
 
   var familyEl = document.getElementById('eod-family');
-  if (!canAfford) {
-    familyEl.innerHTML = '<div class="eod-family-title">FAMILY STATUS</div><div class="eod-family-text">You could not cover today\'s expenses. Your family went without food tonight.</div>';
-  } else {
-    familyEl.innerHTML = '<div class="eod-family-title">FAMILY STATUS</div><div class="eod-family-text">Your family is fed. The rent is paid. For today, that is enough.</div>';
-  }
+  var titleExtra = crisisNote ? ' · ' + crisisNote : '';
+  familyEl.innerHTML =
+    '<div class="eod-family-title">FAMILY / HOUSEHOLD' + titleExtra + '</div>' +
+    '<div class="eod-family-text">' + familyReport + '</div>' +
+    (intelLine ? '<div class="eod-family-text" style="margin-top:10px;border-top:1px solid rgba(212,160,23,0.35);padding-top:10px;color:#D4A017">' + intelLine + '</div>' : '');
 
-  document.getElementById('eod-night').textContent = nightEvent ? nightEvent.text : '';
+  // Night: prefer bill-crisis voice when streak is hot
+  var nightText = nightEvent ? nightEvent.text : '';
+  if (!canAfford && (state.missedBillsStreak || 0) >= 2) {
+    nightText = (nightText ? nightText + ' ' : '') +
+      'You lie awake calculating stamps into yams. The arithmetic never becomes food.';
+  }
+  document.getElementById('eod-night').textContent = nightText;
   document.getElementById('btn-next-day').textContent = state.day >= 25 ? 'FINAL REPORT →' : 'DAY ' + (state.day + 1) + ' →';
 
+  state.lastBillReport = { canAfford: canAfford, streak: state.missedBillsStreak, foodCost: foodCost, rentCost: rentCost };
+  updateFamilyBar();
   saveState();
   showScreen('eod-report');
 }
@@ -1194,8 +1442,16 @@ function nextDay() {
 // ── ENDING ──
 function calculateEnding() {
   var ending = null;
-  for (var i = 0; i < ENDINGS.length; i++) {
-    if (ENDINGS[i].condition(state)) { ending = ENDINGS[i]; break; }
+  // Household ruin and collaboration outrank soft "ordinary" outcomes — the war is not fair, but it is ordered
+  var priority = ['collaborator_dawn', 'empty_pot', 'landlord_war', 'executed', 'disappeared', 'burned'];
+  for (var p = 0; p < priority.length; p++) {
+    var pe = ENDINGS.find(function(e){ return e.id === priority[p]; });
+    if (pe && pe.condition(state)) { ending = pe; break; }
+  }
+  if (!ending) {
+    for (var i = 0; i < ENDINGS.length; i++) {
+      if (ENDINGS[i].condition(state)) { ending = ENDINGS[i]; break; }
+    }
   }
   if (!ending) ending = ENDINGS.find(function(e){ return e.id === 'ordinary_man'; }) || ENDINGS[ENDINGS.length-1];
 
@@ -1225,7 +1481,7 @@ function showEndingScreen(ending) {
   });
   axesEl.innerHTML = axisHtml + scoreHtml;
 
-  document.getElementById('endings-unlocked').textContent = state.endingsUnlocked.length + ' OF 28 ENDINGS DISCOVERED';
+  document.getElementById('endings-unlocked').textContent = state.endingsUnlocked.length + ' OF ' + ENDINGS.length + ' ENDINGS DISCOVERED';
   showScreen('ending');
 }
 
@@ -1251,12 +1507,14 @@ function updateQueueDots() {
 
 function updateFamilyBar() {
   var bar = document.getElementById('family-bar');
+  if (!bar) return;
   bar.innerHTML = '';
-  state.family.forEach(function(f) {
+  (state.family || []).forEach(function(f) {
     var icon = document.createElement('div');
-    icon.className = 'family-icon' + (f.status !== 'ok' ? ' ' + f.status : '');
-    icon.title = f.role + ': ' + f.status;
-    icon.textContent = f.icon;
+    var st = f.status || 'ok';
+    icon.className = 'family-icon' + (st !== 'ok' ? ' ' + st : '');
+    icon.title = f.role + ': ' + st;
+    icon.textContent = st === 'gone' ? '·' : (st === 'dead' ? '✕' : f.icon);
     bar.appendChild(icon);
   });
 }
@@ -1288,8 +1546,14 @@ function loadSavedGame() {
     var saved = JSON.parse(localStorage.getItem(SAVE_KEY));
     if (!saved || !saved.day) return;
     state = saved;
-    // Re-ensure moralFiredDays exists (older saves)
+    // Re-ensure fields on older saves
     if (!state.moralFiredDays) state.moralFiredDays = [];
+    if (!state.flags) state.flags = {};
+    if (state.missedBillsStreak == null) state.missedBillsStreak = 0;
+    if (state.billsMissedTotal == null) state.billsMissedTotal = 0;
+    if (state.infiltrationCount == null) state.infiltrationCount = 0;
+    if (state.suspicion == null) state.suspicion = 0;
+    state.__billsEngineV15 = true;
     // Rebuild day travellers if missing
     if (!state.dayTravellers || state.dayTravellers.length === 0) {
       state.dayTravellers = buildTravellerList(state.day, state.totalTravellers || 8);
@@ -1344,7 +1608,7 @@ function showEndingsGallery() {
 
   var countEl = document.createElement('div');
   countEl.style.cssText = "font-family:'Courier Prime',monospace;font-size:10px;color:#D4A017;letter-spacing:0.3em;margin-bottom:20px";
-  countEl.textContent = unlocked.length + ' OF 28 ENDINGS DISCOVERED';
+  countEl.textContent = unlocked.length + ' OF ' + ENDINGS.length + ' ENDINGS DISCOVERED';
   inner.appendChild(countEl);
 
   ENDINGS.forEach(function(e) {
@@ -1453,7 +1717,7 @@ function init() {
   // Service Worker registration for iOS PWA offline support.
   // Bump CACHE_NAME in sw.js whenever shipping asset changes (network-first + versioned cache).
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=1.4').catch(function(){});
+    navigator.serviceWorker.register('./sw.js?v=1.5').catch(function(){});
   }
 }
 

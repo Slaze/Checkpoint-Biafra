@@ -1158,6 +1158,8 @@ html, body {
 
 .family-icon.hungry { border-color: var(--red); background: rgba(192,57,43,0.3); }
 .family-icon.ill { border-color: #E67E22; background: rgba(230,126,34,0.3); animation: pulse 1.5s infinite; }
+.family-icon.gone { border-color: #555; background: rgba(0,0,0,0.45); opacity: 0.45; filter: grayscale(1); }
+.family-icon.dead { border-color: #000; background: rgba(80,0,0,0.75); color: #F2E8D0; font-weight: 700; }
 
 /* ═══ EXCHANGE RATE WIDGET ═══ */
 .rate-widget {
