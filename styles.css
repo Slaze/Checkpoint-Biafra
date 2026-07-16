@@ -2252,77 +2252,56 @@ button:focus-visible,
   }
 }
 
-/* Hands — first person, bottom corners, holding the papers */
+/* Hands — detailed first-person grip */
 .pov-hand {
   position: absolute;
-  bottom: -8px;
-  width: min(42vw, 160px);
-  height: min(48vw, 180px);
+  bottom: -18px;
+  width: min(52vw, 200px);
+  height: min(62vw, 240px);
   z-index: 6;
   pointer-events: none;
-  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.4));
+  filter: drop-shadow(0 10px 14px rgba(0,0,0,0.45));
   opacity: 0;
-  transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
 }
-.doc-pov.docs-present .pov-hand {
-  opacity: 0.92;
-}
+.doc-pov.docs-present .pov-hand { opacity: 1; }
+
 .pov-hand-left {
-  left: -4%;
-  transform: translateY(24px) rotate(-8deg);
+  left: -6%;
+  transform: translateY(36px) rotate(-10deg);
+  transform-origin: 40% 100%;
 }
 .pov-hand-right {
-  right: -4%;
-  transform: translateY(24px) rotate(8deg);
+  right: -6%;
+  transform: translateY(36px) rotate(10deg) scaleX(-1);
+  transform-origin: 60% 100%;
 }
 .doc-pov.docs-present .pov-hand-left {
-  transform: translateY(0) rotate(-6deg);
+  transform: translateY(4px) rotate(-5deg);
 }
 .doc-pov.docs-present .pov-hand-right {
-  transform: translateY(0) rotate(6deg);
+  transform: translateY(4px) rotate(5deg) scaleX(-1);
 }
 
-.pov-hand-svg { width: 100%; height: 100%; display: block; }
-.hand-skin {
-  fill: #c4a07a;
-  stroke: #8a6a48;
-  stroke-width: 1.2;
-}
-.hand-line {
-  fill: none;
-  stroke: rgba(90, 60, 40, 0.35);
-  stroke-width: 1.5;
-  stroke-linecap: round;
+.pov-hand-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
 }
 
-/* Shirt cuffs under hands */
-.pov-cuff {
-  position: absolute;
-  bottom: 0;
-  width: 22%;
-  height: 28px;
-  background: linear-gradient(180deg, #2c3e1f 0%, #1a2610 100%);
-  border-top: 2px solid rgba(212,160,23,0.35);
-  opacity: 0;
-  z-index: 5;
-  pointer-events: none;
-  transition: opacity 0.35s;
-}
-.doc-pov.docs-present .pov-cuff { opacity: 0.85; }
-.pov-cuff-left {
-  left: 2%;
-  border-radius: 4px 12px 0 0;
-  transform: skewX(-8deg);
-}
-.pov-cuff-right {
-  right: 2%;
-  border-radius: 12px 4px 0 0;
-  transform: skewX(8deg);
-}
+/* CSS cuffs hidden — cuff is now inside SVG */
+.pov-cuff { display: none !important; }
 
-/* Empty docs: hands open, no grip */
-.doc-pov.docs-empty .pov-hand-left { transform: translateY(8px) rotate(-12deg); opacity: 0.55; }
-.doc-pov.docs-empty .pov-hand-right { transform: translateY(8px) rotate(12deg); opacity: 0.55; }
+.doc-pov.docs-empty .pov-hand-left {
+  transform: translateY(18px) rotate(-14deg);
+  opacity: 0.65;
+}
+.doc-pov.docs-empty .pov-hand-right {
+  transform: translateY(18px) rotate(14deg) scaleX(-1);
+  opacity: 0.65;
+}
 
 /* Modal held-paper POV */
 .doc-inspector-pov {
@@ -2368,27 +2347,31 @@ button:focus-visible,
 .pov-hand-modal-left,
 .pov-hand-modal-right {
   position: absolute;
-  bottom: 0;
-  width: min(38vw, 140px);
-  height: min(42vw, 160px);
+  bottom: -12px;
+  width: min(48vw, 190px);
+  height: min(56vw, 230px);
   z-index: 4;
   pointer-events: none;
-  opacity: 0.95;
-  filter: drop-shadow(0 8px 12px rgba(0,0,0,0.45));
+  opacity: 1;
+  filter: drop-shadow(0 12px 16px rgba(0,0,0,0.5));
 }
 .pov-hand-modal-left {
-  left: -2%;
-  transform: rotate(-10deg) translateY(10px);
-  animation: handRise 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  left: -4%;
+  transform: rotate(-8deg) translateY(8px);
+  animation: handRiseL 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 .pov-hand-modal-right {
-  right: -2%;
-  transform: rotate(10deg) translateY(10px);
-  animation: handRise 0.45s 0.05s cubic-bezier(0.16, 1, 0.3, 1) both;
+  right: -4%;
+  transform: rotate(8deg) translateY(8px) scaleX(-1);
+  animation: handRiseR 0.5s 0.06s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
-@keyframes handRise {
-  from { opacity: 0; transform: translateY(40px) rotate(0deg); }
-  to { opacity: 0.95; }
+@keyframes handRiseL {
+  from { opacity: 0; transform: translateY(48px) rotate(-4deg); }
+  to { opacity: 1; transform: rotate(-8deg) translateY(8px); }
+}
+@keyframes handRiseR {
+  from { opacity: 0; transform: translateY(48px) rotate(4deg) scaleX(-1); }
+  to { opacity: 1; transform: rotate(8deg) translateY(8px) scaleX(-1); }
 }
 
 .doc-hold-hint {
@@ -2420,7 +2403,7 @@ body.doc-inspecting .action-bar {
 @media (min-width: 720px) {
   .doc-pov { top: 32%; bottom: 80px; }
   .doc-pov .doc-card { width: 150px; min-height: 100px; }
-  .pov-hand { width: 150px; height: 170px; }
+  .pov-hand { width: 190px; height: 230px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2436,3 +2419,5 @@ body.doc-inspecting .action-bar {
 
 /* Fix right hand: use mirrored path already — ensure not double flipped */
 .pov-hand-right .pov-hand-svg { transform: none; }
+
+/* hand detail pass v1.14 */

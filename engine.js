@@ -1219,7 +1219,7 @@ function rememberFlag(flag) {
   if (map[flag]) pushMemory(map[flag]);
 }
 
-// ── AXIS / PAY BALANCE (v1.13) ──
+// ── AXIS / PAY BALANCE (v1.14) ──
 // Soft-cap axes so 25 days of correct stamps do not produce loyalty 300+.
 // Endings still use thresholds ~7–15; cap 20 keeps them meaningful.
 var AXIS_SOFT = 12;
@@ -2238,7 +2238,7 @@ function init() {
   // Service Worker registration for iOS PWA offline support.
   // Bump CACHE_NAME in sw.js whenever shipping asset changes (network-first + versioned cache).
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=1.13').catch(function(){});
+    navigator.serviceWorker.register('./sw.js?v=1.14').catch(function(){});
   }
 }
 

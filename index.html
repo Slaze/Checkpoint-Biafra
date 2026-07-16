@@ -16,7 +16,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=IM+Fell+English:ital@0;1&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=1.13">
+<link rel="stylesheet" href="styles.css?v=1.14">
 </head>
 <body class="ui-modern">
 
@@ -47,7 +47,7 @@
       <button class="btn-secondary btn-ghost" id="btn-gallery" type="button">CASE FILES</button>
     </div>
   </div>
-  <div class="splash-version">v1.13 · CHECKPOINT BIAFRA</div>
+  <div class="splash-version">v1.14 · CHECKPOINT BIAFRA</div>
 </div>
 
 <!-- CHARACTER CREATION -->
@@ -159,16 +159,244 @@
         <div class="doc-stack" id="doc-stack"></div>
       </div>
       <div class="pov-hand pov-hand-left" aria-hidden="true">
-        <svg viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg" class="pov-hand-svg">
-          <path class="hand-skin" d="M28 158 C18 120 22 88 38 72 C42 50 52 38 62 42 C58 28 68 18 78 28 C82 14 96 16 98 32 C108 30 116 42 112 56 C118 62 118 78 108 88 L104 150 C70 162 40 160 28 158Z"/>
-          <path class="hand-line" d="M48 95 C55 88 70 90 78 98 M55 110 C62 104 75 106 82 114"/>
-        </svg>
+        <svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg" class="pov-hand-svg" aria-hidden="true">
+  <defs>
+    <linearGradient id="skinGradLDL" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e8c4a0"/>
+      <stop offset="35%" stop-color="#d4a574"/>
+      <stop offset="70%" stop-color="#c4925e"/>
+      <stop offset="100%" stop-color="#a87848"/>
+    </linearGradient>
+    <linearGradient id="skinShadowLDL" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#5c3a1e" stop-opacity="0.35"/>
+    </linearGradient>
+    <linearGradient id="nailGradDL" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f5e6d8"/>
+      <stop offset="100%" stop-color="#e0c8b0"/>
+    </linearGradient>
+    <linearGradient id="cuffGradDL" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3d5429"/>
+      <stop offset="50%" stop-color="#2c3e1f"/>
+      <stop offset="100%" stop-color="#1a2610"/>
+    </linearGradient>
+    <linearGradient id="cuffEdgeDL" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e8dfc4"/>
+      <stop offset="100%" stop-color="#c4b896"/>
+    </linearGradient>
+    <filter id="handSoftLDL" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="2.5" result="b"/>
+      <feOffset dy="3" result="o"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.35"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#handSoftLDL)">
+    <!-- Sleeve / cuff -->
+    <path d="M22 248 L22 210 Q30 198 55 196 L95 196 Q118 198 125 212 L128 248 Q75 258 22 248Z" fill="url(#cuffGradDL)"/>
+    <path d="M24 212 L124 212 L123 222 L25 222Z" fill="url(#cuffEdgeDL)" opacity="0.9"/>
+    <path d="M28 218 L120 218" stroke="#d4a017" stroke-width="1.2" opacity="0.55"/>
+    <!-- Shirt button -->
+    <circle cx="74" cy="230" r="4.5" fill="#c9b896" stroke="#8a7a55" stroke-width="0.8"/>
+    <circle cx="74" cy="230" r="1.5" fill="#5a4a30"/>
+
+    <!-- Wrist -->
+    <path d="M40 210 Q38 185 48 168 L100 168 Q112 185 110 210Z" fill="url(#skinGradLDL)"/>
+    <path d="M48 190 Q74 186 100 192" fill="none" stroke="#8a6040" stroke-width="1" opacity="0.25"/>
+
+    <!-- Palm (holding upward toward papers) -->
+    <path d="M42 172
+      C36 150 38 128 48 112
+      C52 98 58 90 70 88
+      C78 70 95 68 108 78
+      C118 72 132 78 134 94
+      C148 92 158 104 154 118
+      C162 128 160 145 148 154
+      C150 170 140 178 122 176
+      C110 188 88 190 70 182
+      C55 188 45 184 42 172Z" fill="url(#skinGradLDL)"/>
+    <!-- Palm shade -->
+    <path d="M55 160 C60 140 75 130 95 128 C105 145 100 165 85 172 C70 175 58 168 55 160Z" fill="url(#skinShadowLDL)" opacity="0.5"/>
+
+    <!-- Thumb (left side, gripping) -->
+    <path d="M48 130
+      C40 118 32 108 30 96
+      C28 84 36 76 46 80
+      C54 84 58 96 58 108
+      C56 118 52 126 48 130Z" fill="url(#skinGradLDL)"/>
+    <ellipse cx="38" cy="86" rx="6" ry="7.5" fill="url(#nailGradDL)" transform="rotate(-25 38 86)"/>
+    <path d="M42 100 C46 94 50 98 48 106" fill="none" stroke="#8a6040" stroke-width="1.1" opacity="0.3"/>
+
+    <!-- Index finger -->
+    <path d="M72 95
+      C70 78 72 58 76 42
+      C78 32 88 30 92 40
+      C94 52 92 72 90 90
+      C86 98 78 100 72 95Z" fill="url(#skinGradLDL)"/>
+    <ellipse cx="84" cy="38" rx="5.5" ry="6.5" fill="url(#nailGradDL)"/>
+    <path d="M78 70 C82 68 86 72 84 78" fill="none" stroke="#8a6040" stroke-width="1" opacity="0.28"/>
+
+    <!-- Middle finger (longest) -->
+    <path d="M92 92
+      C92 72 94 48 98 30
+      C100 20 112 20 114 32
+      C116 48 112 72 108 92
+      C104 100 96 100 92 92Z" fill="url(#skinGradLDL)"/>
+    <ellipse cx="106" cy="28" rx="5.5" ry="7" fill="url(#nailGradDL)"/>
+    <path d="M98 62 C102 60 106 64 104 72" fill="none" stroke="#8a6040" stroke-width="1" opacity="0.28"/>
+
+    <!-- Ring finger -->
+    <path d="M110 98
+      C112 80 116 58 120 44
+      C122 34 134 34 136 46
+      C136 60 132 82 128 100
+      C124 108 112 106 110 98Z" fill="url(#skinGradLDL)"/>
+    <ellipse cx="128" cy="42" rx="5" ry="6.5" fill="url(#nailGradDL)"/>
+    <path d="M118 72 C122 70 126 74 124 80" fill="none" stroke="#8a6040" stroke-width="1" opacity="0.28"/>
+
+    <!-- Pinky -->
+    <path d="M128 110
+      C132 96 138 80 142 68
+      C144 60 154 60 156 70
+      C156 82 150 98 146 114
+      C140 120 128 118 128 110Z" fill="url(#skinGradLDL)"/>
+    <ellipse cx="149" cy="68" rx="4.5" ry="5.5" fill="url(#nailGradDL)"/>
+
+    <!-- Knuckle highlights -->
+    <ellipse cx="78" cy="100" rx="7" ry="4" fill="#e8c4a0" opacity="0.35"/>
+    <ellipse cx="98" cy="98" rx="7" ry="4" fill="#e8c4a0" opacity="0.35"/>
+    <ellipse cx="116" cy="102" rx="6" ry="3.5" fill="#e8c4a0" opacity="0.3"/>
+    <ellipse cx="134" cy="112" rx="5" ry="3" fill="#e8c4a0" opacity="0.28"/>
+
+    <!-- Palm creases -->
+    <path d="M58 145 C72 138 95 136 118 142" fill="none" stroke="#8a6040" stroke-width="1.3" opacity="0.28"/>
+    <path d="M62 158 C80 150 100 148 122 154" fill="none" stroke="#8a6040" stroke-width="1.1" opacity="0.22"/>
+    <path d="M70 130 C85 125 100 128 112 136" fill="none" stroke="#8a6040" stroke-width="1" opacity="0.2"/>
+
+    <!-- Outer rim shade for depth -->
+    <path d="M42 172 C36 150 38 128 48 112 L52 115 C44 130 44 150 50 168Z" fill="#8a5a38" opacity="0.15"/>
+  </g>
+</svg>
       </div>
       <div class="pov-hand pov-hand-right" aria-hidden="true">
-        <svg viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg" class="pov-hand-svg">
-          <path class="hand-skin" d="M92 158 C102 120 98 88 82 72 C78 50 68 38 58 42 C62 28 52 18 42 28 C38 14 24 16 22 32 C12 30 4 42 8 56 C2 62 2 78 12 88 L16 150 C50 162 80 160 92 158Z"/>
-          <path class="hand-line" d="M72 95 C65 88 50 90 42 98 M65 110 C58 104 45 106 38 114"/>
-        </svg>
+        <svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg" class="pov-hand-svg" aria-hidden="true">
+  <defs>
+    <linearGradient id="skinGradLDR" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e8c4a0"/>
+      <stop offset="35%" stop-color="#d4a574"/>
+      <stop offset="70%" stop-color="#c4925e"/>
+      <stop offset="100%" stop-color="#a87848"/>
+    </linearGradient>
+    <linearGradient id="skinShadowLDR" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#5c3a1e" stop-opacity="0.35"/>
+    </linearGradient>
+    <linearGradient id="nailGradDR" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f5e6d8"/>
+      <stop offset="100%" stop-color="#e0c8b0"/>
+    </linearGradient>
+    <linearGradient id="cuffGradDR" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3d5429"/>
+      <stop offset="50%" stop-color="#2c3e1f"/>
+      <stop offset="100%" stop-color="#1a2610"/>
+    </linearGradient>
+    <linearGradient id="cuffEdgeDR" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e8dfc4"/>
+      <stop offset="100%" stop-color="#c4b896"/>
+    </linearGradient>
+    <filter id="handSoftLDR" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="2.5" result="b"/>
+      <feOffset dy="3" result="o"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.35"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#handSoftLDR)">
+    <!-- Sleeve / cuff -->
+    <path d="M22 248 L22 210 Q30 198 55 196 L95 196 Q118 198 125 212 L128 248 Q75 258 22 248Z" fill="url(#cuffGradDR)"/>
+    <path d="M24 212 L124 212 L123 222 L25 222Z" fill="url(#cuffEdgeDR)" opacity="0.9"/>
+    <path d="M28 218 L120 218" stroke="#d4a017" stroke-width="1.2" opacity="0.55"/>
+    <!-- Shirt button -->
+    <circle cx="74" cy="230" r="4.5" fill="#c9b896" stroke="#8a7a55" stroke-width="0.8"/>
+    <circle cx="74" cy="230" r="1.5" fill="#5a4a30"/>
+
+    <!-- Wrist -->
+    <path d="M40 210 Q38 185 48 168 L100 168 Q112 185 110 210Z" fill="url(#skinGradLDR)"/>
+    <path d="M48 190 Q74 186 100 192" fill="none" stroke="#8a6040" stroke-width="1" opacity="0.25"/>
+
+    <!-- Palm (holding upward toward papers) -->
+    <path d="M42 172
+      C36 150 38 128 48 112
+      C52 98 58 90 70 88
+      C78 70 95 68 108 78
+      C118 72 132 78 134 94
+      C148 92 158 104 154 118
+      C162 128 160 145 148 154
+      C150 170 140 178 122 176
+      C110 188 88 190 70 182
+      C55 188 45 184 42 172Z" fill="url(#skinGradLDR)"/>
+    <!-- Palm shade -->
+    <path d="M55 160 C60 140 75 130 95 128 C105 145 100 165 85 172 C70 175 58 168 55 160Z" fill="url(#skinShadowLDR)" opacity="0.5"/>
+
+    <!-- Thumb (left side, gripping) -->
+    <path d="M48 130
+      C40 118 32 108 30 96
+      C28 84 36 76 46 80
+      C54 84 58 96 58 108
+      C56 118 52 126 48 130Z" fill="url(#skinGradLDR)"/>
+    <ellipse cx="38" cy="86" rx="6" ry="7.5" fill="url(#nailGradDR)" transform="rotate(-25 38 86)"/>
+    <path d="M42 100 C46 94 50 98 48 106" fill="none" stroke="#8a6040" stroke-width="1.1" opacity="0.3"/>
+
+    <!-- Index finger -->
+    <path d="M72 95
+      C70 78 72 58 76 42
+      C78 32 88 30 92 40
+      C94 52 92 72 90 90
+      C86 98 78 100 72 95Z" fill="url(#skinGradLDR)"/>
+    <ellipse cx="84" cy="38" rx="5.5" ry="6.5" fill="url(#nailGradDR)"/>
+    <path d="M78 70 C82 68 86 72 84 78" fill="none" stroke="#8a6040" stroke-width="1" opacity="0.28"/>
+
+    <!-- Middle finger (longest) -->
+    <path d="M92 92
+      C92 72 94 48 98 30
+      C100 20 112 20 114 32
+      C116 48 112 72 108 92
+      C104 100 96 100 92 92Z" fill="url(#skinGradLDR)"/>
+    <ellipse cx="106" cy="28" rx="5.5" ry="7" fill="url(#nailGradDR)"/>
+    <path d="M98 62 C102 60 106 64 104 72" fill="none" stroke="#8a6040" stroke-width="1" opacity="0.28"/>
+
+    <!-- Ring finger -->
+    <path d="M110 98
+      C112 80 116 58 120 44
+      C122 34 134 34 136 46
+      C136 60 132 82 128 100
+      C124 108 112 106 110 98Z" fill="url(#skinGradLDR)"/>
+    <ellipse cx="128" cy="42" rx="5" ry="6.5" fill="url(#nailGradDR)"/>
+    <path d="M118 72 C122 70 126 74 124 80" fill="none" stroke="#8a6040" stroke-width="1" opacity="0.28"/>
+
+    <!-- Pinky -->
+    <path d="M128 110
+      C132 96 138 80 142 68
+      C144 60 154 60 156 70
+      C156 82 150 98 146 114
+      C140 120 128 118 128 110Z" fill="url(#skinGradLDR)"/>
+    <ellipse cx="149" cy="68" rx="4.5" ry="5.5" fill="url(#nailGradDR)"/>
+
+    <!-- Knuckle highlights -->
+    <ellipse cx="78" cy="100" rx="7" ry="4" fill="#e8c4a0" opacity="0.35"/>
+    <ellipse cx="98" cy="98" rx="7" ry="4" fill="#e8c4a0" opacity="0.35"/>
+    <ellipse cx="116" cy="102" rx="6" ry="3.5" fill="#e8c4a0" opacity="0.3"/>
+    <ellipse cx="134" cy="112" rx="5" ry="3" fill="#e8c4a0" opacity="0.28"/>
+
+    <!-- Palm creases -->
+    <path d="M58 145 C72 138 95 136 118 142" fill="none" stroke="#8a6040" stroke-width="1.3" opacity="0.28"/>
+    <path d="M62 158 C80 150 100 148 122 154" fill="none" stroke="#8a6040" stroke-width="1.1" opacity="0.22"/>
+    <path d="M70 130 C85 125 100 128 112 136" fill="none" stroke="#8a6040" stroke-width="1" opacity="0.2"/>
+
+    <!-- Outer rim shade for depth -->
+    <path d="M42 172 C36 150 38 128 48 112 L52 115 C44 130 44 150 50 168Z" fill="#8a5a38" opacity="0.15"/>
+  </g>
+</svg>
       </div>
       <div class="pov-cuff pov-cuff-left" aria-hidden="true"></div>
       <div class="pov-cuff pov-cuff-right" aria-hidden="true"></div>
@@ -245,9 +473,124 @@
 <div class="modal-overlay" id="doc-modal">
   <div class="doc-inspector-pov">
     <div class="pov-hand pov-hand-modal-left" aria-hidden="true">
-      <svg viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg" class="pov-hand-svg">
-        <path class="hand-skin" d="M28 158 C18 120 22 88 38 72 C42 50 52 38 62 42 C58 28 68 18 78 28 C82 14 96 16 98 32 C108 30 116 42 112 56 C118 62 118 78 108 88 L104 150 C70 162 40 160 28 158Z"/>
-      </svg>
+      <svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg" class="pov-hand-svg" aria-hidden="true">
+  <defs>
+    <linearGradient id="skinGradLML" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e8c4a0"/>
+      <stop offset="35%" stop-color="#d4a574"/>
+      <stop offset="70%" stop-color="#c4925e"/>
+      <stop offset="100%" stop-color="#a87848"/>
+    </linearGradient>
+    <linearGradient id="skinShadowLML" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#5c3a1e" stop-opacity="0.35"/>
+    </linearGradient>
+    <linearGradient id="nailGradML" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f5e6d8"/>
+      <stop offset="100%" stop-color="#e0c8b0"/>
+    </linearGradient>
+    <linearGradient id="cuffGradML" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3d5429"/>
+      <stop offset="50%" stop-color="#2c3e1f"/>
+      <stop offset="100%" stop-color="#1a2610"/>
+    </linearGradient>
+    <linearGradient id="cuffEdgeML" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e8dfc4"/>
+      <stop offset="100%" stop-color="#c4b896"/>
+    </linearGradient>
+    <filter id="handSoftLML" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="2.5" result="b"/>
+      <feOffset dy="3" result="o"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.35"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#handSoftLML)">
+    <!-- Sleeve / cuff -->
+    <path d="M22 248 L22 210 Q30 198 55 196 L95 196 Q118 198 125 212 L128 248 Q75 258 22 248Z" fill="url(#cuffGradML)"/>
+    <path d="M24 212 L124 212 L123 222 L25 222Z" fill="url(#cuffEdgeML)" opacity="0.9"/>
+    <path d="M28 218 L120 218" stroke="#d4a017" stroke-width="1.2" opacity="0.55"/>
+    <!-- Shirt button -->
+    <circle cx="74" cy="230" r="4.5" fill="#c9b896" stroke="#8a7a55" stroke-width="0.8"/>
+    <circle cx="74" cy="230" r="1.5" fill="#5a4a30"/>
+
+    <!-- Wrist -->
+    <path d="M40 210 Q38 185 48 168 L100 168 Q112 185 110 210Z" fill="url(#skinGradLML)"/>
+    <path d="M48 190 Q74 186 100 192" fill="none" stroke="#8a6040" stroke-width="1" opacity="0.25"/>
+
+    <!-- Palm (holding upward toward papers) -->
+    <path d="M42 172
+      C36 150 38 128 48 112
+      C52 98 58 90 70 88
+      C78 70 95 68 108 78
+      C118 72 132 78 134 94
+      C148 92 158 104 154 118
+      C162 128 160 145 148 154
+      C150 170 140 178 122 176
+      C110 188 88 190 70 182
+      C55 188 45 184 42 172Z" fill="url(#skinGradLML)"/>
+    <!-- Palm shade -->
+    <path d="M55 160 C60 140 75 130 95 128 C105 145 100 165 85 172 C70 175 58 168 55 160Z" fill="url(#skinShadowLML)" opacity="0.5"/>
+
+    <!-- Thumb (left side, gripping) -->
+    <path d="M48 130
+      C40 118 32 108 30 96
+      C28 84 36 76 46 80
+      C54 84 58 96 58 108
+      C56 118 52 126 48 130Z" fill="url(#skinGradLML)"/>
+    <ellipse cx="38" cy="86" rx="6" ry="7.5" fill="url(#nailGradML)" transform="rotate(-25 38 86)"/>
+    <path d="M42 100 C46 94 50 98 48 106" fill="none" stroke="#8a6040" stroke-width="1.1" opacity="0.3"/>
+
+    <!-- Index finger -->
+    <path d="M72 95
+      C70 78 72 58 76 42
+      C78 32 88 30 92 40
+      C94 52 92 72 90 90
+      C86 98 78 100 72 95Z" fill="url(#skinGradLML)"/>
+    <ellipse cx="84" cy="38" rx="5.5" ry="6.5" fill="url(#nailGradML)"/>
+    <path d="M78 70 C82 68 86 72 84 78" fill="none" stroke="#8a6040" stroke-width="1" opacity="0.28"/>
+
+    <!-- Middle finger (longest) -->
+    <path d="M92 92
+      C92 72 94 48 98 30
+      C100 20 112 20 114 32
+      C116 48 112 72 108 92
+      C104 100 96 100 92 92Z" fill="url(#skinGradLML)"/>
+    <ellipse cx="106" cy="28" rx="5.5" ry="7" fill="url(#nailGradML)"/>
+    <path d="M98 62 C102 60 106 64 104 72" fill="none" stroke="#8a6040" stroke-width="1" opacity="0.28"/>
+
+    <!-- Ring finger -->
+    <path d="M110 98
+      C112 80 116 58 120 44
+      C122 34 134 34 136 46
+      C136 60 132 82 128 100
+      C124 108 112 106 110 98Z" fill="url(#skinGradLML)"/>
+    <ellipse cx="128" cy="42" rx="5" ry="6.5" fill="url(#nailGradML)"/>
+    <path d="M118 72 C122 70 126 74 124 80" fill="none" stroke="#8a6040" stroke-width="1" opacity="0.28"/>
+
+    <!-- Pinky -->
+    <path d="M128 110
+      C132 96 138 80 142 68
+      C144 60 154 60 156 70
+      C156 82 150 98 146 114
+      C140 120 128 118 128 110Z" fill="url(#skinGradLML)"/>
+    <ellipse cx="149" cy="68" rx="4.5" ry="5.5" fill="url(#nailGradML)"/>
+
+    <!-- Knuckle highlights -->
+    <ellipse cx="78" cy="100" rx="7" ry="4" fill="#e8c4a0" opacity="0.35"/>
+    <ellipse cx="98" cy="98" rx="7" ry="4" fill="#e8c4a0" opacity="0.35"/>
+    <ellipse cx="116" cy="102" rx="6" ry="3.5" fill="#e8c4a0" opacity="0.3"/>
+    <ellipse cx="134" cy="112" rx="5" ry="3" fill="#e8c4a0" opacity="0.28"/>
+
+    <!-- Palm creases -->
+    <path d="M58 145 C72 138 95 136 118 142" fill="none" stroke="#8a6040" stroke-width="1.3" opacity="0.28"/>
+    <path d="M62 158 C80 150 100 148 122 154" fill="none" stroke="#8a6040" stroke-width="1.1" opacity="0.22"/>
+    <path d="M70 130 C85 125 100 128 112 136" fill="none" stroke="#8a6040" stroke-width="1" opacity="0.2"/>
+
+    <!-- Outer rim shade for depth -->
+    <path d="M42 172 C36 150 38 128 48 112 L52 115 C44 130 44 150 50 168Z" fill="#8a5a38" opacity="0.15"/>
+  </g>
+</svg>
     </div>
     <div class="doc-inspector">
       <div class="doc-inspector-header">
@@ -262,9 +605,124 @@
       <p class="doc-hold-hint">Your hands. Their papers. Look carefully.</p>
     </div>
     <div class="pov-hand pov-hand-modal-right" aria-hidden="true">
-      <svg viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg" class="pov-hand-svg">
-        <path class="hand-skin" d="M92 158 C102 120 98 88 82 72 C78 50 68 38 58 42 C62 28 52 18 42 28 C38 14 24 16 22 32 C12 30 4 42 8 56 C2 62 2 78 12 88 L16 150 C50 162 80 160 92 158Z"/>
-      </svg>
+      <svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg" class="pov-hand-svg" aria-hidden="true">
+  <defs>
+    <linearGradient id="skinGradLMR" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e8c4a0"/>
+      <stop offset="35%" stop-color="#d4a574"/>
+      <stop offset="70%" stop-color="#c4925e"/>
+      <stop offset="100%" stop-color="#a87848"/>
+    </linearGradient>
+    <linearGradient id="skinShadowLMR" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#5c3a1e" stop-opacity="0.35"/>
+    </linearGradient>
+    <linearGradient id="nailGradMR" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f5e6d8"/>
+      <stop offset="100%" stop-color="#e0c8b0"/>
+    </linearGradient>
+    <linearGradient id="cuffGradMR" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3d5429"/>
+      <stop offset="50%" stop-color="#2c3e1f"/>
+      <stop offset="100%" stop-color="#1a2610"/>
+    </linearGradient>
+    <linearGradient id="cuffEdgeMR" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e8dfc4"/>
+      <stop offset="100%" stop-color="#c4b896"/>
+    </linearGradient>
+    <filter id="handSoftLMR" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="2.5" result="b"/>
+      <feOffset dy="3" result="o"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.35"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#handSoftLMR)">
+    <!-- Sleeve / cuff -->
+    <path d="M22 248 L22 210 Q30 198 55 196 L95 196 Q118 198 125 212 L128 248 Q75 258 22 248Z" fill="url(#cuffGradMR)"/>
+    <path d="M24 212 L124 212 L123 222 L25 222Z" fill="url(#cuffEdgeMR)" opacity="0.9"/>
+    <path d="M28 218 L120 218" stroke="#d4a017" stroke-width="1.2" opacity="0.55"/>
+    <!-- Shirt button -->
+    <circle cx="74" cy="230" r="4.5" fill="#c9b896" stroke="#8a7a55" stroke-width="0.8"/>
+    <circle cx="74" cy="230" r="1.5" fill="#5a4a30"/>
+
+    <!-- Wrist -->
+    <path d="M40 210 Q38 185 48 168 L100 168 Q112 185 110 210Z" fill="url(#skinGradLMR)"/>
+    <path d="M48 190 Q74 186 100 192" fill="none" stroke="#8a6040" stroke-width="1" opacity="0.25"/>
+
+    <!-- Palm (holding upward toward papers) -->
+    <path d="M42 172
+      C36 150 38 128 48 112
+      C52 98 58 90 70 88
+      C78 70 95 68 108 78
+      C118 72 132 78 134 94
+      C148 92 158 104 154 118
+      C162 128 160 145 148 154
+      C150 170 140 178 122 176
+      C110 188 88 190 70 182
+      C55 188 45 184 42 172Z" fill="url(#skinGradLMR)"/>
+    <!-- Palm shade -->
+    <path d="M55 160 C60 140 75 130 95 128 C105 145 100 165 85 172 C70 175 58 168 55 160Z" fill="url(#skinShadowLMR)" opacity="0.5"/>
+
+    <!-- Thumb (left side, gripping) -->
+    <path d="M48 130
+      C40 118 32 108 30 96
+      C28 84 36 76 46 80
+      C54 84 58 96 58 108
+      C56 118 52 126 48 130Z" fill="url(#skinGradLMR)"/>
+    <ellipse cx="38" cy="86" rx="6" ry="7.5" fill="url(#nailGradMR)" transform="rotate(-25 38 86)"/>
+    <path d="M42 100 C46 94 50 98 48 106" fill="none" stroke="#8a6040" stroke-width="1.1" opacity="0.3"/>
+
+    <!-- Index finger -->
+    <path d="M72 95
+      C70 78 72 58 76 42
+      C78 32 88 30 92 40
+      C94 52 92 72 90 90
+      C86 98 78 100 72 95Z" fill="url(#skinGradLMR)"/>
+    <ellipse cx="84" cy="38" rx="5.5" ry="6.5" fill="url(#nailGradMR)"/>
+    <path d="M78 70 C82 68 86 72 84 78" fill="none" stroke="#8a6040" stroke-width="1" opacity="0.28"/>
+
+    <!-- Middle finger (longest) -->
+    <path d="M92 92
+      C92 72 94 48 98 30
+      C100 20 112 20 114 32
+      C116 48 112 72 108 92
+      C104 100 96 100 92 92Z" fill="url(#skinGradLMR)"/>
+    <ellipse cx="106" cy="28" rx="5.5" ry="7" fill="url(#nailGradMR)"/>
+    <path d="M98 62 C102 60 106 64 104 72" fill="none" stroke="#8a6040" stroke-width="1" opacity="0.28"/>
+
+    <!-- Ring finger -->
+    <path d="M110 98
+      C112 80 116 58 120 44
+      C122 34 134 34 136 46
+      C136 60 132 82 128 100
+      C124 108 112 106 110 98Z" fill="url(#skinGradLMR)"/>
+    <ellipse cx="128" cy="42" rx="5" ry="6.5" fill="url(#nailGradMR)"/>
+    <path d="M118 72 C122 70 126 74 124 80" fill="none" stroke="#8a6040" stroke-width="1" opacity="0.28"/>
+
+    <!-- Pinky -->
+    <path d="M128 110
+      C132 96 138 80 142 68
+      C144 60 154 60 156 70
+      C156 82 150 98 146 114
+      C140 120 128 118 128 110Z" fill="url(#skinGradLMR)"/>
+    <ellipse cx="149" cy="68" rx="4.5" ry="5.5" fill="url(#nailGradMR)"/>
+
+    <!-- Knuckle highlights -->
+    <ellipse cx="78" cy="100" rx="7" ry="4" fill="#e8c4a0" opacity="0.35"/>
+    <ellipse cx="98" cy="98" rx="7" ry="4" fill="#e8c4a0" opacity="0.35"/>
+    <ellipse cx="116" cy="102" rx="6" ry="3.5" fill="#e8c4a0" opacity="0.3"/>
+    <ellipse cx="134" cy="112" rx="5" ry="3" fill="#e8c4a0" opacity="0.28"/>
+
+    <!-- Palm creases -->
+    <path d="M58 145 C72 138 95 136 118 142" fill="none" stroke="#8a6040" stroke-width="1.3" opacity="0.28"/>
+    <path d="M62 158 C80 150 100 148 122 154" fill="none" stroke="#8a6040" stroke-width="1.1" opacity="0.22"/>
+    <path d="M70 130 C85 125 100 128 112 136" fill="none" stroke="#8a6040" stroke-width="1" opacity="0.2"/>
+
+    <!-- Outer rim shade for depth -->
+    <path d="M42 172 C36 150 38 128 48 112 L52 115 C44 130 44 150 50 168Z" fill="#8a5a38" opacity="0.15"/>
+  </g>
+</svg>
     </div>
   </div>
 </div>
@@ -274,7 +732,7 @@
   <div class="stamp-mark" id="stamp-mark"></div>
 </div>
 
-<script src="engine.js?v=1.13" defer></script>
+<script src="engine.js?v=1.14" defer></script>
 <div id="install-caveat" role="dialog" aria-modal="true">
   <div class="caveat-box">
     <h1>ADD TO HOME SCREEN</h1>
@@ -825,6 +1283,6 @@ tryHookDecide();
   if(document.body) mo.observe(document.body,{childList:true,subtree:false});
 })();</script>
 
-<script src="patch.js?v=1.13" defer></script>
+<script src="patch.js?v=1.14" defer></script>
 </body>
 </html>
