@@ -1,8 +1,9 @@
-// CHECKPOINT BIAFRA — Service Worker v1.17
+// CHECKPOINT BIAFRA — Service Worker v1.18
 // Network-first for app shell so ships/fixes actually reach players.
 // Cache fallback keeps offline play after first successful load.
+// /api/* is never cached (auth session cookies).
 
-const CACHE_NAME = 'checkpoint-biafra-v1.17';
+const CACHE_NAME = 'checkpoint-biafra-v1.18';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',
@@ -41,6 +42,13 @@ self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
   const isSameOrigin = url.origin === self.location.origin;
   const isFont = url.hostname.includes('fonts.google') || url.hostname.includes('fonts.gstatic');
+  const isApi = isSameOrigin && url.pathname.startsWith('/api/');
+
+  // Auth and other API routes: network only, never cache
+  if (isApi) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
 
   if (isSameOrigin) {
     // Network-first: prefer live files (deploy updates), fall back to cache offline

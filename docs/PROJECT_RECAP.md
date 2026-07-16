@@ -1,5 +1,28 @@
 # Checkpoint Biafra — Project Recap
 
+## Latest session (2026-07-16) — GitHub OAuth admin (v1.18)
+
+### Goals
+- Real backend login for NW admin (GitHub OAuth + allowlist)
+
+### Changes
+- `api/auth/*`: login, callback, session, logout + HMAC session cookies
+- `supervisor.js`: production admin only via `/api/auth/session`; localhost still open
+- Hidden entry: 5× click splash version or Alt+Shift+N → GitHub sign-in modal
+- SW never caches `/api/*`
+- vercel.json no-store on API
+
+### Setup still required (human)
+- Create GitHub OAuth App + set Vercel env vars (see README)
+
+### Verification
+- node --check on api + supervisor
+- session sign/verify + allowlist unit smoke
+
+---
+
+# Checkpoint Biafra — Project Recap
+
 ## Latest session (2026-07-16) — admin-only NW UI (v1.17)
 
 ### Goals

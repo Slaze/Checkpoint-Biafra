@@ -2424,6 +2424,54 @@ body.doc-inspecting .action-bar {
 
 /* ═══ v1.15 Inspector Nwosu Supervisor ═══ */
 /* ═══ v1.16 multi-LLM fallback panel extras ═══ */
+/* ═══ v1.18 GitHub OAuth admin login modal ═══ */
+.nwosu-login-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(4px);
+}
+.nwosu-login-card {
+  position: relative;
+  width: min(360px, 100%);
+  padding: 20px 18px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(212, 160, 23, 0.45);
+  background: rgba(14, 18, 12, 0.98);
+  color: #e8dfc4;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55);
+  font-family: "Crimson Text", serif;
+}
+.nwosu-login-title {
+  display: block;
+  font-family: "Bebas Neue", sans-serif;
+  letter-spacing: 0.1em;
+  font-size: 22px;
+  color: #d4a017;
+  margin-bottom: 8px;
+}
+.nwosu-login-body {
+  font-size: 14px;
+  line-height: 1.45;
+  margin: 0 0 14px;
+  opacity: 0.9;
+}
+.nwosu-login-btn {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  margin-bottom: 8px;
+}
+.nwosu-login-x {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
 .nwosu-hint {
   font-family: "Courier Prime", monospace;
   font-size: 10px;

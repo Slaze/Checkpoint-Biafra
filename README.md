@@ -11,3 +11,41 @@ Runtime supervisor that **observes gameplay**, **learns locally** (preferences, 
 - Nwosu will **not** rewrite `engine.js` on disk; code changes stay human-gated. Narrative and soft difficulty adapt in-session.
 
 Doctrine: teach the human cost of 1967–70 through a checkpoint desk — household, conscience, memory.
+
+
+## Admin (Inspector Nwosu)
+
+The **NW** admin console is **not shown to public players**.
+
+| Where | Access |
+|--------|--------|
+| Localhost / `127.0.0.1` | NW always available (dev) |
+| Production | **GitHub OAuth** — only allowlisted logins |
+
+### Production setup (one-time)
+
+1. Create a GitHub **OAuth App** (Settings → Developer settings → OAuth Apps):
+   - Homepage: `https://checkpoint-biafra.vercel.app`
+   - Callback: `https://checkpoint-biafra.vercel.app/api/auth/callback`
+2. In **Vercel → Project → Settings → Environment Variables** set:
+   - `GITHUB_CLIENT_ID`
+   - `GITHUB_CLIENT_SECRET`
+   - `SESSION_SECRET` (long random string, 32+ chars)
+   - `ADMIN_GITHUB_LOGINS=Slaze` (comma-separated for more admins)
+   - Optional: `APP_BASE_URL=https://checkpoint-biafra.vercel.app`
+3. Redeploy.
+
+### Sign in on live site
+
+- Click the splash **version line** 5 times within 3 seconds, **or** press `Alt+Shift+N`
+- Choose **Sign in with GitHub**
+- After allowlisted login, the **NW** button appears
+- **Sign out** from the panel clears the session cookie
+
+### API routes
+
+- `GET /api/auth/login` — start OAuth
+- `GET /api/auth/callback` — OAuth return
+- `GET /api/auth/session` — `{ authenticated, login? }`
+- `POST /api/auth/logout` — clear session
+
