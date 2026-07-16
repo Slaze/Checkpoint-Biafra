@@ -36,6 +36,7 @@ function freshState() {
     suspicion: 0,
     familyPressure: 0,
     lastBillReport: null,
+    totalErrors: 0,
   };
 }
 
@@ -781,7 +782,7 @@ function proceedFromCC() {
   var bg = BACKGROUNDS.find(function(b){ return b.id === ccSel.background; });
   if (bg && bg.bias) {
     Object.keys(bg.bias).forEach(function(k) {
-      state.axes[k] = (state.axes[k] || 0) + bg.bias[k];
+      addAxis(k, bg.bias[k]);
     });
   }
 
@@ -869,7 +870,7 @@ function startDay() {
   state.dayApproved = 0;
   state.dayDenied = 0;
   state.dayDetained = 0;
-  state.totalTravellers = (function(){ var base = 18 + Math.floor(state.day / 3); var jitter = Math.floor(Math.random() * 8); return Math.max(20, Math.min(30, base + jitter)); })();
+  state.totalTravellers = (function(){ var base = 14 + Math.floor(state.day / 4); var jitter = Math.floor(Math.random() * 5); return Math.max(14, Math.min(22, base + jitter)); })();
   state.traveller = 0;
   state.exchangeRate = getExchangeRate(state.day);
   state.dayResults = [];
@@ -1153,6 +1154,24 @@ function closeModal() {
   document.getElementById('doc-modal').classList.remove('open');
 }
 
+
+// ── AXIS / PAY BALANCE (v1.11) ──
+// Soft-cap axes so 25 days of correct stamps do not produce loyalty 300+.
+// Endings still use thresholds ~7–15; cap 20 keeps them meaningful.
+var AXIS_SOFT = 12;
+var AXIS_HARD = 20;
+function addAxis(key, delta) {
+  if (!delta || !state.axes) return;
+  var cur = state.axes[key] || 0;
+  var d = delta;
+  if (d > 0) {
+    if (cur >= AXIS_HARD) return;
+    if (cur >= AXIS_SOFT) d = Math.max(1, Math.ceil(d / 2));
+    if (cur + d > AXIS_HARD) d = AXIS_HARD - cur;
+  }
+  state.axes[key] = Math.max(0, cur + d);
+}
+
 // ── DECISIONS ──
 function travellerLooksForged(t) {
   if (!t) return false;
@@ -1189,12 +1208,14 @@ function decide(action) {
   else if (action === 'deny') state.dayDenied++;
   else if (action === 'detain') state.dayDetained++;
 
-  // Wartime pay: correct detention is noticed; errors are expensive (family eats the difference)
-  if (correct && action === 'detain') payChange = 800;
-  else if (correct && action === 'deny') payChange = 100;
-  else if (!correct) payChange = -1800;
+  // Pay: modest rewards, painful errors (loners no longer mint a fortune)
+  if (correct && action === 'detain') payChange = 320;
+  else if (correct && action === 'deny') payChange = 40;
+  else if (correct && action === 'approve') payChange = 15;
+  else if (!correct) payChange = -1400;
 
   state.totalPay += payChange;
+  if (!correct) state.totalErrors = (state.totalErrors || 0) + 1;
 
   // Espionage / infiltration: wave through someone who should not pass
   if (!correct && action === 'approve' && travellerLooksForged(t)) {
@@ -1204,24 +1225,24 @@ function decide(action) {
     if (state.infiltrationCount >= 3) state.flags.pattern_of_breaches = true;
     if (state.infiltrationCount >= 5) state.flags.suspected_collaborator = true;
   }
-  // Over-detention of clean civilians breeds fear and quiet hatred
+  // Over-detention of clean civilians breeds fear — not loyalty points
   if (!correct && action === 'detain') {
     state.suspicion = (state.suspicion || 0) + 1;
-    state.axes.loyalty = (state.axes.loyalty || 0) + 0; // no free loyalty for cruelty
     state.flags.harsh_booth = true;
+    addAxis('loyalty', -1);
   }
 
-  // Axis changes
+  // Axis changes (capped) — stamp work is thin signal; morals carry the story
   if (t.axisHint === 'compassion') {
-    if (action === 'approve') state.axes.compassion++;
-    else state.axes.loyalty++;
+    if (action === 'approve') addAxis('compassion', 1);
+    else addAxis('loyalty', 1);
   } else if (t.axisHint === 'loyalty') {
-    if (action === 'detain') state.axes.loyalty += 2;
-    else if (action === 'approve') state.axes.loyalty--;
+    if (action === 'detain') addAxis('loyalty', 1);
+    else if (action === 'approve') addAxis('loyalty', -1);
   } else if (t.axisHint === 'witness') {
-    if (action === 'detain') state.axes.witness++;
+    if (action === 'detain') addAxis('witness', 1);
   } else if (t.axisHint === 'rebellion') {
-    if (action === 'approve') state.axes.rebellion++;
+    if (action === 'approve') addAxis('rebellion', 1);
   }
 
   state.dayResults.push({ name: t.name, action: action, correct: correct, payChange: payChange });
@@ -1293,7 +1314,7 @@ function fireMoralEvent(event) {
 function chooseMoral(choice) {
   if (choice.axes) {
     Object.keys(choice.axes).forEach(function(k) {
-      state.axes[k] = (state.axes[k] || 0) + choice.axes[k];
+      addAxis(k, choice.axes[k]);
     });
   }
   if (choice.flag) state.flags[choice.flag] = true;
@@ -1387,7 +1408,7 @@ function endOfDay(opts) {
   if (state.flags.evicted || state.flags.family_collapsed) rentCost = 0;
 
   var totalExpenses = foodCost + rentCost;
-  var baseDaily = 6800;
+  var baseDaily = 6000;
   // Errors already cut totalPay during the day; grade pay still arrives
   var wagePenalty = state.wagePenaltyNextDay || 0;
   state.wagePenaltyNextDay = 0;
@@ -1502,6 +1523,10 @@ function endOfDay(opts) {
     }
   }
 
+
+    // Keep patch reintegration fields in sync with engine household ledger
+    state.rentMissedTotal = state.billsMissedTotal || 0;
+    state.rentMissedStreak = state.missedBillsStreak || 0;
   // Persist report for safe CONTINUE from end-of-day screen
   state.lastBillReport = {
     canAfford: canAfford,
@@ -2014,6 +2039,7 @@ try {
   if (typeof nextDay === "function") window.nextDay = nextDay;
   if (typeof saveState === "function") window.saveState = saveState;
   if (typeof showBulletin === "function") window.showBulletin = showBulletin;
+  if (typeof addAxis === "function") window.addAxis = addAxis;
   try { delete window.state; } catch (_) {}
   Object.defineProperty(window, 'state', {
     configurable: true,
