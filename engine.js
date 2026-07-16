@@ -37,6 +37,10 @@ function freshState() {
     familyPressure: 0,
     lastBillReport: null,
     totalErrors: 0,
+    careerApproved: 0,
+    careerDenied: 0,
+    careerDetained: 0,
+    memoryBeats: [],
   };
 }
 
@@ -1155,7 +1159,52 @@ function closeModal() {
 }
 
 
-// ── AXIS / PAY BALANCE (v1.11) ──
+
+function pushMemory(line) {
+  if (!line) return;
+  if (!state.memoryBeats) state.memoryBeats = [];
+  if (state.memoryBeats.indexOf(line) === -1) state.memoryBeats.push(line);
+  if (state.memoryBeats.length > 24) state.memoryBeats = state.memoryBeats.slice(-24);
+}
+
+function rememberFlag(flag) {
+  if (!flag) return;
+  var map = {
+    took_bribe: 'An envelope stayed on the desk. Money changed the air.',
+    reported_bribe: 'You sent a man to Internal Affairs for an envelope.',
+    mama_chioma_detained: 'Mama Chioma was taken. The market women still ask where she went.',
+    mama_chioma_asset: 'You made a courier of a woman who only wanted to survive.',
+    mama_chioma_turned: 'You became the contact. Two masters. One stamp.',
+    mama_chioma_warned: 'You warned her and looked away. Warning is not protection.',
+    enforced_021: 'You redirected your own people under Bulletin 021 without explanation.',
+    defied_021: 'You refused Bulletin 021 once. The log remembers either way.',
+    objected_021: 'You objected in writing. Paper outlived the war.',
+    signed_final_log: 'On the last day you signed your full name. No initials to hide behind.',
+    unsigned_final_log: 'On the last day the signature line stayed blank.',
+    family_collapsed: 'The household collapsed before the front did.',
+    family_death: 'There was a death that food would have prevented.',
+    child_or_dependant_sent_away: 'Someone was sent inland with a bundle and no ceremony.',
+    evicted: 'The landlord came with men. A door stopped belonging to you.',
+    suspected_collaborator: 'Someone wrote collaborator in a margin that was not yours.',
+    pattern_of_breaches: 'The breaches at your window formed a pattern Headquarters could read.',
+    harsh_booth: 'You detained the clean as if fear were a kind of correctness.',
+    generator_approved: 'In the dark of the generator failure, you chose heat over certainty.',
+    generator_denied: 'In the dark, you chose the bulletin over the child.',
+    kept_private_list: 'You memorised a list that was never supposed to be written.',
+    reported_rumour_list: 'You reported the whisper about Eastern names.',
+    bent_fuel_rule: 'A fuel receipt was illegible. You let the lorry go anyway.',
+    read_the_flight_doc: 'You read what HQ said not to read.',
+    bg_soldier_spared_boy: 'A boy with army boots under civilian polish walked free.',
+    bg_teacher_bent_rule: 'A school register became a kind of passport at your window.',
+    bg_clergy_absolved: 'A man asked for absolution. You gave him the road.',
+    bg_press_let_camera: 'A camera left your booth undeclared. The world might see what you saw.',
+    bg_home_strict: 'A face from home got the same bulletin as a stranger.',
+    bg_home_bent: 'A face from home found a lawful crack in the rules.',
+  };
+  if (map[flag]) pushMemory(map[flag]);
+}
+
+// ── AXIS / PAY BALANCE (v1.12) ──
 // Soft-cap axes so 25 days of correct stamps do not produce loyalty 300+.
 // Endings still use thresholds ~7–15; cap 20 keeps them meaningful.
 var AXIS_SOFT = 12;
@@ -1204,9 +1253,9 @@ function decide(action) {
 
   var correct = t.correct === action;
   var payChange = 0;
-  if (action === 'approve') state.dayApproved++;
-  else if (action === 'deny') state.dayDenied++;
-  else if (action === 'detain') state.dayDetained++;
+  if (action === 'approve') { state.dayApproved++; state.careerApproved = (state.careerApproved || 0) + 1; }
+  else if (action === 'deny') { state.dayDenied++; state.careerDenied = (state.careerDenied || 0) + 1; }
+  else if (action === 'detain') { state.dayDetained++; state.careerDetained = (state.careerDetained || 0) + 1; }
 
   // Pay: modest rewards, painful errors (loners no longer mint a fortune)
   if (correct && action === 'detain') payChange = 320;
@@ -1222,13 +1271,14 @@ function decide(action) {
     state.infiltrationCount = (state.infiltrationCount || 0) + 1;
     state.suspicion = (state.suspicion || 0) + 2;
     state.flags.last_infiltration_name = t.name || 'Unknown';
-    if (state.infiltrationCount >= 3) state.flags.pattern_of_breaches = true;
-    if (state.infiltrationCount >= 5) state.flags.suspected_collaborator = true;
+    if (state.infiltrationCount >= 3) { state.flags.pattern_of_breaches = true; rememberFlag('pattern_of_breaches'); }
+    if (state.infiltrationCount >= 5) { state.flags.suspected_collaborator = true; rememberFlag('suspected_collaborator'); }
   }
   // Over-detention of clean civilians breeds fear — not loyalty points
   if (!correct && action === 'detain') {
     state.suspicion = (state.suspicion || 0) + 1;
     state.flags.harsh_booth = true;
+    rememberFlag('harsh_booth');
     addAxis('loyalty', -1);
   }
 
@@ -1317,7 +1367,7 @@ function chooseMoral(choice) {
       addAxis(k, choice.axes[k]);
     });
   }
-  if (choice.flag) state.flags[choice.flag] = true;
+  if (choice.flag) { state.flags[choice.flag] = true; rememberFlag(choice.flag); }
   saveState();
   showScreen('game');
   setTimeout(function() { loadNextTraveller(); }, 300);
@@ -1473,7 +1523,7 @@ function endOfDay(opts) {
       member = pickLivingMember(['child', 'parent', 'partner']);
       if (member && member.role !== 'self') {
         member.status = 'gone';
-        state.flags.child_or_dependant_sent_away = true;
+        state.flags.child_or_dependant_sent_away = true; rememberFlag('child_or_dependant_sent_away');
         familyReport = 'You send ' + (member.role === 'child' ? 'the child' : 'one of your people') + ' to the village before the road is cut. There is no ceremony — only a bundle and a look that will outlive the war. The house is quieter. Quiet is not peace.';
       } else {
         livingFamily().forEach(function (f) { f.status = 'ill'; });
@@ -1486,7 +1536,7 @@ function endOfDay(opts) {
       member = pickLivingMember(['partner', 'parent', 'child', 'self']);
       if (member) {
         member.status = 'dead';
-        state.flags.family_death = true;
+        state.flags.family_death = true; rememberFlag('family_death');
       }
       state.axes.survival = Math.max(0, state.axes.survival - 2);
       state.axes.loyalty = Math.max(0, (state.axes.loyalty || 0) - 1);
@@ -1496,6 +1546,8 @@ function endOfDay(opts) {
     } else {
       state.flags.family_collapsed = true;
       state.flags.evicted = true;
+      rememberFlag('family_collapsed');
+      rememberFlag('evicted');
       livingFamily().forEach(function (f) { if (f.status !== 'dead') f.status = 'gone'; });
       state.axes.survival = Math.max(0, state.axes.survival - 3);
       familyReport = 'The landlord does not knock. He arrives with two men and the kind of patience that has already decided. Your things fit in less than you believed. You are still an officer at dawn. At night you are a person without a door.';
@@ -1650,27 +1702,163 @@ function calculateEnding() {
   else showEndingScreen(ending);
 }
 
-function showEndingScreen(ending) {
-  var enEl=document.getElementById('ending-number');if(enEl){enEl.style.display='none';enEl.textContent='';}
-  document.getElementById('ending-title').textContent  = ending.title;
-  document.getElementById('ending-text').innerHTML     = ending.text;
+function bgLabel(id) {
+  var b = BACKGROUNDS.find(function(x){ return x.id === id; });
+  return b ? b.label : (id || 'UNRECORDED');
+}
 
-  var axesEl = document.getElementById('ending-axes');
-  var axisHtml = ending.axes.map(function(a) {
-    return '<span class="axis-tag ' + a + '">' + a.toUpperCase() + '</span>';
-  }).join('');
+function axisReading(k, v) {
+  v = v || 0;
+  var lines = {
+    loyalty: v >= 14 ? 'You treated the bulletin as scripture.' : v >= 8 ? 'You believed order would keep people alive.' : v >= 4 ? 'Duty and doubt shared the same desk.' : 'The Republic did not own your hand.',
+    compassion: v >= 12 ? 'You saw faces before papers. That is not always mercy.' : v >= 6 ? 'You bent when the queue became human.' : v >= 3 ? 'Pity visited. It did not move in.' : 'You learned not to look too long.',
+    rebellion: v >= 10 ? 'You built a second law under the first.' : v >= 5 ? 'You disobeyed carefully.' : v >= 2 ? 'A few stamps argued with Headquarters.' : 'You rarely crossed the written line.',
+    survival: v >= 10 ? 'You kept a household breathing when the map burned.' : v >= 5 ? 'You counted rice as carefully as stamps.' : v >= 2 ? 'You felt hunger as a kind of clock.' : 'Survival was a theory, not a practice.',
+    witness: v >= 12 ? 'You kept a private archive of what the war did at windows.' : v >= 6 ? 'You noticed. Sometimes you wrote it down.' : v >= 3 ? 'Memory snagged on a few names.' : 'You tried not to become a witness.',
+    corruption: v >= 8 ? 'Money and favours learned your booth number.' : v >= 4 ? 'You took what the war offered, once or twice.' : v >= 1 ? 'A stain is still a stain.' : 'Your hands stayed empty of envelopes.',
+  };
+  return lines[k] || '';
+}
 
-  // Show all non-zero axis scores
-  var scoreHtml = '<br>';
-  Object.keys(state.axes).forEach(function(k) {
-    if (state.axes[k] > 0) {
-      scoreHtml += '<span class="axis-tag ' + k + '">' + k.toUpperCase() + ' ' + state.axes[k] + '</span> ';
-    }
+function buildAssessment(ending) {
+  var p = state.player || {};
+  var name = p.name || 'UNKNOWN OFFICER';
+  var days = state.day || 25;
+  var ap = state.careerApproved || 0;
+  var de = state.careerDenied || 0;
+  var dt = state.careerDetained || 0;
+  var total = ap + de + dt;
+  var err = state.totalErrors || 0;
+  var acc = total ? Math.round(((total - err) / total) * 100) : 0;
+  var fileNo = 'FIBA/OG-E/' + String(1967 + Math.floor(days / 12)) + '/' + String(1000 + (name.length * 37 + days * 13) % 9000);
+
+  var famBits = (state.family || []).map(function(f) {
+    var st = f.status || 'ok';
+    var label = f.role || 'person';
+    if (st === 'ok') return label + ' — present';
+    if (st === 'hungry') return label + ' — hungry';
+    if (st === 'ill') return label + ' — ill';
+    if (st === 'gone') return label + ' — sent away / missing from the house';
+    if (st === 'dead') return label + ' — dead (household ledger)';
+    return label + ' — ' + st;
   });
-  axesEl.innerHTML = axisHtml + scoreHtml;
+  if (!famBits.length) famBits = ['No dependants registered — or none left to name.'];
 
-  document.getElementById('endings-unlocked').textContent = state.endingsUnlocked.length + ' OF ' + ENDINGS.length + ' ENDINGS DISCOVERED';
+  var incidents = (state.memoryBeats || []).slice();
+  // Seed from flags if memory empty (older saves)
+  if (!incidents.length && state.flags) {
+    Object.keys(state.flags).forEach(function(k) {
+      if (state.flags[k]) rememberFlag(k);
+    });
+    incidents = (state.memoryBeats || []).slice();
+  }
+  if ((state.infiltrationCount || 0) > 0) {
+    incidents.push('Breaches logged at the window: ' + state.infiltrationCount + '. Suspicion index: ' + (state.suspicion || 0) + '.');
+  }
+  if ((state.billsMissedTotal || 0) > 0) {
+    incidents.push('Household shortfalls across the posting: ' + state.billsMissedTotal + ' nights the pot or the rent failed.');
+  }
+  if (!incidents.length) {
+    incidents.push('The file is thin on drama. That is also a kind of story — the ordinary violence of correct stamps.');
+  }
+
+  var scarLines = [];
+  Object.keys(state.axes || {}).forEach(function(k) {
+    var v = state.axes[k] || 0;
+    if (v <= 0) return;
+    var read = axisReading(k, v);
+    if (read) scarLines.push('<div class="assess-scar"><span class="assess-scar-k">' + k.toUpperCase() + ' · ' + v + '</span><span class="assess-scar-v">' + read + '</span></div>');
+  });
+
+  var history = 'Between 1967 and 1970 the Nigerian Civil War turned bridges, markets, and border posts into places where a signature could feed a family or end one. Checkpoint officers were not generals. They were clerks with power over movement — and movement was life. What you did at Ogoja-East is a small window on a large grief: papers against hunger, loyalty against kinship, the Federal bulletin against the face in front of you. Those who were not yet born may still inherit the silence around these desks. This assessment is one way of refusing that silence.';
+
+  var html = '';
+  html += '<div class="assess-dossier">';
+  html += '<div class="assess-mast">FEDERAL MINISTRY OF IDENTITY &amp; BORDER AUTHORITY</div>';
+  html += '<div class="assess-sub">FINAL POSTING ASSESSMENT · CHECKPOINT OGOJA-EAST</div>';
+  html += '<div class="assess-file">FILE ' + fileNo + ' · CLASSIFICATION: RESTRICTED · DAYS ON STATION: ' + days + '</div>';
+
+  html += '<div class="assess-verdict-tag">VERDICT CLASSIFICATION</div>';
+  html += '<h1 class="assess-title">' + ending.title + '</h1>';
+  html += '<div class="assess-lede">' + ending.text + '</div>';
+
+  html += '<section class="assess-sec"><h2>I · OFFICER OF RECORD</h2>';
+  html += '<p><strong>' + name + '</strong>, posted from <strong>' + (p.state || '—') + '</strong>.</p>';
+  html += '<p>Prior life: <strong>' + bgLabel(p.background) + '</strong>. Household registration: <strong>' + (p.family || 'unrecorded') + '</strong>.</p>';
+  html += '<p class="assess-quiet">The war does not ask who you were. The queue will still smell of who you became.</p></section>';
+
+  html += '<section class="assess-sec"><h2>II · SERVICE RECORD</h2>';
+  html += '<div class="assess-stats">';
+  html += '<div><b>' + ap + '</b><span>Approved</span></div>';
+  html += '<div><b>' + de + '</b><span>Denied</span></div>';
+  html += '<div><b>' + dt + '</b><span>Detained</span></div>';
+  html += '<div><b>' + err + '</b><span>Errors logged</span></div>';
+  html += '<div><b>' + (total ? acc + '%' : '—') + '</b><span>Rough accuracy</span></div>';
+  html += '<div><b>' + formatNotes(state.totalPay || 0) + '</b><span>Closing balance</span></div>';
+  html += '</div>';
+  html += '<p class="assess-quiet">Numbers are not innocence. They are only what the log could hold.</p></section>';
+
+  html += '<section class="assess-sec"><h2>III · HOUSEHOLD CONSEQUENCES</h2>';
+  html += '<ul class="assess-list">' + famBits.map(function(x){ return '<li>' + x + '</li>'; }).join('') + '</ul>';
+  if ((state.billsMissedTotal || 0) === 0) {
+    html += '<p>The pot did not empty on your watch. That is a quieter victory than any commendation.</p>';
+  } else {
+    html += '<p>The ledger of hunger is not a footnote. It is the part of the war that entered the house without a permit.</p>';
+  }
+  html += '</section>';
+
+  html += '<section class="assess-sec"><h2>IV · INCIDENTS &amp; SCARS</h2>';
+  html += '<ul class="assess-list assess-mem">' + incidents.slice(0, 12).map(function(x){ return '<li>' + x + '</li>'; }).join('') + '</ul>';
+  if (scarLines.length) {
+    html += '<div class="assess-scars">' + scarLines.join('') + '</div>';
+  }
+  html += '</section>';
+
+  html += '<section class="assess-sec assess-history"><h2>V · FOR THOSE WHO WERE NOT THERE</h2>';
+  html += '<p>' + history + '</p>';
+  html += '<p class="assess-close">Remember: the desk is ordinary. The choices were not. If this file troubles you, it has done part of its work.</p></section>';
+
+  html += '<div class="assess-footer">Case files unlocked: ' + (state.endingsUnlocked || []).length + ' of ' + ENDINGS.length + ' · Assessment closed at end of posting</div>';
+  html += '</div>';
+  return html;
+}
+
+function showEndingScreen(ending) {
+  var content = document.querySelector('#ending .ending-content') || document.getElementById('ending');
+  if (!content) return;
+
+  // Hide legacy title stack; dossier replaces the story body
+  var enEl = document.getElementById('ending-number');
+  if (enEl) enEl.style.display = 'none';
+  var titleEl = document.getElementById('ending-title');
+  var textEl = document.getElementById('ending-text');
+  var axesEl = document.getElementById('ending-axes');
+  var unEl = document.getElementById('endings-unlocked');
+  if (titleEl) titleEl.style.display = 'none';
+  if (textEl) textEl.style.display = 'none';
+  if (axesEl) axesEl.style.display = 'none';
+  if (unEl) unEl.style.display = 'none';
+
+  var host = document.getElementById('ending-assessment');
+  if (!host) {
+    host = document.createElement('div');
+    host.id = 'ending-assessment';
+    var btn = document.getElementById('btn-return-splash');
+    if (btn && btn.parentNode) btn.parentNode.insertBefore(host, btn);
+    else content.appendChild(host);
+  }
+  host.innerHTML = buildAssessment(ending);
+  host.style.display = 'block';
+
+  var ret = document.getElementById('btn-return-splash');
+  if (ret) ret.textContent = 'CLOSE THE FILE';
+
   showScreen('ending');
+  try {
+    var endScreen = document.getElementById('ending');
+    if (endScreen) endScreen.scrollTop = 0;
+    if (host) host.scrollTop = 0;
+  } catch (_) {}
 }
 
 // ── HUD ──

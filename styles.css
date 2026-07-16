@@ -1967,3 +1967,206 @@ button:focus-visible,
     transition: none !important;
   }
 }
+
+/* ═══ v1.12 OFFICIAL ASSESSMENT / MEMORY ENDING ═══ */
+#ending {
+  justify-content: flex-start !important;
+  align-items: center !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  padding: max(12px, env(safe-area-inset-top)) 12px max(24px, env(safe-area-inset-bottom)) !important;
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 0%, rgba(44,62,31,0.55) 0%, transparent 55%),
+    #0a0d07 !important;
+}
+
+.ending-content-dossier {
+  width: min(100%, 520px);
+  max-height: none !important;
+  overflow: visible !important;
+  padding: 0 0 8px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ending-assessment-host {
+  width: 100%;
+}
+
+.assess-dossier {
+  background: linear-gradient(180deg, #f4ead2 0%, #ebe0c4 100%);
+  color: #1a1a18;
+  border-radius: 14px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.55);
+  border: 1px solid rgba(26,26,24,0.12);
+  padding: 22px 20px 18px;
+  font-family: "Crimson Text", "Noto Serif", serif;
+  line-height: 1.55;
+  text-align: left;
+}
+
+.assess-mast {
+  font-family: "Courier Prime", monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: #3a3a36;
+  text-align: center;
+}
+
+.assess-sub {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 15px;
+  letter-spacing: 0.14em;
+  text-align: center;
+  color: #1b3a5c;
+  margin-top: 4px;
+}
+
+.assess-file {
+  font-family: "Courier Prime", monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-align: center;
+  color: #5a5a52;
+  margin: 8px 0 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(26,26,24,0.15);
+}
+
+.assess-verdict-tag {
+  font-family: "Courier Prime", monospace;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  color: #8b0000;
+  margin-bottom: 4px;
+}
+
+.assess-title {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: clamp(26px, 7vw, 34px);
+  letter-spacing: 0.08em;
+  color: #1a2610;
+  line-height: 1.05;
+  margin: 0 0 10px;
+}
+
+.assess-lede {
+  font-size: 15.5px;
+  line-height: 1.6;
+  margin-bottom: 18px;
+  color: #1a1a18;
+}
+.assess-lede em {
+  color: #6b4e0a;
+  font-style: italic;
+  font-weight: 600;
+}
+
+.assess-sec {
+  margin: 16px 0;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(26,26,24,0.18);
+}
+.assess-sec h2 {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  color: #1b3a5c;
+  margin: 0 0 8px;
+  font-weight: 400;
+}
+.assess-sec p {
+  margin: 0 0 8px;
+  font-size: 14.5px;
+}
+.assess-quiet {
+  font-size: 13px !important;
+  color: #4a4a44 !important;
+  font-style: italic;
+}
+
+.assess-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 10px 0 12px;
+}
+.assess-stats div {
+  background: rgba(26,38,16,0.06);
+  border-radius: 8px;
+  padding: 10px 6px;
+  text-align: center;
+}
+.assess-stats b {
+  display: block;
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  color: #1a2610;
+}
+.assess-stats span {
+  font-family: "Courier Prime", monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: #5a5a52;
+}
+
+.assess-list {
+  margin: 0 0 10px 1.1em;
+  padding: 0;
+  font-size: 14px;
+}
+.assess-list li { margin-bottom: 6px; }
+.assess-mem li { font-style: italic; color: #2a2a24; }
+
+.assess-scars { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+.assess-scar {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  background: rgba(27,58,92,0.06);
+  border-left: 3px solid #1b3a5c;
+  border-radius: 0 8px 8px 0;
+}
+.assess-scar-k {
+  font-family: "Courier Prime", monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: #1b3a5c;
+}
+.assess-scar-v { font-size: 13.5px; color: #222; }
+
+.assess-history {
+  background: rgba(26,38,16,0.05);
+  margin-left: -8px;
+  margin-right: -8px;
+  padding: 14px 12px !important;
+  border-radius: 10px;
+  border-top: none !important;
+}
+.assess-close {
+  font-weight: 600;
+  color: #1a2610 !important;
+  margin-top: 10px !important;
+}
+
+.assess-footer {
+  font-family: "Courier Prime", monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: #6a6a62;
+  text-align: center;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(26,26,24,0.12);
+}
+
+#ending #btn-return-splash {
+  width: 100%;
+  max-width: 520px;
+  margin: 4px auto 12px;
+  border-radius: 999px;
+  clip-path: none !important;
+}

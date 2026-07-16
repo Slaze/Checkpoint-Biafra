@@ -16,7 +16,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=IM+Fell+English:ital@0;1&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=1.11">
+<link rel="stylesheet" href="styles.css?v=1.12">
 </head>
 <body class="ui-modern">
 
@@ -47,7 +47,7 @@
       <button class="btn-secondary btn-ghost" id="btn-gallery" type="button">CASE FILES</button>
     </div>
   </div>
-  <div class="splash-version">v1.11 · CHECKPOINT BIAFRA</div>
+  <div class="splash-version">v1.12 · CHECKPOINT BIAFRA</div>
 </div>
 
 <!-- CHARACTER CREATION -->
@@ -208,15 +208,16 @@
   </div>
 </div>
 
-<!-- ENDING SCREEN -->
+<!-- ENDING SCREEN — full official assessment / memory file -->
 <div id="ending" class="screen">
-  <div class="ending-content">
+  <div class="ending-content ending-content-dossier">
     <span class="ending-number" id="ending-number" style="display:none"></span>
-    <div class="ending-title" id="ending-title">ENDING TITLE</div>
-    <div class="ending-text" id="ending-text"></div>
-    <div class="ending-axes" id="ending-axes"></div>
+    <div class="ending-title" id="ending-title" style="display:none">ENDING TITLE</div>
+    <div class="ending-text" id="ending-text" style="display:none"></div>
+    <div class="ending-axes" id="ending-axes" style="display:none"></div>
     <div class="endings-unlocked" id="endings-unlocked" style="display:none"></div>
-    <button class="btn-primary" id="btn-return-splash" style="margin-top:8px">RETURN TO CHECKPOINT BIAFRA</button>
+    <div id="ending-assessment" class="ending-assessment-host"></div>
+    <button class="btn-primary" id="btn-return-splash" type="button">CLOSE THE FILE</button>
   </div>
 </div>
 
@@ -240,7 +241,7 @@
   <div class="stamp-mark" id="stamp-mark"></div>
 </div>
 
-<script src="engine.js?v=1.11" defer></script>
+<script src="engine.js?v=1.12" defer></script>
 <div id="install-caveat" role="dialog" aria-modal="true">
   <div class="caveat-box">
     <h1>ADD TO HOME SCREEN</h1>
@@ -563,7 +564,7 @@ setInterval(deficitWatch,1500);
 function fullNameUp(){var els=document.querySelectorAll(".eod-error-name, .processing-error-name, [data-error-name]");els.forEach(function(e){var n=e.textContent;if(n&&!e.dataset.expanded){e.dataset.expanded="1";if(n.split(" ").length<2){e.textContent=n+" "+(window.__pickFreshName?window.__pickFreshName().split(" ")[1]:"Onuoha");}}});}
 setInterval(fullNameUp,1000);
 window.__officerRating=function(){var s=window.state;if(!s)return null;var corr=(s.totalApproved||0)-(s.totalErrors||0);var pct=(s.totalProcessed?Math.round(((corr)/s.totalProcessed)*100):0);var grade="C";if(pct>=90)grade="A+";else if(pct>=80)grade="A";else if(pct>=70)grade="B";else if(pct>=55)grade="C";else if(pct>=40)grade="D";else grade="F";return{grade:grade,pct:pct,corr:corr,total:s.totalProcessed||0};};
-function injectEndingSummary(){var endScreen=document.getElementById("ending");if(!endScreen||!endScreen.classList.contains("active"))return;if(endScreen.querySelector(".officer-rating-block"))return;var r=window.__officerRating();if(!r)return;var s=window.state||{};var content=endScreen.querySelector(".ending-content");if(!content)return;var block=document.createElement("div");block.className="officer-rating-block";var famLine=s.familyStatus?("<b>Family:</b> "+s.familyStatus):"<b>Family:</b> survived the war on what your stamps could buy.";var warLine="<b>The war:</b> ended on Day "+(s.day||25)+". Cross River fell silent.";var studyLine=(s.player&&s.player.background==="other")?"<b>Your studies:</b> went unrecorded — a quiet life.":"<b>Your studies:</b> the war suspended every classroom. Whether you returned to them depended on what your conscience permitted.";block.innerHTML="<div class=\"or-grade\">OFFICER RATING: <b>"+r.grade+"</b></div><div class=\"or-pct\">"+r.pct+"% accuracy across "+r.total+" travellers</div><div class=\"or-summary\">"+warLine+"<br>"+famLine+"<br>"+studyLine+"</div>";content.appendChild(block);}
+function injectEndingSummary(){var endScreen=document.getElementById("ending");if(!endScreen||!endScreen.classList.contains("active"))return;if(endScreen.querySelector("#ending-assessment .assess-dossier")||endScreen.querySelector(".officer-rating-block"))return;var r=window.__officerRating();if(!r)return;var s=window.state||{};var content=endScreen.querySelector(".ending-content");if(!content)return;var block=document.createElement("div");block.className="officer-rating-block";var famLine=s.familyStatus?("<b>Family:</b> "+s.familyStatus):"<b>Family:</b> survived the war on what your stamps could buy.";var warLine="<b>The war:</b> ended on Day "+(s.day||25)+". Cross River fell silent.";var studyLine=(s.player&&s.player.background==="other")?"<b>Your studies:</b> went unrecorded — a quiet life.":"<b>Your studies:</b> the war suspended every classroom. Whether you returned to them depended on what your conscience permitted.";block.innerHTML="<div class=\"or-grade\">OFFICER RATING: <b>"+r.grade+"</b></div><div class=\"or-pct\">"+r.pct+"% accuracy across "+r.total+" travellers</div><div class=\"or-summary\">"+warLine+"<br>"+famLine+"<br>"+studyLine+"</div>";content.appendChild(block);}
 setInterval(injectEndingSummary,400);
 function gateCrossRiver(){if(!window.state||!window.state.player)return;var st=window.state.player.state;document.querySelectorAll("[data-gate=\"cross-river\"]").forEach(function(el){el.style.display=(st==="Cross River")?"block":"none";});}
 setInterval(gateCrossRiver,500);
@@ -791,6 +792,6 @@ tryHookDecide();
   if(document.body) mo.observe(document.body,{childList:true,subtree:false});
 })();</script>
 
-<script src="patch.js?v=1.11" defer></script>
+<script src="patch.js?v=1.12" defer></script>
 </body>
 </html>
