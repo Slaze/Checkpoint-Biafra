@@ -1219,7 +1219,7 @@ function rememberFlag(flag) {
   if (map[flag]) pushMemory(map[flag]);
 }
 
-// ── AXIS / PAY BALANCE (v1.14) ──
+// ── AXIS / PAY BALANCE (v1.15) ──
 // Soft-cap axes so 25 days of correct stamps do not produce loyalty 300+.
 // Endings still use thresholds ~7–15; cap 20 keeps them meaningful.
 var AXIS_SOFT = 12;
@@ -1367,7 +1367,7 @@ function fireMoralEvent(event) {
 
     // ── FIX: closure captures correct variables ──
     (function(c) {
-      btn.addEventListener('click', function() { chooseMoral(c); });
+      btn.addEventListener('click', function() { if (typeof window.chooseMoral==='function') window.chooseMoral(c); else chooseMoral(c); });
     })(choice);
 
     choicesEl.appendChild(btn);
@@ -2238,7 +2238,7 @@ function init() {
   // Service Worker registration for iOS PWA offline support.
   // Bump CACHE_NAME in sw.js whenever shipping asset changes (network-first + versioned cache).
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=1.14').catch(function(){});
+    navigator.serviceWorker.register('./sw.js?v=1.15').catch(function(){});
   }
 }
 
@@ -2265,6 +2265,9 @@ try {
   if (typeof saveState === "function") window.saveState = saveState;
   if (typeof showBulletin === "function") window.showBulletin = showBulletin;
   if (typeof addAxis === "function") window.addAxis = addAxis;
+  if (typeof chooseMoral === "function") window.chooseMoral = chooseMoral;
+  if (typeof rememberFlag === "function") window.rememberFlag = rememberFlag;
+  if (typeof pushMemory === "function") window.pushMemory = pushMemory;
   try { delete window.state; } catch (_) {}
   Object.defineProperty(window, 'state', {
     configurable: true,

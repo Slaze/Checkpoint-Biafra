@@ -1,8 +1,8 @@
-// CHECKPOINT BIAFRA — Service Worker v1.14
+// CHECKPOINT BIAFRA — Service Worker v1.15
 // Network-first for app shell so ships/fixes actually reach players.
 // Cache fallback keeps offline play after first successful load.
 
-const CACHE_NAME = 'checkpoint-biafra-v1.14';
+const CACHE_NAME = 'checkpoint-biafra-v1.15';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',
@@ -10,6 +10,7 @@ const CORE_ASSETS = [
   './styles.css',
   './engine.js',
   './patch.js',
+  './supervisor.js',
   './icon-192.png',
   './icon-512.png',
 ];
