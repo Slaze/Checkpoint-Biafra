@@ -1621,7 +1621,8 @@ function calculateEnding() {
     state.endingsUnlocked.push(ending.id);
   }
   saveState();
-  showEndingScreen(ending);
+  if (typeof window.showEndingScreen === "function") window.showEndingScreen(ending);
+  else showEndingScreen(ending);
 }
 
 function showEndingScreen(ending) {
