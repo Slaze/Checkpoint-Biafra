@@ -3,3 +3,5 @@
 _local_inject_key.html
 .env
 .env.*
+
+.DS_Store
