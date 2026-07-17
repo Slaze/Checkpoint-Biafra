@@ -5,3 +5,4 @@ _local_inject_key.html
 .env.*
 
 .DS_Store
+.vercel
