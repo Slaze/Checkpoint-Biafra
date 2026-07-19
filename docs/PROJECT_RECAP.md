@@ -1,5 +1,25 @@
 # Checkpoint Biafra — Project Recap
 
+## Latest session (2026-07-19) — audit fix (v1.19)
+
+### Findings fixed
+- **Invent scenario now** could no-op (random + cooldown gates) — added `{ force: true }`
+- Online invent fail → offline still re-rolled random — offline fallback now forced
+- OAuth error pages: XSS escape for `error` and GitHub login
+- Cookie parse: decodeURIComponent try/catch
+- Login: require both CLIENT_ID and CLIENT_SECRET
+- Preview env vars were missing — re-added all five
+- Callback query parsing hardened for Vercel `req.query`
+- Admin gesture also binds splash title
+
+### Verified
+- node --check supervisor + api
+- Live session/login still OK before deploy of this patch
+
+---
+
+# Checkpoint Biafra — Project Recap
+
 ## Latest session (2026-07-16) — GitHub OAuth admin (v1.18)
 
 ### Goals

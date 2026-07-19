@@ -95,9 +95,24 @@ function parseCookies(req) {
     if (idx < 0) return;
     const k = part.slice(0, idx).trim();
     const v = part.slice(idx + 1).trim();
-    if (k) out[k] = decodeURIComponent(v);
+    if (!k) return;
+    try {
+      out[k] = decodeURIComponent(v);
+    } catch (e) {
+      out[k] = v;
+    }
   });
   return out;
+}
+
+/** Escape untrusted strings before embedding in HTML error pages. */
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 function cookieAttrs(req, maxAgeSec) {
@@ -197,5 +212,6 @@ module.exports = {
   json,
   html,
   redirect,
+  escapeHtml,
   getSessionSecret,
 };

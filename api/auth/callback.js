@@ -11,6 +11,7 @@ const {
   SESSION_TTL_SEC,
   html,
   redirect,
+  escapeHtml,
 } = require('./_lib');
 
 async function exchangeCode(code, redirectUri) {
@@ -61,10 +62,18 @@ module.exports = async function handler(req, res) {
   }
 
   const base = getBaseUrl(req);
-  const url = new URL(req.url, base);
-  const code = url.searchParams.get('code');
-  const state = url.searchParams.get('state');
-  const err = url.searchParams.get('error');
+  // Vercel may provide req.query; fall back to parsing req.url
+  let code, state, err;
+  if (req.query && typeof req.query === 'object') {
+    code = req.query.code;
+    state = req.query.state;
+    err = req.query.error;
+  } else {
+    const url = new URL(req.url || '/', base);
+    code = url.searchParams.get('code');
+    state = url.searchParams.get('state');
+    err = url.searchParams.get('error');
+  }
 
   if (err) {
     html(
@@ -72,7 +81,7 @@ module.exports = async function handler(req, res) {
       400,
       '<!doctype html><title>Login cancelled</title><body style="font-family:system-ui;padding:2rem">' +
         '<h1>Login cancelled</h1><p>' +
-        String(err) +
+        escapeHtml(err) +
         '</p><p><a href="/">Back to game</a></p></body>'
     );
     return;
@@ -118,7 +127,7 @@ module.exports = async function handler(req, res) {
         '<!doctype html><title>Access denied</title><body style="font-family:system-ui;padding:2rem;background:#111;color:#e8dfc4">' +
           '<h1>Access denied</h1>' +
           '<p>GitHub user <strong>' +
-          String(login || 'unknown') +
+          escapeHtml(login || 'unknown') +
           '</strong> is not on the admin allowlist.</p>' +
           '<p><a href="/" style="color:#d4a017">Back to game</a></p></body>'
       );

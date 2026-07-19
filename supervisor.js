@@ -1,5 +1,5 @@
 /**
- * Inspector Nwosu — Gameplay Supervisor (v1.18)
+ * Inspector Nwosu — Gameplay Supervisor (v1.19)
  * ─────────────────────────────────────────
  * Observes play, learns locally, invents drama within the game's doctrine,
  * and applies SAFE runtime upgrades (narrative, soft difficulty, scenarios).
@@ -864,15 +864,18 @@
     return { key: key, scenario: sc };
   }
 
-  function inventDayDrama(s) {
+  function inventDayDrama(s, opts) {
+    opts = opts || {};
+    var force = !!opts.force;
     var now = Date.now();
-    if (now - session.lastInvent < 40000) return;
-    if (Math.random() > 0.55 * store.dramaIntensity) return;
+    // Ambient invent is throttled + probabilistic; force skips gates (admin button / online fallback)
+    if (!force && now - session.lastInvent < 40000) return;
+    if (!force && Math.random() > 0.55 * store.dramaIntensity) return;
     session.lastInvent = now;
 
     var inv = inventScenario();
     showInventedScenario(inv.scenario, inv.key);
-    appendLog('invent', inv.key);
+    appendLog('invent', inv.key + (force ? ' (force)' : ''));
   }
 
   function showInventedScenario(sc, key) {
@@ -1023,10 +1026,12 @@
     return tryAt(0);
   }
 
-  function inventDayDramaOnlineAware(s) {
+  function inventDayDramaOnlineAware(s, opts) {
+    opts = opts || {};
+    var force = !!opts.force;
     var now = Date.now();
-    if (now - session.lastInvent < 45000) return;
-    if (Math.random() > 0.5 * store.dramaIntensity) return;
+    if (!force && now - session.lastInvent < 45000) return;
+    if (!force && Math.random() > 0.5 * store.dramaIntensity) return;
     session.lastInvent = now;
 
     var ctx = {
@@ -1045,17 +1050,17 @@
         showInventedScenario(sc, src);
         appendLog('invent_online', src + ': ' + sc.title);
       } else {
-        // Always use offline templates — do not re-enter online path
-        _inventDayDrama(s);
+        // Offline fallback must not re-roll random / re-enter online path
+        _inventDayDrama(s, { force: true });
       }
     });
   }
 
   // Override invent path when any online provider is configured
   var _inventDayDrama = inventDayDrama;
-  inventDayDrama = function (s) {
-    if (configuredProviders().length) inventDayDramaOnlineAware(s);
-    else _inventDayDrama(s);
+  inventDayDrama = function (s, opts) {
+    if (configuredProviders().length) inventDayDramaOnlineAware(s, opts);
+    else _inventDayDrama(s, opts);
   };
 
   // ── Hooks into engine ────────────────────────────────────────
@@ -1370,7 +1375,7 @@
     });
   }
 
-  /** 5 clicks on splash version within 3s → login or open NW */
+  /** 5 clicks on splash version (or title) within 3s → login or open NW */
   function installAdminGesture() {
     if (isLocalDevHost()) return;
     var clicks = [];
@@ -1382,7 +1387,7 @@
       });
       if (clicks.length < 5) return;
       clicks = [];
-      ev.preventDefault();
+      if (ev && ev.preventDefault) ev.preventDefault();
       fetchServerSession().then(function () {
         if (isAdmin()) {
           exposeAdminApi();
@@ -1395,16 +1400,25 @@
         }
       });
     }
-    function bind() {
-      var el =
-        document.querySelector('.splash-version') ||
-        document.querySelector('.splash .version');
-      if (!el) return false;
-      if (el.__nwosuGesture) return true;
+    function bindEl(el) {
+      if (!el || el.__nwosuGesture) return !!el;
       el.__nwosuGesture = true;
       el.style.cursor = 'default';
       el.addEventListener('click', onVersionClick);
       return true;
+    }
+    function bind() {
+      var found = false;
+      [
+        document.querySelector('.splash-version'),
+        document.querySelector('.splash .version'),
+        document.querySelector('.splash-title'),
+        document.querySelector('h1.splash-title'),
+        document.getElementById('splash-title'),
+      ].forEach(function (el) {
+        if (bindEl(el)) found = true;
+      });
+      return found;
     }
     if (!bind()) {
       var tries = 0;
@@ -1519,7 +1533,7 @@
         return;
       }
       session.lastInvent = 0;
-      inventDayDrama(gameState());
+      inventDayDrama(gameState(), { force: true });
     };
     document.getElementById('nwosu-probe').onclick = function () {
       probeProviders();
@@ -1680,8 +1694,8 @@
     window.__NwosuSupervisor.doctrine = DOCTRINE;
     window.__NwosuSupervisor.observe = observe;
     window.__NwosuSupervisor.assess = assessAndGrow;
-    window.__NwosuSupervisor.invent = function () {
-      inventDayDrama(gameState());
+    window.__NwosuSupervisor.invent = function (force) {
+      inventDayDrama(gameState(), { force: force !== false });
     };
     window.__NwosuSupervisor.speak = speak;
     window.__NwosuSupervisor.getStore = function () {

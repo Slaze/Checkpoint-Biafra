@@ -16,7 +16,8 @@ module.exports = function handler(req, res) {
   }
 
   const clientId = process.env.GITHUB_CLIENT_ID;
-  if (!clientId) {
+  const clientSecret = process.env.GITHUB_CLIENT_SECRET;
+  if (!clientId || !clientSecret) {
     html(
       res,
       503,
