@@ -1,107 +1,47 @@
-// CHECKPOINT BIAFRA — Service Worker v1.21
-const CACHE_NAME = 'checkpoint-biafra-v1.21';
-const CORE_ASSETS = [
-  './index.html',
-  './manifest.json',
-  './sw.js',
-  './styles.css',
-  './engine.js',
-  './patch.js',
-  './supervisor.js',
-  './icon-192.png',
-  './icon-512.png',
-  './v20.js',
-  './version.json',
-];
+// CHECKPOINT BIAFRA — Service Worker v1.22
+const CACHE_NAME = 'checkpoint-biafra-v1.22';
+const CORE_ASSETS = ['./index.html','./manifest.json','./sw.js','./styles.css','./engine.js','./patch.js','./supervisor.js','./icon-192.png','./icon-512.png','./v20.js','./desk-v22.js','./version.json'];
 
 function patchHtml(html) {
   if (!html || html.indexOf('<html') === -1) return html;
-  var skin = {
-    '#e8c4a0': '#6b3d28',
-    '#d4a574': '#5a3222',
-    '#c4925e': '#4a281c',
-    '#a87848': '#3a1e16',
-    '#f5e6d8': '#c9a090',
-    '#e0c8b0': '#a87868'
-  };
-  Object.keys(skin).forEach(function (old) {
-    html = html.split(old).join(skin[old]);
-  });
-  html = html.replace(/v1\.19/g, 'v1.21');
-  html = html.replace(/\?v=1\.19/g, '?v=1.21');
-  html = html.replace(/>3,400 notes</g, '>₦3,400<');
-  html = html.replace(/\u20a4B \/ notes/g, '₤B / ₦');
-  html = html.replace(/>\u20a4B \/ NOTES</g, '>₤B / NAIRA<');
-  if (html.indexOf('v20.js?v=1.21') === -1) {
-    html = html.replace('</body>', '<script src="v20.js?v=1.21"></script></body>');
-  }
-  if (html.indexOf('id="v21-skin"') === -1) {
-    html = html.replace('</head>', '<style id="v21-skin">#eod-report{padding-top:max(22px,env(safe-area-inset-top,0px))!important;max-height:100dvh;overflow-y:auto}body.doc-inspecting .pov-hand{opacity:.32}</style></head>');
-  }
+  html = html.replace(/v1\.19/g, 'v1.22').replace(/v1\.21/g, 'v1.22');
+  html = html.replace(/\?v=1\.19/g, '?v=1.22');
+  if (html.indexOf('v20.js') === -1) html = html.replace('</body>', '<script src="v20.js?v=1.22"></script></body>');
+  if (html.indexOf('desk-v22.js') === -1) html = html.replace('</body>', '<script src="desk-v22.js?v=1.22"></script></body>');
   return html;
 }
 
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(CORE_ASSETS)).catch(function () {})
-  );
+  event.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(CORE_ASSETS)).catch(function(){}));
   self.skipWaiting();
 });
-
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))))
-  );
+  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))));
   self.clients.claim();
 });
-
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
-  const isSameOrigin = url.origin === self.location.origin;
-  const isApi = isSameOrigin && url.pathname.startsWith('/api/');
-  const isHtml = isSameOrigin && event.request.mode === 'navigate' ||
-    (isSameOrigin && (url.pathname === '/' || url.pathname.endsWith('/index.html') || url.pathname.endsWith('/')));
-
-  if (isApi) {
-    event.respondWith(fetch(event.request));
+  if (url.origin === self.location.origin && url.pathname.startsWith('/api/')) {
+    event.respondWith(fetch(event.request)); return;
+  }
+  const nav = event.request.mode === 'navigate' || (url.origin === self.location.origin && (url.pathname === '/' || /index\.html$/.test(url.pathname)));
+  if (nav && event.request.method === 'GET') {
+    event.respondWith(fetch(event.request).then(r => r.text().then(html => {
+      var h = new Headers(r.headers); h.set('Content-Type','text/html; charset=utf-8'); h.set('Cache-Control','no-store');
+      return new Response(patchHtml(html), {status:200, headers:h});
+    })).catch(() => caches.match('./index.html')));
     return;
   }
-
-  if (isHtml && event.request.method === 'GET') {
-    event.respondWith(
-      fetch(event.request).then(function (response) {
-        return response.text().then(function (html) {
-          var out = patchHtml(html);
-          var headers = new Headers(response.headers);
-          headers.set('Content-Type', 'text/html; charset=utf-8');
-          headers.set('Cache-Control', 'no-store');
-          return new Response(out, { status: 200, headers: headers });
-        });
-      }).catch(function () {
-        return caches.match('./index.html').then(function (cached) {
-          if (!cached) return caches.match('./index.html');
-          return cached.text().then(function (html) {
-            return new Response(patchHtml(html), { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
-          });
-        });
-      })
-    );
-    return;
-  }
-
-  if (isSameOrigin) {
-    event.respondWith(
-      fetch(event.request).then(response => {
-        if (response && response.status === 200 && response.type === 'basic') {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-        }
-        return response;
-      }).catch(() => caches.match(event.request).then(cached => cached || caches.match('./index.html')))
-    );
+  if (url.origin === self.location.origin) {
+    event.respondWith(fetch(event.request).then(response => {
+      if (response && response.status === 200 && response.type === 'basic') {
+        var clone = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+      }
+      return response;
+    }).catch(() => caches.match(event.request)));
   }
 });
-
-self.addEventListener('message', function (event) {
-  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
+self.addEventListener('message', function (e) {
+  if (e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
