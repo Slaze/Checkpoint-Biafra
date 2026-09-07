@@ -1,14 +1,17 @@
-/* v1.25 live boot */
+/* v1.26 live boot — same-origin overlays only (no raw.githubusercontent) */
 (function () {
   if (window.__cbLiveBoot) return;
   window.__cbLiveBoot = true;
+
+  var VER = '1.26';
 
   function hideOldHands() {
     var s = document.getElementById('cb-hide-old-hands');
     if (!s) {
       s = document.createElement('style');
       s.id = 'cb-hide-old-hands';
-      s.textContent = '.pov-hand,.pov-hand-svg,.pov-hand-left,.pov-hand-right,.pov-hand-modal-left,.pov-hand-modal-right{display:none!important;visibility:hidden!important;opacity:0!important;width:0!important;height:0!important;pointer-events:none!important}';
+      s.textContent =
+        '.pov-hand,.pov-hand-svg,.pov-hand-left,.pov-hand-right,.pov-hand-modal-left,.pov-hand-modal-right{display:none!important;visibility:hidden!important;opacity:0!important;width:0!important;height:0!important;pointer-events:none!important}';
       document.documentElement.appendChild(s);
     }
     var nodes = document.querySelectorAll('.pov-hand, .pov-hand-svg');
@@ -27,7 +30,9 @@
     if (mod) el.type = 'module';
     document.head.appendChild(el);
   }
-  add('https://raw.githubusercontent.com/Slaze/Checkpoint-Biafra/ae33cb5e20a0c0b677f34806ab91dd2192c651f7/patch.js', false);
-  add('features-v23.js?v=1.25', false);
-  add('three-desk.js?v=1.25', true);
+
+  // Gameplay wrappers (was pinned raw GitHub; browsers block that as text/plain+nosniff)
+  add('patch-gameplay.js?v=' + VER, false);
+  add('features-v23.js?v=' + VER, false);
+  add('three-desk.js?v=' + VER, true);
 })();

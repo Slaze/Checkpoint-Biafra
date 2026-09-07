@@ -1,5 +1,45 @@
 # Checkpoint Biafra — Project Recap
 
+## Latest session (2026-09-07) — pull + fix overlay boot (v1.26)
+
+### Goal
+Pull behind local clone; make gameplay overlays actually load on live.
+
+### What changed
+- Fast-forwarded Desktop `main` to `origin/main` (was 17 behind / v1.19).
+- Added same-origin `patch-gameplay.js` (content from `ae33cb5:patch.js`).
+- `patch.js` v1.26: load `patch-gameplay.js` + `features-v23.js` + `three-desk.js` — **removed** `raw.githubusercontent.com` (blocked by `text/plain` + `nosniff`).
+- `sw.js` → CACHE `checkpoint-biafra-v1.26`; caches `patch-gameplay.js`; `patchHtml` only aligns `v1.19–1.25` → `v1.26` (no extra `v20.js` inject).
+- Bumped `index.html` splash/`?v=`, `engine.js` SW register, `manifest.json` `start_url` `?cb=126`, `version.json` → **1.26**.
+
+### Why
+Live boot never ran the big gameplay patch; version strings were inconsistent so ships looked dead.
+
+### How verified
+- `node --check` on patch/sw/patch-gameplay/features.
+- Local serve + browser: `__cbLiveBoot`, `__patchV7`, splash `v1.26`, scripts same-origin.
+- After push: live `version.json` / CDP flags.
+
+### Current state
+- Fix on disk (and pushed if deploy succeeded). Hard-refresh or wait for SW activate on installed PWAs.
+
+### Next steps
+- Optional: fold overlays into fewer files; drop redundant `v20.js`.
+- Confirm NW OAuth still works after SW bump.
+
+### Blockers / risks
+- Old clients on CACHE v1.24 until new SW activates (`skipWaiting` + network-first helps).
+
+---
+
+## Prior session (2026-09-07) — diagnosis (pre-fix)
+
+Local was 17 behind; live overlays + raw GitHub `nosniff` blocked gameplay patch; HTML still tagged v1.19.
+
+---
+
+# Checkpoint Biafra — Project Recap
+
 ## Latest session (2026-07-19) — audit fix (v1.19)
 
 ### Findings fixed

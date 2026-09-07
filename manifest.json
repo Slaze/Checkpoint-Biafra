@@ -2,7 +2,7 @@
   "name": "Checkpoint Biafra",
   "short_name": "Checkpoint Biafra",
   "description": "A border checkpoint game set during the Biafran secession.",
-  "start_url": "./?cb=125",
+  "start_url": "./?cb=126",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#1A2610",

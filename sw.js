@@ -1,29 +1,117 @@
-// SW v1.24
-const CACHE_NAME='checkpoint-biafra-v1.24';
-const CORE_ASSETS=['./index.html','./manifest.json','./sw.js','./styles.css','./engine.js','./patch.js','./supervisor.js','./icon-192.png','./icon-512.png','./v20.js','./three-desk.js','./features-v23.js','./version.json'];
-function patchHtml(html){
-  if(!html||html.indexOf('<html')===-1)return html;
-  html=html.replace(/v1\.1[9]/g,'v1.24').replace(/v1\.2[123]/g,'v1.24');
-  if(html.indexOf('v20.js')===-1) html=html.replace('</body>','<script src="v20.js?v=1.24"></script></body>');
+// CHECKPOINT BIAFRA — Service Worker v1.26
+// Network-first for app shell so ships/fixes actually reach players.
+// Cache fallback keeps offline play after first successful load.
+// /api/* is never cached (auth session cookies).
+
+const CACHE_NAME = 'checkpoint-biafra-v1.26';
+const CORE_ASSETS = [
+  './index.html',
+  './manifest.json',
+  './sw.js',
+  './styles.css',
+  './engine.js',
+  './patch.js',
+  './patch-gameplay.js',
+  './supervisor.js',
+  './icon-192.png',
+  './icon-512.png',
+  './v20.js',
+  './three-desk.js',
+  './features-v23.js',
+  './version.json',
+];
+
+function patchHtml(html) {
+  if (!html || html.indexOf('<html') === -1) return html;
+  // Keep splash / cache-busters aligned with this ship
+  html = html
+    .replace(/v1\.(1[9]|2[0-5])/g, 'v1.26')
+    .replace(/\?v=1\.(1[9]|2[0-5])/g, '?v=1.26');
   return html;
 }
-self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(CORE_ASSETS)).catch(()=>{}));self.skipWaiting();});
-self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE_NAME).map(k=>caches.delete(k)))));self.clients.claim();});
-self.addEventListener('fetch',event=>{
-  const url=new URL(event.request.url);
-  if(url.origin===self.location.origin&&url.pathname.startsWith('/api/')){event.respondWith(fetch(event.request));return;}
-  const nav=event.request.mode==='navigate'||(url.origin===self.location.origin&&(url.pathname==='/'||/index\.html$/.test(url.pathname)));
-  if(nav&&event.request.method==='GET'){
-    event.respondWith(fetch(event.request).then(r=>r.text().then(html=>{
-      const h=new Headers(r.headers);h.set('Content-Type','text/html; charset=utf-8');h.set('Cache-Control','no-store');
-      return new Response(patchHtml(html),{status:200,headers:h});
-    })).catch(()=>caches.match('./index.html'))); return;
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches
+      .open(CACHE_NAME)
+      .then((cache) => cache.addAll(CORE_ASSETS))
+      .catch((err) => {
+        console.warn('SW install cache failed:', err);
+      })
+  );
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
+    )
+  );
+  self.clients.claim();
+});
+
+self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+  const isSameOrigin = url.origin === self.location.origin;
+  const isFont =
+    url.hostname.includes('fonts.google') || url.hostname.includes('fonts.gstatic');
+  const isApi = isSameOrigin && url.pathname.startsWith('/api/');
+
+  if (isApi) {
+    event.respondWith(fetch(event.request));
+    return;
   }
-  if(url.origin===self.location.origin){
-    event.respondWith(fetch(event.request).then(response=>{
-      if(response&&response.status===200&&response.type==='basic'){const c=response.clone();caches.open(CACHE_NAME).then(cache=>cache.put(event.request,c));}
-      return response;
-    }).catch(()=>caches.match(event.request)));
+
+  const nav =
+    event.request.mode === 'navigate' ||
+    (isSameOrigin && (url.pathname === '/' || /index\.html$/.test(url.pathname)));
+
+  if (nav && event.request.method === 'GET') {
+    event.respondWith(
+      fetch(event.request)
+        .then((r) =>
+          r.text().then((html) => {
+            const h = new Headers(r.headers);
+            h.set('Content-Type', 'text/html; charset=utf-8');
+            h.set('Cache-Control', 'no-store');
+            return new Response(patchHtml(html), { status: 200, headers: h });
+          })
+        )
+        .catch(() => caches.match('./index.html'))
+    );
+    return;
+  }
+
+  if (isSameOrigin) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200 && response.type === 'basic') {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(() =>
+          caches.match(event.request).then((cached) => cached || caches.match('./index.html'))
+        )
+    );
+  } else if (isFont) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200 && response.type !== 'opaque') {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
   }
 });
-self.addEventListener('message',e=>{if(e.data&&e.data.type==='SKIP_WAITING')self.skipWaiting();});
+
+self.addEventListener('message', (e) => {
+  if (e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
+});
