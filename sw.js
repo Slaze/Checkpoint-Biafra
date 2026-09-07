@@ -1,9 +1,9 @@
-// CHECKPOINT BIAFRA — Service Worker v1.19
+// CHECKPOINT BIAFRA — Service Worker v1.20
 // Network-first for app shell so ships/fixes actually reach players.
 // Cache fallback keeps offline play after first successful load.
 // /api/* is never cached (auth session cookies).
 
-const CACHE_NAME = 'checkpoint-biafra-v1.19';
+const CACHE_NAME = 'checkpoint-biafra-v1.20';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',
@@ -14,6 +14,8 @@ const CORE_ASSETS = [
   './supervisor.js',
   './icon-192.png',
   './icon-512.png',
+  './v20.js',
+  './version.json',
 ];
 
 self.addEventListener('install', event => {
@@ -44,14 +46,12 @@ self.addEventListener('fetch', event => {
   const isFont = url.hostname.includes('fonts.google') || url.hostname.includes('fonts.gstatic');
   const isApi = isSameOrigin && url.pathname.startsWith('/api/');
 
-  // Auth and other API routes: network only, never cache
   if (isApi) {
     event.respondWith(fetch(event.request));
     return;
   }
 
   if (isSameOrigin) {
-    // Network-first: prefer live files (deploy updates), fall back to cache offline
     event.respondWith(
       fetch(event.request).then(response => {
         if (response && response.status === 200 && response.type === 'basic') {
@@ -76,4 +76,8 @@ self.addEventListener('fetch', event => {
       }).catch(() => caches.match(event.request))
     );
   }
+});
+
+self.addEventListener('message', function (event) {
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
