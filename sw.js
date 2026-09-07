@@ -1,12 +1,10 @@
-// CHECKPOINT BIAFRA SW v1.23
-const CACHE_NAME = 'checkpoint-biafra-v1.23';
-const CORE_ASSETS = ['./index.html','./manifest.json','./sw.js','./styles.css','./engine.js','./patch.js','./supervisor.js','./icon-192.png','./icon-512.png','./v20.js','./three-desk.js','./features-v23.js','./version.json'];
+// SW v1.24
+const CACHE_NAME='checkpoint-biafra-v1.24';
+const CORE_ASSETS=['./index.html','./manifest.json','./sw.js','./styles.css','./engine.js','./patch.js','./supervisor.js','./icon-192.png','./icon-512.png','./v20.js','./three-desk.js','./features-v23.js','./version.json'];
 function patchHtml(html){
   if(!html||html.indexOf('<html')===-1)return html;
-  html=html.replace(/v1\.19/g,'v1.23').replace(/v1\.21/g,'v1.23').replace(/v1\.22/g,'v1.23');
-  if(html.indexOf('v20.js')===-1) html=html.replace('</body>','<script src="v20.js?v=1.23"></script></body>');
-  if(html.indexOf('three-desk.js')===-1) html=html.replace('</body>','<script src="three-desk.js?v=1.23"></script></body>');
-  if(html.indexOf('features-v23.js')===-1) html=html.replace('</body>','<script src="features-v23.js?v=1.23"></script></body>');
+  html=html.replace(/v1\.1[9]/g,'v1.24').replace(/v1\.2[123]/g,'v1.24');
+  if(html.indexOf('v20.js')===-1) html=html.replace('</body>','<script src="v20.js?v=1.24"></script></body>');
   return html;
 }
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(CORE_ASSETS)).catch(()=>{}));self.skipWaiting();});
@@ -19,8 +17,7 @@ self.addEventListener('fetch',event=>{
     event.respondWith(fetch(event.request).then(r=>r.text().then(html=>{
       const h=new Headers(r.headers);h.set('Content-Type','text/html; charset=utf-8');h.set('Cache-Control','no-store');
       return new Response(patchHtml(html),{status:200,headers:h});
-    })).catch(()=>caches.match('./index.html')));
-    return;
+    })).catch(()=>caches.match('./index.html'))); return;
   }
   if(url.origin===self.location.origin){
     event.respondWith(fetch(event.request).then(response=>{
