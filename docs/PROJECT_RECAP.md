@@ -15,19 +15,21 @@ Bare `import … from 'three'` never resolved on live. Hands stayed dead after C
 ### How verified
 - `node --check` on `three-desk.js`, `patch.js`, `sw.js`, `v20.js`, `engine.js`, `desk-v22.js`.
 - Local `http://127.0.0.1:8766/_hand-accept.html`: `accept true`, `threeOk true`, `__cbThreeDeskReady`, 24 meshes, canvas CSS 390×520 (backing 780×1040). SVG visible at boot, hidden after Three paint.
+- GitHub `8cf4159` on `main`. Live `version.json` = `1.27` immediately after push.
+- Live CDP `https://checkpoint-biafra.vercel.app/?cb=127`: splash `v1.27`; new game to `phase-booth`; `__cbThreeDeskReady`; 24 meshes; desk 560×671; SW `sw.js?v=1.27`; console errors 0. Hands visible on desk screenshot.
+- OAuth still wired: `GET /api/auth/session` 200 `{authenticated:false}`; `GET /api/auth/login` 302 GitHub authorize.
 
 ### Current state
-- Disk = v1.27. Live was 1.26 at session start; deploy after this push.
+- Live + GitHub + disk = **v1.27**. Pending ship closed.
 
-### Next steps (not this ship)
-- Hard-refresh live / wait SW `checkpoint-biafra-v1.27`; confirm hands on game desk.
+### Next steps (leftover, not blockers)
 - Optional: fold overlays; drop redundant `v20.js`.
 - Human: LLM keys (xAI team 403 no credits) or OpenRouter/Groq/Gemini/Ollama for online invent.
-- Confirm NW GitHub OAuth after SW bump.
+- Human: 5× splash version or Alt+Shift+N, GitHub sign-in, confirm NW button (API login 302 already OK).
 
 ### Blockers / risks
 - jsDelivr `three.module.js` not in app SW. Procedural hands skip GLB flake.
-- Old SW until v1.27 activates (`skipWaiting` + network-first).
+- Installed PWAs may hold old SW until skipWaiting + hard-refresh.
 
 ---
 
