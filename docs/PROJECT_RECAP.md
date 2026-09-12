@@ -21,7 +21,7 @@ Hands must show on the live booth. User: they do not. Reference: Downloads `IMG_
 - Local booth `?cb=128`: `phase-booth`, `cb-png-hands`, `__cbHandsReady`, splash v1.28. Screenshot: two illustrated hands on wood, papers between them.
 
 ### Current state
-- Disk = v1.28. Push/deploy this session.
+- Live + GitHub `7e4670b` + disk = **v1.28**. Hands visible on live booth.
 
 ### Next steps
 - Hard-refresh live / wait SW `checkpoint-biafra-v1.28`.
