@@ -1,6 +1,36 @@
 # Checkpoint Biafra — Project Recap
 
-## Latest session (2026-09-13) — v1.28 illustrated desk hands
+## Latest session (2026-09-13) — v1.29 overlay / naira / hunger ending
+
+### Goal
+Fix registration overlay; change till copy from "notes" to naira; hunger ends the posting; deploy.
+
+### What changed
+- Registration: killed fullscreen `flash("REGISTRATION")` on START / REPORT FOR DUTY. Flash is a top toast. Hints off on char-create. `REPORT FOR DUTY` bar z-index 40. Native `confirm` replaced with in-game `fibaConfirm`.
+- Naira: engine `formatNotes` now `₦` (the v1.23 window patch never reached the IIFE HUD). Rate `₤B / ₦`. Help / garnishment / query / disciplinary copy aligned.
+- Hunger: 3 consecutive unpaid food nights sets `starved_out` and ends the posting (`THE POT RAN OUT`). Button: `TRY AGAIN — READ THE PAPERS`.
+- Story: duplicate JOURNALIST background → NEWSPAPER SUB-EDITOR; Abia MASSOB anachronism gone; in-game date from 30 May 1967; help DETAIN not REJECT; CC option descriptions actually render.
+
+### Why
+Fullscreen flash covered the form. HUD still said "notes" because `formatNotes` lived inside engine IIFE. Hunger used to continue to Day 25 after the pot was empty.
+
+### How verified
+- `node --check` engine / patch / desk-v22 / v20 / sw.
+- Browser: char-create has no REGISTRATION veil; HUD `₦`; starve flag → ending.
+
+### Current state
+- Ship **v1.29**. Push/deploy this session.
+
+### Next steps
+- Hard-refresh live (`?cb=129`).
+- Human: LLM keys; NW GitHub click-confirm.
+
+### Blockers / risks
+- Old PWA until SW `checkpoint-biafra-v1.29`.
+
+---
+
+## Prior session (2026-09-13) — v1.28 illustrated desk hands
 
 ### Goal
 Hands must show on the live booth. User: they do not. Reference: Downloads `IMG_3716.jpg` / `IMG_3715.jpg` (first-person illustrated palms on desk).

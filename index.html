@@ -16,7 +16,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=IM+Fell+English:ital@0;1&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=1.28">
+<link rel="stylesheet" href="styles.css?v=1.29">
 </head>
 <body class="ui-modern">
 
@@ -47,7 +47,7 @@
       <button class="btn-secondary btn-ghost" id="btn-gallery" type="button">CASE FILES</button>
     </div>
   </div>
-  <div class="splash-version">v1.28 · CHECKPOINT BIAFRA</div>
+  <div class="splash-version">v1.29 · CHECKPOINT BIAFRA</div>
 </div>
 
 <!-- CHARACTER CREATION -->
@@ -135,8 +135,8 @@
       <div class="hud-queue-dots" id="queue-dots" aria-hidden="true"></div>
     </div>
     <div class="hud-chip hud-chip-pay hud-right">
-      <div class="hud-pay" id="hud-pay">3,400 notes</div>
-      <div class="hud-rate" id="hud-rate">₤B / notes 1.00 <span class="save-dot"></span></div>
+      <div class="hud-pay" id="hud-pay">₦3,400</div>
+      <div class="hud-rate" id="hud-rate">₤B / ₦ 1.00 <span class="save-dot"></span></div>
     </div>
   </header>
 
@@ -148,7 +148,7 @@
       <div id="tp-flags" class="traveller-flags"></div>
     </div>
     <div class="rate-widget" id="rate-widget">
-      <div class="rate-label">₤B / NOTES</div>
+      <div class="rate-label">₤B / ₦</div>
       <div class="rate-value" id="rate-val">1.00 ↔</div>
     </div>
     <div class="family-bar" id="family-bar" aria-label="Household status"></div>
@@ -732,7 +732,7 @@
   <div class="stamp-mark" id="stamp-mark"></div>
 </div>
 
-<script src="engine.js?v=1.28" defer></script>
+<script src="engine.js?v=1.29" defer></script>
 <div id="install-caveat" role="dialog" aria-modal="true">
   <div class="caveat-box">
     <h1>ADD TO HOME SCREEN</h1>
@@ -900,26 +900,25 @@
     <section class="hints-sec">
       <h3>The booth</h3>
       <p><b>Bulletin</b> — the day’s rules from FIBA. Read it first; it tells you which papers are required and which stamps are illegal that day.</p>
-      <p><b>Documents</b> — papers each traveller hands you (passport, permit, BDA, work card…). Compare them against the bulletin and against each other. Mismatched names, expired dates, missing stamps, or impossible regions are grounds to deny.</p>
-      <p><b>Stamps</b> — your tools: APPROVE, DENY, REJECT. Each leaves a permanent mark on the traveller’s papers and on your record.</p>
+      <p><b>Documents</b> — papers each traveller hands you (passport, movement pass, BCD, tax ticket). Compare them against the bulletin and against each other. Mismatched names, expired dates, missing stamps, or impossible regions are grounds to deny.</p>
+      <p><b>Stamps</b> — your tools: APPROVE, DENY, DETAIN. Each leaves a permanent mark on the traveller’s papers and on your record.</p>
       <p><b>Day counter</b> — top bar; days run 1 → 25. The war ends on day 25 regardless of how many you process.</p>
-      <p><b>Wallet</b> — your daily Biafran notes. Rent and food are deducted at the end of each day.</p>
+      <p><b>Wallet</b> — naira in the till. Rent and food are deducted at the end of each day.</p>
     </section>
     <section class="hints-sec">
       <h3>How you earn (and lose)</h3>
       <ul>
-        <li>+1 Biafran note for each correct decision (approving a clean traveller; denying a clear forgery).</li>
-        <li>−2 Biafran notes for each mistake (waving a forgery through; turning away a legal traveller).</li>
-        <li>Citations from FIBA accumulate; three in one day costs you the booth.</li>
-        <li>End-of-day costs: rent, food, sometimes medicine. Run out and the game ends in destitution.</li>
+        <li>Correct APPROVE pays little. Correct DENY / DETAIN pays more. A wrong stamp costs ₦1,400.</li>
+        <li>End-of-day rent and food still come due. Three unpaid nights and the posting ends — hunger does not wait for Day 25.</li>
+        <li>Pattern of breaches (waving forgeries through) draws a tribunal, not a bonus.</li>
       </ul>
     </section>
     <section class="hints-sec">
-      <h3>What APPROVE / DENY / REJECT mean</h3>
+      <h3>What APPROVE / DENY / DETAIN mean</h3>
       <ul>
         <li><b>APPROVE</b> — let the traveller cross. Use only when papers match the bulletin.</li>
         <li><b>DENY</b> — turn them back. Use for missing or expired papers; the traveller is sent home, not detained.</li>
-        <li><b>REJECT</b> — detain. Use for forgeries, smugglers, infiltrators. Triggers a security write-up.</li>
+        <li><b>DETAIN</b> — hold for secondary. Use for forgeries, smugglers, infiltrators. Triggers a security write-up.</li>
       </ul>
     </section>
     
@@ -958,13 +957,10 @@
       hb && hb.addEventListener("click", function(){ try { localStorage.setItem("cb_hints_seen","1"); } catch(e){} }, { once: true });
     }
   } catch(e){}
-  function hookBegin(){ var btn = document.getElementById("btn-begin"); if (btn) btn.addEventListener("click", function(){ window.flash("REGISTRATION", "Federal Ministry of Identity & Border Authority"); }); }
-  function hookCC(){ document.addEventListener("click", function(e){ var t=e.target; if(!t)return; var id=t.id||""; var txt=(t.textContent||"").trim().toUpperCase(); if (id==="cc-finish"||id==="btn-cc-finish"||/REPORT FOR DUTY|TAKE THE BOOTH|CONFIRM REGISTRATION|FINISH REGISTRATION|COMPLETE REGISTRATION/.test(txt)) { window.flash("REGISTRATION COMPLETE","Reporting for duty — booth ready"); } }, true); }
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function(){ hookBegin(); hookCC(); });
-  else { hookBegin(); hookCC(); }
+  /* Registration form is the screen. Do not cover it with a fullscreen flash. */
 })();
 </script>
-<script>(function(){function setPhase(p){var b=document.body;b.classList.remove("phase-splash","phase-charcreate","phase-bulletin","phase-booth","phase-day-end","phase-ending","phase-allow-hints");b.classList.add("phase-"+p);if(p==="splash"||p==="bulletin"||p==="charcreate"){b.classList.add("phase-allow-hints");}}window.__setPhase=setPhase;function detect(){/* Screen IDs must match engine.js SCREENS / index.html */var ids=["splash","char-create","intro","bulletin-screen","game","eod-report","ending"];for(var i=0;i<ids.length;i++){var el=document.getElementById(ids[i]);if(el&&(el.classList.contains("active")||el.style.display==="flex")){var map={"splash":"splash","char-create":"charcreate","intro":"bulletin","bulletin-screen":"bulletin","game":"booth","eod-report":"day-end","ending":"ending"};setPhase(map[ids[i]]);return;}}}var mo=new MutationObserver(detect);document.addEventListener("DOMContentLoaded",function(){detect();document.querySelectorAll(".screen").forEach(function(s){mo.observe(s,{attributes:true,attributeFilter:["class","style"]});});});setInterval(detect,500);})();</script>
+<script>(function(){function setPhase(p){var b=document.body;b.classList.remove("phase-splash","phase-charcreate","phase-bulletin","phase-booth","phase-day-end","phase-ending","phase-allow-hints");b.classList.add("phase-"+p);if(p==="splash"||p==="bulletin"){b.classList.add("phase-allow-hints");}}window.__setPhase=setPhase;function detect(){/* Screen IDs must match engine.js SCREENS / index.html */var ids=["splash","char-create","intro","bulletin-screen","game","eod-report","ending"];for(var i=0;i<ids.length;i++){var el=document.getElementById(ids[i]);if(el&&(el.classList.contains("active")||el.style.display==="flex")){var map={"splash":"splash","char-create":"charcreate","intro":"bulletin","bulletin-screen":"bulletin","game":"booth","eod-report":"day-end","ending":"ending"};setPhase(map[ids[i]]);return;}}}var mo=new MutationObserver(detect);document.addEventListener("DOMContentLoaded",function(){detect();document.querySelectorAll(".screen").forEach(function(s){mo.observe(s,{attributes:true,attributeFilter:["class","style"]});});});setInterval(detect,500);})();</script>
 <script>(function(){
 var POOLS_FIRST = {
   igbo: {
@@ -1049,8 +1045,8 @@ window.__recordTravellerDecision=function(name,decision,errors){if(!name)return;
 window.__getReturningNote=function(name){var h=window.__travellerHistory[name];if(!h)return null;var note="Last seen Day "+h.day+": "+h.decision.toUpperCase();if(h.errors&&h.errors.length){note+=" — flagged for "+h.errors.join(", ")+".";}return note;};
 function scanSuspicious(){var papers=document.querySelectorAll(".doc, .paper, .document, .traveller-doc, [data-doc]");var keys=["EXPIRED","FORGED","MISMATCH","SUSPENDED","INVALID","UNREGISTERED","ALTERED"];papers.forEach(function(p){var t=(p.textContent||"").toUpperCase();var hit=keys.some(function(k){return t.indexOf(k)>=0;});if(hit&&!p.querySelector(".susp-badge")){var b=document.createElement("span");b.className="susp-badge";b.textContent="⚠ DOUBLE-CHECK";p.appendChild(b);}});}
 setInterval(scanSuspicious,800);
-window.__todayValue=function(shillings){var n=Math.round(shillings);return "≈ "+n.toLocaleString()+" notes (period units)";};
-function deficitWatch(){if(!window.state)return;var pay=window.state.totalPay;if(typeof pay!=="number")return;if(pay<0&&!window.__deficitWarned){window.__deficitWarned=true;var msg=document.createElement("div");msg.className="deficit-warning";msg.innerHTML="<b>YOU ARE IN DEFICIT.</b><br>If this continues, your family will lose rent and food. Children may be sent away. Your assignment may be revoked. <span class=\"deficit-sub\">Long-term deficit erodes loyalty meters and can trigger eviction endings.</span>";document.body.appendChild(msg);setTimeout(function(){if(msg.parentNode)msg.parentNode.removeChild(msg);},9000);}}
+window.__todayValue=function(shillings){var n=Math.round(shillings);return "≈ ₦"+n.toLocaleString();};
+function deficitWatch(){if(!window.state)return;var pay=window.state.totalPay;if(typeof pay!=="number")return;if(pay<0&&!window.__deficitWarned){window.__deficitWarned=true;var msg=document.createElement("div");msg.className="deficit-warning";msg.innerHTML="<b>YOU ARE IN DEFICIT.</b><br>If the pot stays empty three nights, the posting ends. Read the papers. A wrong stamp is a meal already spent. <span class=\"deficit-sub\">Hunger does not wait for Day 25.</span>";document.body.appendChild(msg);setTimeout(function(){if(msg.parentNode)msg.parentNode.removeChild(msg);},9000);}}
 setInterval(deficitWatch,1500);
 function fullNameUp(){var els=document.querySelectorAll(".eod-error-name, .processing-error-name, [data-error-name]");els.forEach(function(e){var n=e.textContent;if(n&&!e.dataset.expanded){e.dataset.expanded="1";if(n.split(" ").length<2){e.textContent=n+" "+(window.__pickFreshName?window.__pickFreshName().split(" ")[1]:"Onuoha");}}});}
 setInterval(fullNameUp,1000);
@@ -1059,7 +1055,7 @@ function injectEndingSummary(){var endScreen=document.getElementById("ending");i
 setInterval(injectEndingSummary,400);
 function gateCrossRiver(){if(!window.state||!window.state.player)return;var st=window.state.player.state;document.querySelectorAll("[data-gate=\"cross-river\"]").forEach(function(el){el.style.display=(st==="Cross River")?"block":"none";});}
 setInterval(gateCrossRiver,500);
-function dateSync(){var el=document.getElementById("hud-real-date");if(!el){el=document.createElement("div");el.id="hud-real-date";el.className="hud-real-date";document.body.appendChild(el);}var d=new Date();var opts={year:"numeric",month:"short",day:"numeric"};el.textContent=d.toLocaleDateString(undefined,opts);}
+function dateSync(){var el=document.getElementById("hud-real-date");if(!el){el=document.createElement("div");el.id="hud-real-date";el.className="hud-real-date";document.body.appendChild(el);}var d=new Date(1967,4,30);var day=(window.state&&window.state.day)||1;d.setDate(d.getDate()+(day-1));el.textContent=d.toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"});el.title="In-game date (Biafra declared 30 May 1967)";}
 setInterval(dateSync,15000);dateSync();
 })();</script>
 <script>(function(){function setup(){var d=document.getElementById("desk");if(!d)return;if(d.querySelector(".traveller-silhouette"))return;var sil=document.createElement("div");sil.className="traveller-silhouette";sil.innerHTML='<svg viewBox="0 0 60 70" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="14" rx="11" ry="13" fill="#1a1a1a" opacity="0.85"/><path d="M 10 70 Q 10 38 30 38 Q 50 38 50 70 Z" fill="#1a1a1a" opacity="0.85"/></svg>';d.appendChild(sil);["p1","p2","p3"].forEach(function(c){var ps=document.createElement("div");ps.className="paper-shadow "+c;d.appendChild(ps);});}document.addEventListener("DOMContentLoaded",setup);setTimeout(setup,500);setInterval(setup,1500);})();</script>
@@ -1077,7 +1073,7 @@ window.__triggerSpyReveal=function(){if(!window.__cleared.length)return null;var
 window.__showBreakingNews=function(){var r=window.__triggerSpyReveal();if(!r)return;var box=document.createElement("div");box.className="breaking-news";box.innerHTML=r.html+"<div class=\"bn-sub\">Your stamp is in the file. The file is in the war.</div>";document.body.appendChild(box);setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},9500);};
 window.__lastBreakingDay=-1;function maybeBreaking(){if(!window.state||!window.state.day)return;if(window.state.day<=2)return;if(window.state.day===window.__lastBreakingDay)return;if(Math.random()<0.32){window.__lastBreakingDay=window.state.day;window.__showBreakingNews();}}setInterval(maybeBreaking,12000);
 window.__disciplinaryEvents=[{id:"ia-summons",title:"INTERNAL AFFAIRS SUMMONS",body:"You will report to Block C tomorrow at first bell. Bring your stamp log.",cost:5},{id:"pay-docked",title:"WAGE DOCKED",body:"Two days of pay are held pending investigation. Your supervisor signed without looking up.",cost:8},{id:"transfer-threat",title:"TRANSFER ORDER — PROVISIONAL",body:"You may be reassigned to Aba Junction within seventy-two hours. Aba is closer to the front.",cost:0},{id:"family-watch",title:"FAMILY UNDER OBSERVATION",body:"State Security has logged your home address. Your wife noticed the same car twice.",cost:0},{id:"treason-letter",title:"TREASON CHARGE — NOTICE",body:"A complaint was filed under section 11. Your name is on the typed sheet. There is no signature yet.",cost:0}];
-window.__triggerDisciplinary=function(){var arr=window.__disciplinaryEvents;var e=arr[Math.floor(Math.random()*arr.length)];if(window.state&&typeof window.state.totalPay==="number"&&e.cost){window.state.totalPay-=e.cost;}var box=document.createElement("div");box.className="disciplinary-card";box.innerHTML="<div class=\"dc-title\">"+e.title+"</div><div class=\"dc-body\">"+e.body+"</div>"+(e.cost?"<div class=\"dc-cost\">−"+e.cost+" notes deducted</div>":"<div class=\"dc-cost\">No fine — yet.</div>");document.body.appendChild(box);setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},10000);return e;};
+window.__triggerDisciplinary=function(){var arr=window.__disciplinaryEvents;var e=arr[Math.floor(Math.random()*arr.length)];if(window.state&&typeof window.state.totalPay==="number"&&e.cost){window.state.totalPay-=e.cost;}var box=document.createElement("div");box.className="disciplinary-card";box.innerHTML="<div class=\"dc-title\">"+e.title+"</div><div class=\"dc-body\">"+e.body+"</div>"+(e.cost?"<div class=\"dc-cost\">−₦"+e.cost+" deducted</div>":"<div class=\"dc-cost\">No fine — yet.</div>");document.body.appendChild(box);setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},10000);return e;};
 window.__targetTravellersPerDay=function(){return 20+Math.floor(Math.random()*11);};
 window.__shouldShowDecisionEvent=function(){return Math.random()<0.18;};
 window.__pickNwosu=function(){return window.__nwosuLines[Math.floor(Math.random()*window.__nwosuLines.length)];};
@@ -1175,7 +1171,7 @@ window.__queryEvents = [
   {tag:"FORMAL WARNING", title:"A FORMAL WARNING", body:"Your supervisor stops at your bench. He does not sit. \"You let a {descShort} pass with a forged passport. The bench is watching you now.\"", cost:1200},
   {tag:"WAGE DOCK", title:"WAGE DOCKED \u2014 IMPROPER ID (FEMALE TRAVELLER)", body:"Internal note: Day {day}. Officer cleared female subject ({name}) without proper identification. Three days wage held pending.", cost:3300, femaleOnly:true},
   {tag:"WAGE DOCK", title:"WAGE DOCKED \u2014 INCOMPLETE DOCUMENTS", body:"Audit found {name} was cleared on incomplete papers. Compensation dock applied to today\u2019s wage. The supervisor signed without looking up.", cost:2200, incompleteOnly:true},
-  {tag:"WAGE DOCK", title:"GARNISHMENT NOTICE", body:"Treasury slip stapled to your kit: GARNISHMENT \u2014 {cost} notes. Reason: improper clearance, file {name}.", cost:1800},
+  {tag:"WAGE DOCK", title:"GARNISHMENT NOTICE", body:"Treasury slip stapled to your kit: GARNISHMENT \u2014 ₦{cost}. Reason: improper clearance, file {name}.", cost:1800},
   {tag:"PROBATION", title:"OFFICER ON PROBATION", body:"You have been placed on internal probation. One more error and the bench becomes someone else\u2019s.", cost:0},
   {tag:"INTERROGATION", title:"BEHIND THE GLASS", body:"They take you to the back office. The chair faces the lamp. They ask: \"Why did you stamp {name}?\" You say: \"The papers seemed in order.\" They write that down.", cost:0}
 ];
@@ -1202,7 +1198,7 @@ window.__triggerQuery = function(){
   box.innerHTML = "<div class=\"q-tag\">"+ev.tag+"</div>"+
     "<div class=\"q-title\">"+ev.title+"</div>"+
     "<div class=\"q-body\">"+bodyText+"</div>"+
-    (ev.cost?"<div class=\"q-cost\">−"+ev.cost.toLocaleString()+" notes deducted from wage</div>":"<div class=\"q-cost\">No fine \u2014 yet.</div>");
+    (ev.cost?"<div class=\"q-cost\">−₦"+ev.cost.toLocaleString()+" deducted from wage</div>":"<div class=\"q-cost\">No fine \u2014 yet.</div>");
   document.body.appendChild(box);
   setTimeout(function(){ if(box.parentNode) box.parentNode.removeChild(box); }, 11000);
   return ev;
@@ -1283,7 +1279,7 @@ tryHookDecide();
   if(document.body) mo.observe(document.body,{childList:true,subtree:false});
 })();</script>
 
-<script src="supervisor.js?v=1.28" defer></script>
-<script src="patch.js?v=1.28" defer></script>
+<script src="supervisor.js?v=1.29" defer></script>
+<script src="patch.js?v=1.29" defer></script>
 </body>
 </html>

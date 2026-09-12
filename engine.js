@@ -101,7 +101,7 @@ var BACKGROUNDS = [
   { id:'cargo',     label:'CARGO DRIVER',        desc:'You hauled relief, ammunition, and refugees in a week.',bias:{witness:1,survival:2} },
   { id:'artist',    label:'ARTIST / CREATIVE',     desc:'Painter, musician, performer. Patrons distrust the regime.', bias:{witness:2,compassion:1} },
   { id:'doctor',    label:'DOCTOR / NURSE',         desc:'Hospitals are your refuge. Bribes are mostly food.',         bias:{compassion:2,survival:1} },
-  { id:'journalist',label:'JOURNALIST',             desc:'You see what others edit out. Watched by FIBA.',             bias:{witness:2,rebellion:1} },
+  { id:'editor',    label:'NEWSPAPER SUB-EDITOR',   desc:'You cut copy until the censor cut you.',                     bias:{witness:2,rebellion:1} },
   { id:'farmer',    label:'FARMER / TRADER',        desc:'Land claims, ration tickets, ferry passes — you know each.', bias:{survival:2} },
   { id:'other',     label:'OTHER — SPECIFY ON FILE', desc:'A general field. FIBA notes your background as unrecorded.', bias:{} },
 ];
@@ -111,7 +111,7 @@ var STATES = [
   { val:'Enugu',      label:'ENUGU',       desc:'Core Biafra. High loyalty pressure.' },
   { val:'Anambra',    label:'ANAMBRA',     desc:'Commercial hub. Survival bias.' },
   { val:'Imo',        label:'IMO',         desc:'Strong Catholic presence.' },
-  { val:'Abia',       label:'ABIA',        desc:'MASSOB origins. Rebellion bias.' },
+  { val:'Abia',       label:'ABIA',        desc:'Aba markets. Ngwa hinterland. Hard to garrison.' },
   { val:'Ebonyi',     label:'EBONYI',      desc:'Highest survival pressure.' },
   { val:'Rivers',     label:'RIVERS',      desc:'Contested. Oil. Politically loaded.' },
   { val:'Cross River',label:'CROSS RIVER', desc:'Your posting. Home ground exposure.' },
@@ -569,7 +569,7 @@ var NIGHT_EVENTS = [
   { day:14, text:'Radio Lagos and Radio Biafra contradict each other on the same battle. Men at the canteen choose which lie they prefer and call it patriotism.' },
   { day:15, text:'A new officer asks what Ogoja-East is like. You say manageable. She asks what the people are like. You realise you have been counting them as cases, not as names their mothers gave them.' },
   { day:17, text:'You hear of a coup rumour inside a rumour — officers arresting officers, lists rewritten overnight. By morning it is "indiscipline." By evening it is forgotten on purpose.' },
-  { day:19, text:'The exchange chalked on the wall at dawn: your notes buy less rice than yesterday. Nobody gasps. Hunger has taught the face not to perform surprise.' },
+  { day:19, text:'The exchange chalked on the wall at dawn: your naira buy less rice than yesterday. Nobody gasps. Hunger has taught the face not to perform surprise.' },
   { day:21, text:'A woman waits outside the post with a photograph. She asks if you have seen this face in the queue. You have stamped a hundred faces. You cannot honestly say yes or no. She thanks you anyway, which is worse.' },
   { day:22, text:'You count the days left and cannot find the decision that mattered most. Only a feeling: that it was made while you thought you were only doing paperwork.' },
   { day:23, text:'Fuel finishes at 1am. You sit in the dark with Nwosu. Far off — thunder, or the line near Awka. Neither of you asks which. Naming it would make it closer.' },
@@ -664,6 +664,9 @@ var ENDINGS = [
     text:'Your formal objection to Bulletin 021 was dismissed. But it was logged. In the years that followed, a constitutional lawyer used it as evidence. The case is ongoing. Your name appears in the legal record. <em>You are still alive. You are watching.</em>',
     condition: function(s) { return !!s.flags.objected_021; } },
   // Household / suspicion endings (registration + bills + booth conduct)
+  { id:'starved_out',    num:32, title:'THE POT RAN OUT',         axes:['survival'],
+    text:'Three nights without a full pot. The queue does not pause for hunger. You left the booth because the house could not eat — or because you could not. The war continues without your stamp. <em>Start again. Read every paper. A wrong stamp is a meal already spent.</em>',
+    condition: function(s) { return !!s.flags.starved_out || (s.missedBillsStreak || 0) >= 3; } },
   { id:'empty_pot',      num:29, title:'THE EMPTY POT',           axes:['survival'],
     text:'You served the desk. The desk did not feed the house. When the war ended you still had a stamp hand and no one left who waited for your footsteps. <em>History keeps the bulletins. It misplaces the children.</em>',
     condition: function(s) { return (s.billsMissedTotal || 0) >= 4 || !!s.flags.family_collapsed; } },
@@ -707,7 +710,8 @@ function makeCcOption(group, val, label, desc, extraClass) {
   btn.className = 'cc-option' + (extraClass ? ' ' + extraClass : '');
   btn.setAttribute('data-group', group);
   btn.setAttribute('data-val', val);
-  btn.innerHTML = '<span class="cc-option-title">' + label + '</span>';
+  btn.innerHTML = '<span class="cc-option-title">' + label + '</span>' +
+    (desc ? '<span class="cc-option-desc">' + desc + '</span>' : '');
   btn.addEventListener('click', function() { ccSelect(group, btn, val); });
   return btn;
 }
@@ -1534,41 +1538,16 @@ function endOfDay(opts) {
       state.axes.survival = Math.max(0, state.axes.survival - 1);
       familyReport = 'Second night without a full pot. Someone is fever-warm. The neighbour\'s pot lid is louder than kindness. You promise the market tomorrow. Promises are the currency of people who have spent their pay packet on stamps for strangers.';
       crisisNote = 'SECOND MISS — ILLNESS · WAGE PENALTY TOMORROW';
-    } else if (streak === 3) {
-      member = pickLivingMember(['child', 'parent', 'partner']);
-      if (member && member.role !== 'self') {
-        member.status = 'gone';
-        state.flags.child_or_dependant_sent_away = true; rememberFlag('child_or_dependant_sent_away');
-        familyReport = 'You send ' + (member.role === 'child' ? 'the child' : 'one of your people') + ' to the village before the road is cut. There is no ceremony — only a bundle and a look that will outlive the war. The house is quieter. Quiet is not peace.';
-      } else {
-        livingFamily().forEach(function (f) { f.status = 'ill'; });
-        familyReport = 'There is no one left to send away and nowhere safe to send them. The walls know your name. So does hunger.';
-      }
-      state.axes.survival = Math.max(0, state.axes.survival - 2);
-      state.suspicion = (state.suspicion || 0) + 1;
-      crisisNote = 'THIRD MISS — SOMEONE LEAVES THE HOUSE';
-    } else if (streak === 4) {
-      member = pickLivingMember(['partner', 'parent', 'child', 'self']);
-      if (member) {
-        member.status = 'dead';
-        state.flags.family_death = true; rememberFlag('family_death');
-      }
-      state.axes.survival = Math.max(0, state.axes.survival - 2);
-      state.axes.loyalty = Math.max(0, (state.axes.loyalty || 0) - 1);
-      state.axes.rebellion = (state.axes.rebellion || 0) + 1;
-      familyReport = 'A preventable death is still a death. There is no tribunal for empty pots — only a grave that will not wait for your leave form. You stamp papers in the morning with a hand that knows what paper cannot buy.';
-      crisisNote = 'FOURTH MISS — DEATH IN THE HOUSE';
     } else {
-      state.flags.family_collapsed = true;
-      state.flags.evicted = true;
-      rememberFlag('family_collapsed');
-      rememberFlag('evicted');
-      livingFamily().forEach(function (f) { if (f.status !== 'dead') f.status = 'gone'; });
-      state.axes.survival = Math.max(0, state.axes.survival - 3);
-      familyReport = 'The landlord does not knock. He arrives with two men and the kind of patience that has already decided. Your things fit in less than you believed. You are still an officer at dawn. At night you are a person without a door.';
-      crisisNote = 'HOUSEHOLD COLLAPSED — EVICTION';
-      // Soft-lock toward bitter endings
-      state.flags.must_face_ruin = true;
+      // Three unpaid nights: the posting ends. Hunger does not wait for Day 25.
+      livingFamily().forEach(function (f) {
+        if (f.status !== 'dead') f.status = 'hungry';
+      });
+      state.flags.starved_out = true;
+      rememberFlag('starved_out');
+      state.axes.survival = Math.max(0, state.axes.survival - 2);
+      familyReport = 'Three nights without a full pot. The queue does not pause for hunger. FIBA will find another stamp hand. You will not find another night of rice on this wage. The posting is over. Read the papers more carefully next time — a wrong stamp is a meal you already spent.';
+      crisisNote = 'POSTING ENDED — THE POT RAN OUT';
     }
   }
 
@@ -1679,7 +1658,9 @@ function endOfDay(opts) {
       'You lie awake calculating stamps into yams. The arithmetic never becomes food.';
   }
   document.getElementById('eod-night').textContent = nightText;
-  document.getElementById('btn-next-day').textContent = state.day >= 25 ? 'FINAL REPORT →' : 'DAY ' + (state.day + 1) + ' →';
+  document.getElementById('btn-next-day').textContent = state.flags.starved_out
+    ? 'THE POSTING ENDS →'
+    : (state.day >= 25 ? 'FINAL REPORT →' : 'DAY ' + (state.day + 1) + ' →');
 
   updateFamilyBar();
 
@@ -1688,6 +1669,7 @@ function endOfDay(opts) {
 }
 
 function nextDay() {
+  if (state.flags.starved_out || (state.missedBillsStreak || 0) >= 3) { calculateEnding(); return; }
   if (state.day >= 25) { calculateEnding(); return; }
   state.day++;
   startDay();
@@ -1697,7 +1679,7 @@ function nextDay() {
 function calculateEnding() {
   var ending = null;
   // Household ruin and collaboration outrank soft "ordinary" outcomes — the war is not fair, but it is ordered
-  var priority = ['collaborator_dawn', 'empty_pot', 'landlord_war', 'executed', 'disappeared', 'burned'];
+  var priority = ['starved_out', 'collaborator_dawn', 'empty_pot', 'landlord_war', 'executed', 'disappeared', 'burned'];
   for (var p = 0; p < priority.length; p++) {
     var pe = ENDINGS.find(function(e){ return e.id === priority[p]; });
     if (pe && pe.condition(state)) { ending = pe; break; }
@@ -1866,7 +1848,9 @@ function showEndingScreen(ending) {
   host.style.display = 'block';
 
   var ret = document.getElementById('btn-return-splash');
-  if (ret) ret.textContent = 'CLOSE THE FILE';
+  if (ret) ret.textContent = (ending && ending.id === 'starved_out')
+    ? 'TRY AGAIN — READ THE PAPERS'
+    : 'CLOSE THE FILE';
 
   showScreen('ending');
   try {
@@ -1882,7 +1866,7 @@ function updateHUD() {
   document.getElementById('hud-queue').textContent = 'TRAVELLER ' + (state.traveller + 1) + ' OF ' + state.totalTravellers;
   document.getElementById('hud-pay').textContent  = formatNotes(Math.max(0, state.totalPay));
   var rate = state.exchangeRate;
-  document.getElementById('hud-rate').innerHTML   = '₤B / notes ' + rate.toFixed(2) + ' ' + (rate < 1.0 ? '↓' : '↔') + ' <span class="save-dot"></span>';
+  document.getElementById('hud-rate').innerHTML   = '₤B / ₦ ' + rate.toFixed(2) + ' ' + (rate < 1.0 ? '↓' : '↔') + ' <span class="save-dot"></span>';
   updateQueueDots();
 }
 
@@ -1923,18 +1907,17 @@ function updateRateWidget() {
 }
 
 
-// ── MONEY DISPLAY (period notes — abstract units, not 1973 naira) ──
-// Game economy is "federal notes" / pay-packet units. Biafran notes trade against them.
+// ── MONEY DISPLAY (naira — player-facing till) ──
 function formatNotes(n) {
   var v = Math.max(0, Math.round(Number(n) || 0));
-  return v.toLocaleString() + ' notes';
+  return '₦' + v.toLocaleString();
 }
 function formatNotesSigned(n) {
   var v = Math.round(Number(n) || 0);
-  var abs = Math.abs(v).toLocaleString() + ' notes';
-  if (v > 0) return '+' + abs;
-  if (v < 0) return '−' + abs;
-  return abs;
+  var a = '₦' + Math.abs(v).toLocaleString();
+  if (v > 0) return '+' + a;
+  if (v < 0) return '−' + a;
+  return a;
 }
 function migrateFlags(flags) {
   if (!flags) return {};
@@ -2042,14 +2025,41 @@ function loadSavedGame() {
   }
 }
 
+function fibaConfirm(message, onYes) {
+  var old = document.getElementById('cb-confirm');
+  if (old && old.parentNode) old.parentNode.removeChild(old);
+  var wrap = document.createElement('div');
+  wrap.id = 'cb-confirm';
+  wrap.className = 'cb-confirm-overlay';
+  wrap.innerHTML =
+    '<div class="cb-confirm-card" role="dialog" aria-modal="true">' +
+    '<div class="cb-confirm-body"></div>' +
+    '<div class="cb-confirm-actions">' +
+    '<button type="button" class="btn-secondary" data-a="no">KEEP POSTING</button>' +
+    '<button type="button" class="btn-primary" data-a="yes">START NEW</button>' +
+    '</div></div>';
+  wrap.querySelector('.cb-confirm-body').textContent = message;
+  wrap.addEventListener('click', function (e) {
+    var a = e.target && e.target.getAttribute && e.target.getAttribute('data-a');
+    if (e.target === wrap) { wrap.parentNode && wrap.parentNode.removeChild(wrap); return; }
+    if (a === 'yes') { wrap.parentNode && wrap.parentNode.removeChild(wrap); onYes(); }
+    else if (a === 'no') { wrap.parentNode && wrap.parentNode.removeChild(wrap); }
+  });
+  document.body.appendChild(wrap);
+}
+
 function startNewGame() {
   try {
     var existing = JSON.parse(localStorage.getItem(SAVE_KEY));
     if (hasResumableSave(existing) && existing.player && existing.player.name) {
-      var ok = window.confirm('Start a new game? Your posting at Day ' + (existing.day || 1) + ' will be overwritten (unlocked endings are kept).');
-      if (!ok) return;
+      fibaConfirm('Start a new game? Your posting at Day ' + (existing.day || 1) + ' will be overwritten (unlocked endings are kept).', beginFreshGame);
+      return;
     }
   } catch (e) {}
+  beginFreshGame();
+}
+
+function beginFreshGame() {
   initAudio();
   // Preserve unlocked endings across runs
   var prevEndings = [];
@@ -2238,7 +2248,7 @@ function init() {
   // Service Worker registration for iOS PWA offline support.
   // Bump CACHE_NAME in sw.js whenever shipping asset changes (network-first + versioned cache).
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=1.28').catch(function(){});
+    navigator.serviceWorker.register('./sw.js?v=1.29').catch(function(){});
   }
 }
 

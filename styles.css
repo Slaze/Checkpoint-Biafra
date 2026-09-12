@@ -284,12 +284,28 @@ html, body {
 .cc-proceed {
   position: fixed;
   bottom: 0; left: 0; right: 0;
+  z-index: 40;
   background: var(--olive-dark);
   padding: 16px 20px;
   border-top: 1px solid rgba(242,232,208,0.1);
   /* iOS safe area */
   padding-bottom: max(16px, env(safe-area-inset-bottom));
 }
+.cc-input, .cc-option { touch-action: manipulation; }
+.cb-confirm-overlay {
+  position: fixed; inset: 0; z-index: 10020;
+  background: rgba(5,7,3,0.82);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px 16px;
+}
+.cb-confirm-card {
+  background: #1A2610; color: #F2E8D0;
+  border: 1px solid rgba(212,160,23,0.55);
+  max-width: 420px; width: 100%; padding: 22px 20px;
+}
+.cb-confirm-body { font-family: "Crimson Text", serif; font-size: 16px; line-height: 1.5; margin-bottom: 18px; }
+.cb-confirm-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.cb-confirm-actions .btn-primary, .cb-confirm-actions .btn-secondary { flex: 1; min-width: 140px; }
 
 /* ═══ INTRO NARRATIVE ═══ */
 #intro {
@@ -1265,9 +1281,10 @@ body:not(.phase-allow-hints) #hints-btn { display: none !important; }
 #hints-close { position: absolute; top: 8px; right: 12px; background: none; border: none; color: #E8DFC4; font-size: 1.5rem; cursor: pointer; padding: 4px 10px; }
 #hints-ok { display: block; margin: 18px auto 0; padding: 10px 28px; background: #5A6E3F; color: #E8DFC4; border: 1px solid #8FA068; font-family: "Special Elite",monospace; cursor: pointer; letter-spacing: 0.05em; }
 #hints-ok:hover { background: #6F8550; }
-/* === FLASH === */
-#flash-banner { position: fixed; inset: 0; z-index: 8800; display: none; align-items: center; justify-content: center; pointer-events: none; background: rgba(20,28,15,0.55); }
-#flash-banner.show { display: flex; animation: flashFade 1.8s ease forwards; }
+/* === FLASH (toast — never cover registration) === */
+#flash-banner { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); inset: auto; z-index: 8800; display: none; width: min(420px, 92vw); pointer-events: none; background: transparent; }
+#flash-banner.show { display: block; animation: flashFade 1.8s ease forwards; }
+body.phase-charcreate #flash-banner { display: none !important; }
 .flash-inner { text-align: center; padding: 28px 44px; background: rgba(44,62,31,0.95); border: 1.5px solid #E8DFC4; border-radius: 4px; box-shadow: 0 8px 30px rgba(0,0,0,0.6); }
 .flash-title { font-family: "Special Elite",monospace; font-size: 1.8rem; letter-spacing: 0.18em; color: #F2E9CE; margin-bottom: 8px; }
 .flash-sub { font-family: "Crimson Text",serif; font-style: italic; font-size: 1.05rem; color: #D4C896; }

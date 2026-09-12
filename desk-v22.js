@@ -3,7 +3,7 @@
   if (window.__cbDeskV22) return;
   window.__cbDeskV22 = true;
 
-  var HAND_SRC = 'hands-male.png?v=1.28';
+  var HAND_SRC = 'hands-male.png?v=1.29';
 
   function injectCss() {
     if (document.getElementById('cb-desk-v22')) return;

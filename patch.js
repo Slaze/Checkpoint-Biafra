@@ -1,9 +1,9 @@
-/* v1.28 live boot — illustrated POV hands (no Three replacement) */
+/* v1.29 live boot — illustrated POV hands (no Three replacement) */
 (function () {
   if (window.__cbLiveBoot) return;
   window.__cbLiveBoot = true;
 
-  var VER = '1.28';
+  var VER = '1.29';
 
   function add(src, mod) {
     var key = src.split('?')[0];
