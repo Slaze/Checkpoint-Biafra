@@ -1,6 +1,69 @@
 # Checkpoint Biafra — Project Recap
 
-## Latest session (2026-09-07) — pull + fix overlay boot (v1.26)
+## Latest session (2026-09-12) — ship v1.27 POV hands
+
+### Goal
+Round up pending work: v1.27 sat on disk since 2026-09-07. Live still `1.26`.
+
+### What changed
+- Committed + pushed existing v1.27 (procedural Three hands; SVG fallback until first sized paint).
+- Did **not** commit debug fixtures `_hand-accept.html` / `_svg-only.html`, `.agents/`, `skills-lock.json`, `.DS_Store`.
+
+### Why
+Bare `import … from 'three'` never resolved on live. Hands stayed dead after CSS/SVG strip.
+
+### How verified
+- `node --check` on `three-desk.js`, `patch.js`, `sw.js`, `v20.js`, `engine.js`, `desk-v22.js`.
+- Local `http://127.0.0.1:8766/_hand-accept.html`: `accept true`, `threeOk true`, `__cbThreeDeskReady`, 24 meshes, canvas CSS 390×520 (backing 780×1040). SVG visible at boot, hidden after Three paint.
+
+### Current state
+- Disk = v1.27. Live was 1.26 at session start; deploy after this push.
+
+### Next steps (not this ship)
+- Hard-refresh live / wait SW `checkpoint-biafra-v1.27`; confirm hands on game desk.
+- Optional: fold overlays; drop redundant `v20.js`.
+- Human: LLM keys (xAI team 403 no credits) or OpenRouter/Groq/Gemini/Ollama for online invent.
+- Confirm NW GitHub OAuth after SW bump.
+
+### Blockers / risks
+- jsDelivr `three.module.js` not in app SW. Procedural hands skip GLB flake.
+- Old SW until v1.27 activates (`skipWaiting` + network-first).
+
+---
+
+## Prior session (2026-09-07) — fix POV hands boot (v1.27)
+
+### Goal
+Hands must visibly load on the checkpoint desk during gameplay.
+
+### What changed
+- Rewrote `three-desk.js`: removed `GLTFLoader` / jsdelivr `examples/jsm` (bare `import … from 'three'` never resolved → module never ran).
+- Now imports only `three.module.js` (full URL) and always mounts **procedural Mesh hands** (palm + fingers + cuff).
+- No longer hides `.cb-hand-layer`; only hides legacy `.pov-hand` / `.pov-hand-svg`.
+- Desk resize: polls / ResizeObserver when `#desk` is 0×0 until game screen shows.
+- Ship **v1.27**: `patch.js` VER, `sw.js` CACHE + `patchHtml` (align 1.19–1.26 → 1.27), `version.json`, `index.html` splash/`?v=`, `engine.js` SW register, `manifest.json` `?cb=127`, `v20.js` cache-busters.
+
+### Why
+Live CDP: `Failed to resolve module specifier "three"` → `__cbThreeDeskGLB` stayed false → no `#cb-three`; CSS/SVG hands already stripped by `patch.js`.
+
+### How verified
+- `node --check` on `three-desk.js`, `patch.js`, `sw.js`, `v20.js`, `engine.js`.
+- Module graph: only import is fully-qualified `three.module.js`.
+- Chrome headless + SwiftShader: `#cb-three` present, `__cbThreeDeskReady`, 24 hand meshes, canvas 390×520.
+
+### Current state
+- Fix on disk only (**not pushed**). Needs deploy for live.
+
+### Next steps
+- Push / deploy v1.27; hard-refresh or wait for SW activate; confirm hands on live desk.
+
+### Blockers / risks
+- Still depends on jsDelivr for `three.module.js` (app SW does not cache that CDN). Procedural hands avoid GLB CDN flake.
+- Old SW caches until v1.27 activates.
+
+---
+
+## Prior session (2026-09-07) — pull + fix overlay boot (v1.26)
 
 ### Goal
 Pull behind local clone; make gameplay overlays actually load on live.

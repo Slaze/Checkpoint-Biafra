@@ -9,8 +9,9 @@
     document.head.appendChild(s);
   }
   function boot(){
-    add('three-desk.js?v=1.26', true);
-    add('features-v23.js?v=1.26', false);
+    add('desk-v22.js?v=1.27', false);
+    add('three-desk.js?v=1.27', true);
+    add('features-v23.js?v=1.27', false);
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();

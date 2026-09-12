@@ -70,6 +70,8 @@
   }
 
   function mountHands() {
+    // Three owns desk after first proven paint — stop fighting the hidden SVG layer
+    if (window.__cbThreeDeskReady && document.getElementById('cb-hide-svg-after-three')) return;
     injectCss();
     var desk = document.getElementById('desk');
     if (!desk) return;
