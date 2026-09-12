@@ -1,6 +1,40 @@
 # Checkpoint Biafra — Project Recap
 
-## Latest session (2026-09-12) — ship v1.27 POV hands
+## Latest session (2026-09-13) — v1.28 illustrated desk hands
+
+### Goal
+Hands must show on the live booth. User: they do not. Reference: Downloads `IMG_3716.jpg` / `IMG_3715.jpg` (first-person illustrated palms on desk).
+
+### What changed
+- Root cause: v1.27 Three.js primitives painted as tiny orange blobs at desk corners, then hid the 2D hand layer (`cb-hide-svg-after-three`). Original `.pov-hand` SVG was `display:none` from patch. Human never saw hands.
+- Stopped loading `three-desk.js` from `patch.js` / `v20.js`. Retired module strips leftover `#cb-three`.
+- Mounted sample-style plate `hands-male.png` (chroma-keyed from `IMG_3716` pose, olive cuffs, deep brown skin) via `desk-v22.js` at desk bottom, z-index 5.
+- Booth always shows `.pov-hand` until PNG loads, then PNG is the live hands.
+- Ship **v1.28**.
+
+### Why
+3D camera/composition ≠ first-person desk game. Sample is large palms-down plates at the bottom of the frame.
+
+### How verified
+- `node --check` desk-v22 / patch / v20 / three-desk / sw / engine.
+- Local `_hand-accept.html`: `accept true`, PNG 864×383, no `#cb-three`.
+- Local booth `?cb=128`: `phase-booth`, `cb-png-hands`, `__cbHandsReady`, splash v1.28. Screenshot: two illustrated hands on wood, papers between them.
+
+### Current state
+- Disk = v1.28. Push/deploy this session.
+
+### Next steps
+- Hard-refresh live / wait SW `checkpoint-biafra-v1.28`.
+- Optional female plate (male PNG scaled 0.92 for now).
+- Human: LLM keys; NW GitHub click-confirm.
+
+### Blockers / risks
+- PNG is JPEG-sourced; thin outline fringe possible on some screens.
+- Old PWA until new SW. `#cb-three{display:none}` is the belt.
+
+---
+
+## Prior session (2026-09-12) — ship v1.27 POV hands
 
 ### Goal
 Round up pending work: v1.27 sat on disk since 2026-09-07. Live still `1.26`.

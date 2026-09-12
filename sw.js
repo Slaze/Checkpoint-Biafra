@@ -1,9 +1,9 @@
-// CHECKPOINT BIAFRA — Service Worker v1.27
+// CHECKPOINT BIAFRA — Service Worker v1.28
 // Network-first for app shell so ships/fixes actually reach players.
 // Cache fallback keeps offline play after first successful load.
 // /api/* is never cached (auth session cookies).
 
-const CACHE_NAME = 'checkpoint-biafra-v1.27';
+const CACHE_NAME = 'checkpoint-biafra-v1.28';
 const CORE_ASSETS = [
   './index.html',
   './manifest.json',
@@ -19,6 +19,7 @@ const CORE_ASSETS = [
   './desk-v22.js',
   './three-desk.js',
   './features-v23.js',
+  './hands-male.png',
   './version.json',
 ];
 
@@ -26,8 +27,8 @@ function patchHtml(html) {
   if (!html || html.indexOf('<html') === -1) return html;
   // Keep splash / cache-busters aligned with this ship
   html = html
-    .replace(/v1\.(1[9]|2[0-6])/g, 'v1.27')
-    .replace(/\?v=1\.(1[9]|2[0-6])/g, '?v=1.27');
+    .replace(/v1\.(1[9]|2[0-7])/g, 'v1.28')
+    .replace(/\?v=1\.(1[9]|2[0-7])/g, '?v=1.28');
   return html;
 }
 

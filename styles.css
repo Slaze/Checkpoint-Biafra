@@ -2266,6 +2266,7 @@ button:focus-visible,
   will-change: transform, opacity;
 }
 .doc-pov.docs-present .pov-hand { opacity: 1; }
+.phase-booth .pov-hand { opacity: 1; }
 
 .pov-hand-left {
   left: -6%;
