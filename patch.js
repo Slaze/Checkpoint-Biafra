@@ -1,9 +1,9 @@
-/* v1.29 live boot — illustrated POV hands (no Three replacement) */
+/* v1.30 live boot — illustrated desk + booth uniqueness */
 (function () {
   if (window.__cbLiveBoot) return;
   window.__cbLiveBoot = true;
 
-  var VER = '1.29';
+  var VER = '1.30';
 
   function add(src, mod) {
     var key = src.split('?')[0];
@@ -17,4 +17,5 @@
   add('desk-v22.js?v=' + VER, false);
   add('patch-gameplay.js?v=' + VER, false);
   add('features-v23.js?v=' + VER, false);
+  add('booth-v30.js?v=' + VER, false);
 })();

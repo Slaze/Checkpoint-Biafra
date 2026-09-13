@@ -1389,8 +1389,8 @@ body.phase-charcreate #flash-banner { display: none !important; }
 .hud-pay.hud-tick-down { animation: hudTickDown 0.7s ease-out; display:inline-block; transform-origin:center; }
 .hud-day.day-flip { animation: dayFlip 0.7s ease-in-out; display:inline-block; transform-origin:center; }
 .traveller-silhouette { animation: silhouetteBreath 4.5s ease-in-out infinite; }
-body.phase-booth::before { content:""; position:fixed; inset:0; pointer-events:none; z-index:7; box-shadow: inset 0 0 220px rgba(0,0,0,0.55); animation: vignettePulse 9s ease-in-out infinite; }
-body.phase-booth::after { content:""; position:fixed; top:0; right:0; width:160px; height:160px; pointer-events:none; z-index:6; background: radial-gradient(circle at 100% 0%, rgba(244,215,122,0.22) 0%, rgba(244,215,122,0) 70%); animation: lampFlicker 7s ease-in-out infinite; mix-blend-mode:screen; }
+body.phase-booth::before { content:""; position:fixed; inset:0; pointer-events:none; z-index:2; box-shadow: inset 0 0 220px rgba(0,0,0,0.55); animation: vignettePulse 9s ease-in-out infinite; }
+body.phase-booth::after { content:""; position:fixed; top:0; right:0; width:160px; height:160px; pointer-events:none; z-index:2; background: radial-gradient(circle at 100% 0%, rgba(244,215,122,0.22) 0%, rgba(244,215,122,0) 70%); animation: lampFlicker 7s ease-in-out infinite; mix-blend-mode:screen; }
 .side-event-card.shake { animation: bnIn 0.45s ease, sideShake 0.5s ease 0.45s, bnOut 0.55s ease 9.5s both; }
 
 #install-caveat { position: fixed; inset: 0; z-index: 9999; display: none; background: #2C3E1F; color: #E8DFC4; font-family: "Courier Prime", monospace; align-items: center; justify-content: center; padding: 24px; text-align: center; }
@@ -2753,4 +2753,81 @@ body.doc-inspecting .action-bar {
 
 .assess-nwosu {
   background: rgba(26,38,16,0.06) !important;
+}
+
+/* ═══ v1.30 illustrated desk + overlay stack + full flags ═══ */
+#desk.desk {
+  background-color: #2a1a0e;
+  background-image:
+    linear-gradient(180deg, rgba(18,10,6,0.28) 0%, rgba(18,10,6,0.08) 40%, rgba(10,6,4,0.45) 100%),
+    url('desk-wood.jpg?v=1.30');
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+}
+#desk.desk::after {
+  z-index: 1;
+  background: radial-gradient(ellipse at center, transparent 42%, rgba(0,0,0,0.38) 100%);
+}
+.cb-hand-layer { z-index: 3 !important; }
+.doc-pov { z-index: 6 !important; }
+.traveller-panel {
+  z-index: 9 !important;
+  right: 96px !important;
+  max-height: 44%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+.traveller-panel-desc {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+  max-height: none !important;
+}
+.traveller-flags {
+  display: flex !important;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  flex-wrap: nowrap !important;
+}
+.traveller-flag,
+.traveller-flag.class-b,
+.traveller-flag.class-c {
+  display: block !important;
+  white-space: normal !important;
+  line-height: 1.5 !important;
+  font-size: 11px !important;
+  letter-spacing: 0.02em !important;
+  padding: 8px 10px !important;
+  background: rgba(28, 22, 14, 0.94) !important;
+  color: #F4E8C8 !important;
+  border: 1px solid rgba(212,160,23,0.38) !important;
+  border-radius: 3px !important;
+}
+.susp-badge { display: none !important; }
+.observation-card-v7 { display: none !important; }
+.doc-pov .doc-card {
+  background-image:
+    repeating-linear-gradient(0deg, rgba(90,55,22,0.05) 0 1px, transparent 1px 5px),
+    linear-gradient(165deg, #f7efd8 0%, #efe2c2 42%, #e4d4b0 100%) !important;
+}
+.field-flag {
+  white-space: normal !important;
+  display: block;
+  line-height: 1.45;
+  margin-top: 4px;
+}
+.side-event-card {
+  max-height: min(88dvh, 560px);
+  overflow-y: auto;
+  z-index: 10050 !important;
+}
+.rate-widget { z-index: 8; }
+.family-bar { z-index: 8; }
+.hints-btn, #hints-btn { z-index: 40 !important; }
+body.phase-booth #hints-btn { opacity: 0.55; }
+@media (max-width: 640px) {
+  .traveller-panel { right: 12px !important; max-height: 38%; }
 }

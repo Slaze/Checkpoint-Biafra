@@ -16,7 +16,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=IM+Fell+English:ital@0;1&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=1.29">
+<link rel="stylesheet" href="styles.css?v=1.30">
 </head>
 <body class="ui-modern">
 
@@ -47,7 +47,7 @@
       <button class="btn-secondary btn-ghost" id="btn-gallery" type="button">CASE FILES</button>
     </div>
   </div>
-  <div class="splash-version">v1.29 · CHECKPOINT BIAFRA</div>
+  <div class="splash-version">v1.30 · CHECKPOINT BIAFRA</div>
 </div>
 
 <!-- CHARACTER CREATION -->
@@ -732,7 +732,8 @@
   <div class="stamp-mark" id="stamp-mark"></div>
 </div>
 
-<script src="engine.js?v=1.29" defer></script>
+<script src="engine.js?v=1.30" defer></script>
+<script src="booth-v30.js?v=1.30" defer></script>
 <div id="install-caveat" role="dialog" aria-modal="true">
   <div class="caveat-box">
     <h1>ADD TO HOME SCREEN</h1>
@@ -964,8 +965,8 @@
 <script>(function(){
 var POOLS_FIRST = {
   igbo: {
-    male:   ["Chinedu","Obinna","Ekene","Uzoma","Kelechi","Emeka","Tobenna","Onyeka","Chima","Chibuzo","Uchenna","Ikenna","Chuma","Chukwudi","Chukwuma","Chigozie","Tochukwu","Chinonso","Chukwuemeka","Ifeanyi","Nnamdi","Okechukwu","Chiebuka","Ikechukwu","Chibueze","Onyekachi","Munachi"],
-    female: ["Adaeze","Ifeoma","Ngozi","Chiamaka","Adaobi","Nneka","Amaka","Adanna","Ezinne","Adaku","Onyinye","Chizoba","Chinwe","Obianuju","Anuli","Iheoma","Chioma","Olamma","Nkechi","Uchechi","Chidinma","Nnenna"]
+    male:   ["Chinedu","Obinna","Ekene","Uzoma","Kelechi","Emeka","Tobenna","Onyeka","Chima","Chibuzo","Uchenna","Ikenna","Chuma","Chukwudi","Chukwuma","Chigozie","Tochukwu","Chinonso","Chukwuemeka","Ifeanyi","Nnamdi","Okechukwu","Chiebuka","Ikechukwu","Chibueze","Onyekachi","Munachi","Somtochukwu","Kamsiyochukwu","Jideofor","Osita","Ndubueze","Chijioke","Ikemefuna","Obiora","Chukwunonso","Ikechukwuka","Nnaemeka","Uzochukwu","Chukwuebuka","Ifeanyichukwu","Obumneme","Chukwuka","Lotanna","Somadina","Kosisochukwu","Ikeora","Okechuku","Chibuike","Ikennaoma"],
+    female: ["Adaeze","Ifeoma","Ngozi","Chiamaka","Adaobi","Nneka","Amaka","Adanna","Ezinne","Adaku","Onyinye","Chizoba","Chinwe","Obianuju","Anuli","Iheoma","Chioma","Olamma","Nkechi","Uchechi","Chidinma","Nnenna","Ifunanya","Chinyere","Ugochi","Amarachi","Ogechi","Ijeoma","Nkiruka","Chisom","Oluchi","Adaora","Ihuoma","Nwanneka","Chikaodinaka","Onyinyechi","Ifeomaoma","Ujunwa","Chidera","Nwamaka","Obioma","Nkeiruka"]
   },
   yoruba: {
     male:   ["Babatunde","Olumide","Olusegun","Ayodele","Olawale","Wale","Tunde","Lekan","Femi","Bayo","Kunle","Ayotunde","Akin","Banji","Niyi","Tobi","Tope","Tayo","Idowu"],
@@ -997,7 +998,7 @@ var POOLS_FIRST = {
   }
 };
 var POOLS_LAST = {
-  igbo: ["Achebe","Okafor","Eze","Onuoha","Nwosu","Ibekwe","Anyanwu","Okonkwo","Obi","Ndubuisi","Madu","Mbah","Nweke","Okeke","Uzor","Aniebo","Iheme","Ezeh","Ojukwu","Achuzia","Madiebo","Nwankwo","Iwobi","Eluemunor","Onyemaechi","Chinwuba","Anozie","Onwumere","Onyemelukwe","Iheanacho","Ekejiuba","Ekenta","Onyema","Egbuna","Mgbachi","Okoye","Nnaji","Udeze","Mbanefo","Nwadike","Okorie","Igwe","Nnabuife"],
+  igbo: ["Achebe","Okafor","Eze","Onuoha","Nwosu","Ibekwe","Anyanwu","Okonkwo","Obi","Ndubuisi","Madu","Mbah","Nweke","Okeke","Uzor","Aniebo","Iheme","Ezeh","Ojukwu","Achuzia","Madiebo","Nwankwo","Iwobi","Eluemunor","Onyemaechi","Chinwuba","Anozie","Onwumere","Onyemelukwe","Iheanacho","Ekejiuba","Ekenta","Onyema","Egbuna","Mgbachi","Okoye","Nnaji","Udeze","Mbanefo","Nwadike","Okorie","Igwe","Nnabuife","Nzekwu","Iweala","Adichie","Emecheta","Nzegwu","Onwudiwe","Ekwensi","Nwapa","Umunna","Ogbuagu","Iroegbu","Chukwuemeka","Nwafor","Okolo","Ezeilo","Ogbonna","Iwuoha","Nwaoboshi"],
   yoruba: ["Adekunle","Akinrinade","Banjo","Adeyemi","Ogunyemi","Olanrewaju","Adekoya","Bamidele","Soyinka","Awolowo","Obasanjo","Tinubu","Ojo","Alabi","Akinwale","Olatunji","Adebanjo","Ogundipe","Olusola","Akinyemi","Fagbemi","Aderibigbe","Awoyemi","Olufemi","Ogungbe","Sodimu","Owoseni","Ladipo","Akanbi"],
   hausa: ["Abubakar","Mohammed","Maitama","Sule","Bello","Bauchi","Sani","Yero","Wushishi","Zazzau","Lawal","Tijani","Wakili","Goje","Aliyu","Garba","Gaya","Kwankwaso","Galadima","Madaki","Wamakko","Dan-Asabe"],
   efik: ["Akpan","Etuk","Bassey","Effiong","Ekanem","Inyang","Udo","Edet","Okon","Asuquo","Umoren","Akpabio","Eshiett","Anwana","Ekong","Ndon","Ekpenyong","Atakpa","Ita","Edemekong","Udofia"],
@@ -1019,7 +1020,7 @@ function inferEthnicity(hint){
   if(/\b(urhobo|itsekiri|isoko|delta|warri|sapele|ughelli)\b/.test(s)) return "urhobo";
   if(/\b(tiv|idoma|igede|benue|makurdi|gboko)\b/.test(s)) return "tiv";
   if(/\b(edo|bini|esan|benin city)\b/.test(s)) return "yoruba";
-  return "generic";
+  return "igbo";
 }
 function inferGender(hint){
   if(!hint) return null;
@@ -1043,7 +1044,7 @@ window.__pickFreshName = function(hint){
 window.__travellerHistory=window.__travellerHistory||{};
 window.__recordTravellerDecision=function(name,decision,errors){if(!name)return;window.__travellerHistory[name]={decision:decision,errors:errors||[],day:(window.state&&window.state.day)||0};};
 window.__getReturningNote=function(name){var h=window.__travellerHistory[name];if(!h)return null;var note="Last seen Day "+h.day+": "+h.decision.toUpperCase();if(h.errors&&h.errors.length){note+=" — flagged for "+h.errors.join(", ")+".";}return note;};
-function scanSuspicious(){var papers=document.querySelectorAll(".doc, .paper, .document, .traveller-doc, [data-doc]");var keys=["EXPIRED","FORGED","MISMATCH","SUSPENDED","INVALID","UNREGISTERED","ALTERED"];papers.forEach(function(p){var t=(p.textContent||"").toUpperCase();var hit=keys.some(function(k){return t.indexOf(k)>=0;});if(hit&&!p.querySelector(".susp-badge")){var b=document.createElement("span");b.className="susp-badge";b.textContent="⚠ DOUBLE-CHECK";p.appendChild(b);}});}
+function scanSuspicious(){if(window.__cbNoSuspScan)return;var papers=document.querySelectorAll(".doc, .paper, .document, .traveller-doc, [data-doc]");var keys=["EXPIRED","FORGED","MISMATCH","SUSPENDED","INVALID","UNREGISTERED","ALTERED"];papers.forEach(function(p){var t=(p.textContent||"").toUpperCase();var hit=keys.some(function(k){return t.indexOf(k)>=0;});if(hit&&!p.querySelector(".susp-badge")){var b=document.createElement("span");b.className="susp-badge";b.textContent="⚠ DOUBLE-CHECK";p.appendChild(b);}});}
 setInterval(scanSuspicious,800);
 window.__todayValue=function(shillings){var n=Math.round(shillings);return "≈ ₦"+n.toLocaleString();};
 function deficitWatch(){if(!window.state)return;var pay=window.state.totalPay;if(typeof pay!=="number")return;if(pay<0&&!window.__deficitWarned){window.__deficitWarned=true;var msg=document.createElement("div");msg.className="deficit-warning";msg.innerHTML="<b>YOU ARE IN DEFICIT.</b><br>If the pot stays empty three nights, the posting ends. Read the papers. A wrong stamp is a meal already spent. <span class=\"deficit-sub\">Hunger does not wait for Day 25.</span>";document.body.appendChild(msg);setTimeout(function(){if(msg.parentNode)msg.parentNode.removeChild(msg);},9000);}}
@@ -1150,7 +1151,7 @@ window.__sideEventChance=0.16; // ~1 in 6 travellers triggers a side-event
 window.__sideEventCooldown=0;
 window.__pickSideEvent=function(){var p=window.__sideEvents;return p[Math.floor(Math.random()*p.length)];};
 window.__showSideEvent=function(){var ev=window.__pickSideEvent();var box=document.createElement("div");box.className="side-event-card";var html="<div class=\"se-tag\">DECISION REQUIRED</div><div class=\"se-title\">"+ev.title+"</div><div class=\"se-body\">"+ev.body+"</div><div class=\"se-choices\">";ev.choices.forEach(function(c,i){html+="<button data-i=\""+i+"\" class=\"se-btn\">"+c.label+"</button>";});html+="</div>";box.innerHTML=html;document.body.appendChild(box);box.querySelectorAll(".se-btn").forEach(function(b){b.addEventListener("click",function(){var ix=parseInt(b.dataset.i,10);var eff=ev.choices[ix].effect||{};var pay=ev.choices[ix].pay||0;if(window.state&&window.state.axes){Object.keys(eff).forEach(function(k){window.state.axes[k]=(window.state.axes[k]||0)+eff[k];});}if(window.state&&typeof window.state.totalPay==="number"&&pay){window.state.totalPay+=pay;if(typeof window.updateHUD==="function")try{window.updateHUD();}catch(_){}var t=document.createElement("div");t.className="pay-flash";t.textContent=(window.formatNotesSigned?window.formatNotesSigned(pay):((pay>0?"+":"−")+Math.abs(pay).toLocaleString()+" notes"));document.body.appendChild(t);setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},2000);}box.classList.add("se-fade");setTimeout(function(){if(box.parentNode)box.parentNode.removeChild(box);},400);});});};
-function tryHookLoad(){if(typeof window.loadNextTraveller!=="function"){setTimeout(tryHookLoad,500);return;}if(window.__loadHooked)return;window.__loadHooked=true;var orig=window.loadNextTraveller;window.loadNextTraveller=function(){var trav=(window.state&&window.state.traveller)||0;if(window.__sideEventCooldown>0){window.__sideEventCooldown--;}else if(trav>2 && Math.random()<window.__sideEventChance){window.__sideEventCooldown=2;window.__showSideEvent();}return orig.apply(this,arguments);};}
+function tryHookLoad(){if(window.__cbBooth30)return;if(typeof window.loadNextTraveller!=="function"){setTimeout(tryHookLoad,500);return;}if(window.__loadHooked)return;window.__loadHooked=true;var orig=window.loadNextTraveller;window.loadNextTraveller=function(){var trav=(window.state&&window.state.traveller)||0;if(window.__sideEventCooldown>0){window.__sideEventCooldown--;}else if(trav>2 && Math.random()<window.__sideEventChance){window.__sideEventCooldown=2;window.__showSideEvent();}return orig.apply(this,arguments);};}
 tryHookLoad();
 })();</script>
 <script>(function(){
@@ -1279,7 +1280,7 @@ tryHookDecide();
   if(document.body) mo.observe(document.body,{childList:true,subtree:false});
 })();</script>
 
-<script src="supervisor.js?v=1.29" defer></script>
-<script src="patch.js?v=1.29" defer></script>
+<script src="supervisor.js?v=1.30" defer></script>
+<script src="patch.js?v=1.30" defer></script>
 </body>
 </html>

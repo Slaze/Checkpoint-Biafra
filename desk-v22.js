@@ -1,20 +1,20 @@
-/* Checkpoint Biafra v1.28 — first-person illustrated desk hands (sample pose) */
+/* Checkpoint Biafra v1.30 — illustrated desk wood + first-person hands */
 (function () {
   if (window.__cbDeskV22) return;
   window.__cbDeskV22 = true;
 
-  var HAND_SRC = 'hands-male.png?v=1.29';
+  var HAND_SRC = 'hands-male.png?v=1.30';
 
   function injectCss() {
     if (document.getElementById('cb-desk-v22')) return;
     var s = document.createElement('style');
     s.id = 'cb-desk-v22';
     s.textContent =
-      '#desk.desk{background-color:#2a1a0e;background-image:radial-gradient(ellipse at 50% 0%,rgba(80,50,20,.35),transparent 55%),repeating-linear-gradient(90deg,rgba(255,220,160,.04) 0 2px,transparent 2px 11px),linear-gradient(180deg,#3a2414 0%,#24150c 55%,#1a1008 100%) !important;}' +
-      '#desk.desk::before{opacity:.22}' +
+      '#desk.desk{background-color:#2a1a0e;background-image:linear-gradient(180deg,rgba(18,10,6,.28),rgba(18,10,6,.08) 40%,rgba(10,6,4,.45)),url("desk-wood.jpg?v=1.30") !important;background-size:cover !important;background-position:center bottom !important;}' +
+      '#desk.desk::before{opacity:.18;z-index:1}' +
       /* 3D blobs covered the real hands — kill leftover Three canvas from old SW */
       '#cb-three{display:none!important}' +
-      '.cb-hand-layer{position:absolute;left:0;right:0;bottom:0;height:44%;pointer-events:none;z-index:5;display:flex;align-items:flex-end;justify-content:center}' +
+      '.cb-hand-layer{position:absolute;left:0;right:0;bottom:0;height:44%;pointer-events:none;z-index:3;display:flex;align-items:flex-end;justify-content:center}' +
       '.cb-hand-layer img{width:100%;height:100%;object-fit:contain;object-position:bottom center;display:block;filter:drop-shadow(0 8px 10px rgba(0,0,0,.45))}' +
       'body.hands-female .cb-hand-layer img{transform:scale(0.92);transform-origin:bottom center}' +
       /* PNG plate is the live hands. Keep original SVG as fallback until PNG paints. */

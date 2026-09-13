@@ -192,8 +192,8 @@ var DOC_TEMPLATES = {
     fields:{ 'TICKET NO':'NA-ENU-44721', 'YEAR':'1967', 'LGA':'ENUGU', 'STATUS':'PAID' },
     flags:[] },
   nin_mismatch:    { type:'TAX TICKET / REGISTRATION', issuer:'Native Authority · Census Office', biafran:false,
-    fields:{ 'TICKET NO':'NA-ENU-44721', 'NAME ON TICKET':'EMEKA EZE', 'YEAR':'1967', 'LGA':'ENUGU' },
-    flags:[{ field:'NAME ON TICKET', note:'Does not match passport: CHUKWUEMEKA EZE', type:'A' }] },
+    fields:{ 'TICKET NO':'NA-ENU-44721', 'NAME ON TICKET':'CHUKWUEMKA EZE', 'YEAR':'1967', 'LGA':'ENUGU' },
+    flags:[{ field:'NAME ON TICKET', note:'One-letter spelling difference from the passport name', type:'A' }] },
   passport_clean:  { type:'NIGERIAN PASSPORT',     issuer:'Federal Republic of Nigeria', biafran:false,
     fields:{ 'PASSPORT NO':'A-61-88421', 'NATIONALITY':'NIGERIAN', 'ISSUED':'LAGOS 1965', 'EXPIRES':'1970' },
     flags:[] },
@@ -293,6 +293,21 @@ var DOC_TEMPLATES = {
     fields:{ 'AUTH':'BDA/PHC/88910', 'NAME':'EMEKA UGOCHUKWU', 'CLASS':'MOTORCYCLE', 'ISSUED':'31 FEB 1969' },
     flags:[{ field:'ISSUED', note:'CLASS B: 31 FEB 1969 — impossible date', type:'B' },
            { field:'STAMPED', note:'CLASS B: Port Harcourt office already lost when this was "issued"', type:'B' }] },
+  bapt_card:      { type:'BAPTISM / CONFIRMATION CARD', issuer:'Catholic Mission · Parish Register', biafran:false,
+    fields:{ 'PARISH':'ST. MARY — OGOJA', 'YEAR':'1959', 'STATUS':'BAPTISED' },
+    flags:[] },
+  market_union:   { type:'MARKET UNION CARD', issuer:'Onitsha Main Market Union', biafran:false,
+    fields:{ 'UNION':'PRODUCE SELLERS', 'STALL':'B-14', 'YEAR':'1967' },
+    flags:[] },
+  school_id:      { type:'SCHOOL IDENTITY', issuer:'Government College · Umuahia', biafran:false,
+    fields:{ 'FORM':'V', 'HOUSE':'NIGER', 'YEAR':'1966' },
+    flags:[] },
+  driving_old:    { type:'DRIVING PERMIT (REGIONAL)', issuer:'Eastern Region Motor Licensing', biafran:false,
+    fields:{ 'CLASS':'MOTOR CAR', 'ISSUED':'1964', 'OFFICE':'ENUGU' },
+    flags:[] },
+  town_union:     { type:'TOWN UNION INTRODUCTION', issuer:'Improvement Union · Hometown', biafran:false,
+    fields:{ 'TOWN':'NNEWI', 'BEARER':'MEMBER', 'YEAR':'1967' },
+    flags:[] },
 };
 
 // ── DATA: TRAVELLER POOL ──
@@ -303,8 +318,8 @@ var TRAVELLER_POOL = [
     docs:['nin_clean','passport_clean','permit_clean'], flags:[], axisHint:null, correct:'approve', minDay:1 },
   { id:'nurse_a',     name:'ADAEZE OKONKWO',  desc:'Nurse, returning from medical conference in Calabar',
     docs:['nin_clean','passport_clean','permit_clean'], flags:[], axisHint:null, correct:'approve', minDay:1 },
-  { id:'student_a',   name:'CHUKWUEMEKA EZE', desc:'Student, returning to family in Enugu — name mismatch on tax ticket',
-    docs:['nin_mismatch','passport_clean','permit_clean'], flags:['Name mismatch: tax ticket says EMEKA EZE, passport says CHUKWUEMEKA EZE'], axisHint:'loyalty', correct:'deny', minDay:1 },
+  { id:'student_a',   name:'CHUKWUEMEKA EZE', desc:'Student, returning to family in Enugu',
+    docs:['nin_mismatch','passport_clean','permit_clean'], flags:['The tax ticket name is one letter off the passport'], axisHint:'loyalty', correct:'deny', minDay:1 },
   { id:'elderly_a',   name:'MARGARET NWACHUKWU', desc:'Elderly woman, medical appointment — no movement permit',
     docs:['nin_clean','passport_clean'], flags:['MISSING: Internal Movement Pass'], axisHint:'compassion', correct:'deny', minDay:1 },
   { id:'official_a',  name:'BELLO ABUBAKAR',  desc:'Federal civil servant, official travel, complete documents',
@@ -1002,18 +1017,15 @@ function loadNextTraveller() {
   }
 
   var t = list[state.traveller % list.length];
+  t = Object.assign({}, t);
+  t.flags = (t.flags || []).slice();
+  t.docs = (t.docs || []).slice();
   // Fresh-name override so the same template-traveller never re-uses its hardcoded name
   try {
     if (window.__pickFreshName) {
       var fresh = window.__pickFreshName((t && (t.desc || t.region || t.state)) || "");
-      // Clone so we do not mutate the pool entry permanently
-      t = Object.assign({}, t);
       t._origName = t.name;
       t.name = fresh;
-      // Sync any embedded name fields on documents
-      if (t.docs && Array.isArray(t.docs)) {
-        t.docs = t.docs.map(function(d){ if(!d || !d.fields) return d; var nd=Object.assign({},d); nd.fields=Object.assign({},d.fields); Object.keys(nd.fields).forEach(function(k){ if(typeof nd.fields[k]==="string" && (nd.fields[k]===t._origName || nd.fields[k].toUpperCase()===String(t._origName||"").toUpperCase())){ nd.fields[k]=fresh; } }); return nd; });
-      }
     }
   } catch(_){}
   state.currentTraveller = t;
@@ -1030,12 +1042,33 @@ function renderTraveller(t) {
   flagsEl.innerHTML = '';
   (t.flags || []).forEach(function(f) {
     var span = document.createElement('span');
-    span.className = 'traveller-flag' +
-      (f.includes('CLASS B') ? ' class-b' : '') +
-      (f.includes('CLASS C') ? ' class-c' : '');
-    span.textContent = f.length > 50 ? f.substring(0,50) + '…' : f;
+    span.className = 'traveller-flag';
+    span.textContent = String(f);
     flagsEl.appendChild(span);
   });
+}
+
+function resolveDoc(docId, t) {
+  var doc = DOC_TEMPLATES[docId];
+  if (!doc) return null;
+  var fields = Object.assign({}, doc.fields);
+  if (t && t.docOverrides && t.docOverrides[docId]) {
+    Object.assign(fields, t.docOverrides[docId]);
+  }
+  if (t && t.typoName && (docId === 'nin_mismatch' || fields['NAME ON TICKET'])) {
+    fields['NAME ON TICKET'] = t.typoName;
+  }
+  if (t && t.name && t._origName) {
+    Object.keys(fields).forEach(function (k) {
+      if (typeof fields[k] === 'string' && fields[k].toUpperCase() === String(t._origName).toUpperCase()) {
+        fields[k] = t.name;
+      }
+    });
+  }
+  var flags = (doc.flags || []).map(function (f) {
+    return Object.assign({}, f, { note: String(f.note || '').replace(/^CLASS [ABC]:\s*/i, '') });
+  });
+  return { type: doc.type, issuer: doc.issuer, biafran: doc.biafran, flags: flags, fields: fields };
 }
 
 function renderDocs(t) {
@@ -1063,7 +1096,7 @@ function renderDocs(t) {
   if (pov) pov.classList.add('docs-present');
 
   t.docs.forEach(function(docId, idx) {
-    var doc = DOC_TEMPLATES[docId];
+    var doc = resolveDoc(docId, t);
     if (!doc) return;
 
     var hasViolation = doc.flags.some(function(f){ return f.type === 'A'; });
@@ -1110,7 +1143,7 @@ function renderDocs(t) {
 
 // ── DOCUMENT MODAL ──
 function openDocModal(docId, traveller) {
-  var doc = DOC_TEMPLATES[docId];
+  var doc = resolveDoc(docId, traveller);
   if (!doc) return;
 
   document.getElementById('modal-title').textContent = doc.type;
@@ -1157,7 +1190,7 @@ function openDocModal(docId, traveller) {
     doc.flags.forEach(function(f) {
       var span = document.createElement('span');
       span.className = 'field-flag';
-      span.textContent = 'CLASS ' + f.type + ' VIOLATION: ' + f.note;
+      span.textContent = (f.note || '').replace(/^CLASS [ABC]:\s*/i, '');
       div.appendChild(span);
     });
     modalFlags.innerHTML = '';
@@ -1617,13 +1650,16 @@ function endOfDay(opts) {
     html += '<div class="eod-pay-row deduction"><span>INTERNAL AFFAIRS — \"COOPERATION\"</span><span>−' + formatNotes(suspicionDock) + '</span></div>';
   }
   state.dayResults.forEach(function(r) {
-    if (r.payChange !== 0) {
-      var cls = r.payChange > 0 ? 'bonus' : 'deduction';
-      var label = r.correct
-        ? (r.action === 'detain' ? '✓ CORRECT DETENTION' : '✓ CORRECT DENIAL')
-        : '✗ WRONG STAMP';
-      var sign = r.payChange > 0 ? '+' : '−';
-      html += '<div class="eod-pay-row ' + cls + '"><span>' + label + ': ' + (r.name || '').split(' ')[0] + '</span><span>' + formatNotesSigned(r.payChange) + '</span></div>';
+    var isWindow = String(r.name || '').indexOf('WINDOW') === 0;
+    if (r.payChange !== 0 || isWindow) {
+      var cls = r.payChange > 0 ? 'bonus' : (r.payChange < 0 || !r.correct ? 'deduction' : 'bonus');
+      var label = isWindow
+        ? (r.correct ? '✓ WINDOW DECISION' : (r.payChange > 0 ? '⚠ WINDOW — ON THE TILL' : '✗ WINDOW DECISION'))
+        : (r.correct
+          ? (r.action === 'detain' ? '✓ CORRECT DETENTION' : '✓ CORRECT DENIAL')
+          : '✗ WRONG STAMP');
+      var who = isWindow ? String(r.name).replace(/^WINDOW ·\s*/, '') : (r.name || '').split(' ')[0];
+      html += '<div class="eod-pay-row ' + cls + '"><span>' + label + ': ' + who + '</span><span>' + formatNotesSigned(r.payChange) + '</span></div>';
     }
   });
   html += '<div class="eod-pay-row deduction"><span>FOOD (' + mouths + ' mouths · war week ' + (warWeek + 1) + ')</span><span>−' + formatNotes(foodCost) + '</span></div>';
@@ -2248,7 +2284,7 @@ function init() {
   // Service Worker registration for iOS PWA offline support.
   // Bump CACHE_NAME in sw.js whenever shipping asset changes (network-first + versioned cache).
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js?v=1.29').catch(function(){});
+    navigator.serviceWorker.register('./sw.js?v=1.30').catch(function(){});
   }
 }
 

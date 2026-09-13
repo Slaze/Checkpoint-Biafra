@@ -1,6 +1,44 @@
 # Checkpoint Biafra — Project Recap
 
-## Latest session (2026-09-13) — v1.29 overlay / naira / hunger ending
+## Latest session (2026-09-13) — v1.30 booth uniqueness / ledger / illustrated desk
+
+### Goal
+Decision Required counts as gameplay; names, office/war popups, infractions, and window copy do not repeat; Deny vs Detain harder to tell apart; Igbo names first; full infraction warnings; decoy IDs; typo (not different-name) mismatch; overlay/graphics pass; host `cpb.iconiaglobal.com`.
+
+### What changed
+- Side-events (`DECISION REQUIRED`) write `dayResults`, till, errors, axes. Unique deck — no recycle until pool empty. Extra war/other-office cards. EOD shows WINDOW rows.
+- Unique decks: traveller names, Nwosu, gossip, rumours, conditions, window beats, flag text.
+- Name mismatch is a 1-letter typo on the tax ticket (`NWAOOSHI` / `UGOHI`), not a different person.
+- Flag copy no longer shouts CLASS A/B/C or DOUBLE-CHECK. Full warning, wrap, no 50-char cut.
+- Default ethnicity Igbo; larger Igbo name pools. Foreign travellers still get matching names.
+- Decoy papers at the window: baptism card, market union, school ID, old driving permit, town union.
+- Overlay stack: vignette z 2, hands 3, papers 6, window card 9. Observation-card telegraph hidden. Illustrated `desk-wood.jpg` under the PNG hands.
+- `booth-v30.js` wraps `loadNextTraveller` once (`__v30` / `__v23` / `__patchedV7`) so v23/v7 intervals cannot nest.
+
+### Why
+Side-events never hit the ledger. Flags truncated. CLASS colours + DOUBLE-CHECK told Deny from Detain. Name mismatch was EMEKA vs CHUKWUEMEKA. Hands sat under a z-7 vignette; papers under z-5 hands.
+
+### How verified
+- `node --check` engine / booth-v30 / patch / desk-v22 / v20 / sw / features-v23.
+- Typo distance 1 on sample names.
+- Local booth `?cb=130c`: splash v1.30; wrap flags all true; Igbo names unique across 10 travellers; typo flag 250+ chars; SCHOOL IDENTITY decoy; WINDOW ledger row after ABA POST choice; desk-wood + PNG hands; z-index 9/3/6; no susp-badge.
+
+### Current state
+- Ship **v1.30**. Push/deploy this session.
+- Vercel alias `cpb.iconiaglobal.com` already points at checkpoint-biafra production. Cloudflare DNS for `cpb` is **not** in this session (no CF token; NS `andronicus`/`teresa`). Needs `A cpb → 76.76.21.21` (DNS only) or `CNAME cpb → cname.vercel-dns.com`.
+
+### Next steps
+- Hard-refresh live (`?cb=130`).
+- Human: Cloudflare A/CNAME for `cpb.iconiaglobal.com`.
+- Human: LLM keys; NW GitHub click-confirm.
+
+### Blockers / risks
+- `cpb.iconiaglobal.com` will 404/NXDOMAIN until Cloudflare record exists. `https://checkpoint-biafra.vercel.app` is the live copy.
+- Old PWA until SW `checkpoint-biafra-v1.30`.
+
+---
+
+## Prior session (2026-09-13) — v1.29 overlay / naira / hunger ending
 
 ### Goal
 Fix registration overlay; change till copy from "notes" to naira; hunger ends the posting; deploy.
