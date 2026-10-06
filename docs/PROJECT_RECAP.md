@@ -1,5 +1,11 @@
 # Checkpoint Biafra — Project Recap
 
+## 2026-10-06 — GDD v0.1 written
+
+Verbose non-technical design doc at `docs/GDD.md`. Shared skeleton: `~/symbiotic-profile/GDD_SKELETON.md`.
+
+---
+
 ## Latest session (2026-09-13) — v1.30 booth uniqueness / ledger / illustrated desk
 
 ### Goal
