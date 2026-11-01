@@ -2288,6 +2288,31 @@ function init() {
   }
 }
 
+// ── Hook routing ─────────────────────────────────────────────
+// engine.js is an IIFE, so its own internal calls (endOfDay -> showEndingScreen,
+// decide -> loadNextTraveller, nextDay -> startDay, ...) used local bindings and
+// skipped every wrapper that patch-gameplay.js / supervisor.js install on window.
+// Route those names through window so wrappers see engine-internal calls too.
+// window.X starts as the real implementation; a wrapper's `orig` is the real
+// implementation, so there is no double execution.
+function routeViaWindow(name, impl) {
+  window[name] = impl;
+  var routed = function () {
+    var f = window[name];
+    if (typeof f !== 'function' || f === routed) f = impl;
+    return f.apply(this, arguments);
+  };
+  routed.__cbRouted = true;
+  return routed;
+}
+decide = routeViaWindow('decide', decide);
+loadNextTraveller = routeViaWindow('loadNextTraveller', loadNextTraveller);
+startDay = routeViaWindow('startDay', startDay);
+endOfDay = routeViaWindow('endOfDay', endOfDay);
+showEndingScreen = routeViaWindow('showEndingScreen', showEndingScreen);
+nextDay = routeViaWindow('nextDay', nextDay);
+chooseMoral = routeViaWindow('chooseMoral', chooseMoral);
+
 // Run on DOM ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
@@ -2297,21 +2322,14 @@ if (document.readyState === 'loading') {
 
 // expose engine to window for runtime hooks / patch.js wrappers
 try {
-  if (typeof decide === "function") window.decide = decide;
   if (typeof updateHUD === "function") window.updateHUD = updateHUD;
   if (typeof renderDocs === "function") window.renderDocs = renderDocs;
   if (typeof renderTraveller === "function") window.renderTraveller = renderTraveller;
-  if (typeof loadNextTraveller === "function") window.loadNextTraveller = loadNextTraveller;
   if (typeof formatNotes === "function") window.formatNotes = formatNotes;
   if (typeof formatNotesSigned === "function") window.formatNotesSigned = formatNotesSigned;
-  if (typeof startDay === "function") window.startDay = startDay;
-  if (typeof endOfDay === "function") window.endOfDay = endOfDay;
-  if (typeof showEndingScreen === "function") window.showEndingScreen = showEndingScreen;
-  if (typeof nextDay === "function") window.nextDay = nextDay;
   if (typeof saveState === "function") window.saveState = saveState;
   if (typeof showBulletin === "function") window.showBulletin = showBulletin;
   if (typeof addAxis === "function") window.addAxis = addAxis;
-  if (typeof chooseMoral === "function") window.chooseMoral = chooseMoral;
   if (typeof rememberFlag === "function") window.rememberFlag = rememberFlag;
   if (typeof pushMemory === "function") window.pushMemory = pushMemory;
   try { delete window.state; } catch (_) {}
