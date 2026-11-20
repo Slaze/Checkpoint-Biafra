@@ -233,7 +233,9 @@
   var origLoad = null;
   function wrapLoad() {
     if (typeof window.loadNextTraveller !== 'function') return false;
-    if (window.loadNextTraveller.__v30) return true;
+    // Install once: re-wrapping after another script chains on top would make
+    // origLoad point at a wrapper that calls back into us (infinite recursion).
+    if (origLoad || window.loadNextTraveller.__v30) return true;
     window.__loadHooked = true;
     origLoad = window.loadNextTraveller;
     var wrapped = function () {
